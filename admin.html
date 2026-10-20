@@ -3,87 +3,115 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>এডমিন প্যানেল</title>
+  <title>এডমিন প্যানেল - ঢং শপ</title>
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: sans-serif; }
-    body { background: #f0f2f5; padding: 20px; }
-    .container { max-width: 800px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-    h2 { color: #1b5e20; margin-bottom: 15px; }
-    .section-box { background: #f9f9f9; padding: 15px; border: 1px solid #ddd; border-radius: 6px; margin-bottom: 25px; }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+    body { background: #f0f2f5; padding: 15px; }
+    .container { max-width: 850px; margin: 0 auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.08); }
+    h2 { color: #1b5e20; margin-bottom: 15px; font-size: 20px; border-bottom: 2px solid #1b5e20; padding-bottom: 5px; }
+    .section-box { background: #f9f9f9; padding: 15px; border: 1px solid #e0e0e0; border-radius: 8px; margin-bottom: 25px; }
     .form-group { margin-bottom: 12px; }
-    label { display: block; font-weight: bold; margin-bottom: 5px; font-size: 13px; }
-    input, select, textarea { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; }
-    button { background: #1b5e20; color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; font-weight: bold; }
-    .wa-item { display: flex; justify-content: space-between; align-items: center; padding: 8px; background: white; border: 1px solid #eee; margin-top: 5px; border-radius: 4px; }
-    .del-btn { background: #e53935; padding: 4px 8px; font-size: 12px; }
-    .active-badge { background: #4caf50; color: white; padding: 2px 6px; border-radius: 3px; font-size: 11px; }
+    .form-row { display: flex; gap: 10px; }
+    .form-row .form-group { flex: 1; }
+    label { display: block; font-weight: 600; margin-bottom: 5px; font-size: 13px; color: #333; }
+    input, select, textarea { width: 100%; padding: 9px; border: 1px solid #ccc; border-radius: 5px; font-size: 14px; outline: none; }
+    button { background: #1b5e20; color: white; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer; font-weight: bold; font-size: 14px; }
+    button:hover { background: #144417; }
+    
+    .wa-item { display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; background: white; border: 1px solid #e0e0e0; margin-top: 6px; border-radius: 5px; }
+    .del-btn { background: #e53935; color: white; padding: 5px 10px; border-radius: 4px; font-size: 12px; border: none; cursor: pointer; }
+    .edit-btn { background: #2196F3; color: white; padding: 5px 10px; border-radius: 4px; font-size: 12px; border: none; cursor: pointer; margin-right: 5px; }
+    .active-badge { background: #4caf50; color: white; padding: 2px 8px; border-radius: 12px; font-size: 11px; margin-left: 5px; }
+
+    .p-card { display: flex; align-items: center; gap: 15px; padding: 10px; border: 1px solid #eee; border-radius: 6px; margin-bottom: 10px; background: white; }
+    .p-card img { width: 50px; height: 50px; object-fit: cover; border-radius: 5px; }
+    .p-details { flex-grow: 1; }
   </style>
 </head>
 <body>
 
-  <!-- Password Lock Modal -->
+  <!-- Lock Modal -->
   <div id="loginOverlay" style="position:fixed; top:0; left:0; width:100%; height:100%; background:white; display:flex; justify-content:center; align-items:center; z-index:999;">
-    <div style="text-align:center; padding:20px; box-shadow:0 0 10px rgba(0,0,0,0.1); border-radius:8px;">
-      <h3>এডমিন লগইন</h3>
-      <input type="password" id="passInput" placeholder="পাসওয়ার্ড দিন" style="margin: 10px 0; text-align:center;">
-      <button onclick="checkPass()">লগইন</button>
+    <div style="text-align:center; padding:25px; box-shadow:0 0 15px rgba(0,0,0,0.15); border-radius:10px; max-width:320px; width:90%;">
+      <h3 style="color:#1b5e20; margin-bottom:10px;">এডমিন লগইন</h3>
+      <input type="password" id="passInput" placeholder="পাসওয়ার্ড দিন" style="margin-bottom: 12px; text-align:center;">
+      <button style="width:100%;" onclick="checkPass()">লগইন করুন</button>
     </div>
   </div>
 
   <div class="container">
 
-    <!-- WhatsApp Numbers Setting Section -->
+    <!-- 1. WhatsApp Number Section -->
     <div class="section-box">
-      <h2>📲 WhatsApp নম্বর সেটিংস (অর্ডার বার্তা পাওয়ার জন্য)</h2>
-      <p style="font-size:12px; color:#666; margin-bottom:10px;">নম্বর যোগ করার সময় অবশ্যই ৮৮ সহ দিন (যেমন: 88017xxxxxxxx)</p>
+      <h2>📲 WhatsApp নম্বর সেটিংস</h2>
+      <p style="font-size:12px; color:#666; margin-bottom:10px;">নম্বর যোগ করার সময় অবশ্যই দেশি কোডসহ লিখুন (যেমন: 8801700000000)</p>
       
-      <div style="display:flex; gap:10px; margin-bottom:10px;">
-        <input type="text" id="waLabel" placeholder="নাম/লেবেল (যেমন: মেইন নাম্বার, সাপোর্ট ২)" style="flex:1;">
-        <input type="text" id="waNum" placeholder="8801700000000" style="flex:1;">
-        <button onclick="addWaNumber()">যোগ করুন</button>
+      <div class="form-row" style="margin-bottom:10px;">
+        <input type="text" id="waLabel" placeholder="নাম/লেবেল (যেমন: মেইন সাপোর্ট)">
+        <input type="text" id="waNum" placeholder="8801700000000">
+        <button onclick="addWaNumber()" style="white-space:nowrap;">যোগ করুন</button>
       </div>
 
-      <h4>সংরক্ষিত WhatsApp নম্বরসমূহ:</h4>
       <div id="waList"></div>
     </div>
 
-    <!-- Product Management Section -->
+    <!-- 2. Add / Edit Product Section -->
     <div class="section-box">
-      <h2>নতুন প্রোডাক্ট যোগ করুন</h2>
+      <h2 id="formTitle">নতুন প্রোডাক্ট যোগ করুন</h2>
+      <input type="hidden" id="editIndex" value="-1">
+
       <div class="form-group">
         <label>প্রোডাক্টের নাম *</label>
-        <input type="text" id="pTitle">
+        <input type="text" id="pTitle" placeholder="প্রোডাক্টের শিরোনাম">
       </div>
-      <div class="form-group">
-        <label>মূল্য (৳) *</label>
-        <input type="number" id="pPrice">
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>মূল্য (৳) *</label>
+          <input type="number" id="pPrice" placeholder="যেমন: 1200">
+        </div>
+        <div class="form-group">
+          <label>ক্যাটাগরি</label>
+          <input type="text" id="pCategory" placeholder="যেমন: পোশাক, এক্সেসরিজ">
+        </div>
       </div>
-      <div class="form-group">
-        <label>ক্যাটাগরি</label>
-        <input type="text" id="pCategory" placeholder="যেমন: পোশাক, ঘড়ি, এক্সেসরিজ">
+
+      <!-- Separate Size & Color Options -->
+      <div class="form-row">
+        <div class="form-group">
+          <label>সাইজ (Size) - কমা দিয়ে আলাদা করুন</label>
+          <input type="text" id="pSizes" placeholder="যেমন: S, M, L, XL">
+        </div>
+        <div class="form-group">
+          <label>কালার (Color) - কমা দিয়ে আলাদা করুন</label>
+          <input type="text" id="pColors" placeholder="যেমন: Red, Blue, Black">
+        </div>
       </div>
-      <div class="form-group">
-        <label>ভ্যারিয়েন্ট / সাইজ / কালার (কমা দিয়ে লিখুন)</label>
-        <input type="text" id="pVariants" placeholder="যেমন: S, M, L অথবা Red, Blue">
-      </div>
+
       <div class="form-group">
         <label>স্টক পরিমাণ</label>
-        <input type="number" id="pStock" placeholder="যেমন: 10">
+        <input type="number" id="pStock" placeholder="যেমন: 15">
       </div>
+
       <div class="form-group">
-        <label>ছবি (URL অথবা লোকাল ফাইল আপলোড)</label>
+        <label>ছবি (URL অথবা লোকাল ছবি ফাইল আপলোড)</label>
         <input type="text" id="pImgUrl" placeholder="Image URL দিন">
         <input type="file" id="pImgFile" accept="image/*" style="margin-top:5px;" onchange="convertBase64()">
       </div>
+
       <div class="form-group">
-        <label>বিস্তারিত বিবরণ</label>
-        <textarea id="pDesc" rows="3"></textarea>
+        <label>বিস্তারিত বিবরণ (Description)</label>
+        <textarea id="pDesc" rows="3" placeholder="প্রোডাক্টের সংক্ষিপ্ত বা বিস্তারিত বিবরণ লিখুন..."></textarea>
       </div>
-      <button onclick="saveProduct()">প্রোডাক্ট যোগ করুন</button>
+
+      <button id="saveBtn" onclick="saveProduct()" style="width:100%;">প্রোডাক্ট যোগ করুন</button>
+      <button id="cancelBtn" onclick="resetForm()" style="width:100%; background:#757575; margin-top:5px; display:none;">বাতিল করুন</button>
     </div>
 
+    <!-- 3. Product List Section -->
     <h2>প্রোডাক্ট তালিকা</h2>
-    <div id="adminPList"></div>
+    <div id="adminPList" style="margin-top:10px;"></div>
+
   </div>
 
   <script>
@@ -95,11 +123,11 @@
       } else { alert('ভুল পাসওয়ার্ড!'); }
     }
 
-    // WhatsApp Numbers Management
+    // WhatsApp Numbers Logic
     function renderWaNumbers() {
       let waList = JSON.parse(localStorage.getItem('wa_numbers')) || [];
       const container = document.getElementById('waList');
-      container.innerHTML = waList.length === 0 ? '<p style="font-size:12px; color:#999; margin-top:5px;">কোনো নম্বর সেভ করা নেই!</p>' : '';
+      container.innerHTML = waList.length === 0 ? '<p style="font-size:12px; color:#888;">কোনো নম্বর পাওয়া যায়নি!</p>' : '';
 
       waList.forEach((item, i) => {
         container.innerHTML += `
@@ -121,10 +149,10 @@
       const label = document.getElementById('waLabel').value.trim();
       const number = document.getElementById('waNum').value.trim();
 
-      if(!label || !number) { alert('নাম ও নম্বর উভয়ই টাইপ করুন!'); return; }
+      if(!label || !number) { alert('নাম ও নম্বর দুটোই দিন!'); return; }
 
       let waList = JSON.parse(localStorage.getItem('wa_numbers')) || [];
-      const isActive = waList.length === 0; // First number becomes active automatically
+      const isActive = waList.length === 0;
       waList.push({ label, number, active: isActive });
 
       localStorage.setItem('wa_numbers', JSON.stringify(waList));
@@ -148,7 +176,7 @@
       renderWaNumbers();
     }
 
-    // Product Management
+    // Product Add / Edit Logic
     function convertBase64() {
       const file = document.getElementById('pImgFile').files[0];
       const reader = new FileReader();
@@ -157,45 +185,105 @@
     }
 
     function saveProduct() {
-      const title = document.getElementById('pTitle').value;
-      const price = document.getElementById('pPrice').value;
-      const category = document.getElementById('pCategory').value || 'অন্যান্য';
-      const variants = document.getElementById('pVariants').value;
-      const stock = document.getElementById('pStock').value;
-      const imgUrl = document.getElementById('pImgUrl').value;
-      const desc = document.getElementById('pDesc').value;
+      const title = document.getElementById('pTitle').value.trim();
+      const price = document.getElementById('pPrice').value.trim();
+      const category = document.getElementById('pCategory').value.trim() || 'অন্যান্য';
+      const sizes = document.getElementById('pSizes').value.trim();
+      const colors = document.getElementById('pColors').value.trim();
+      const stock = document.getElementById('pStock').value.trim();
+      const imgUrl = document.getElementById('pImgUrl').value.trim();
+      const desc = document.getElementById('pDesc').value.trim();
+      const editIndex = parseInt(document.getElementById('editIndex').value);
 
-      const image = base64Img || imgUrl || 'https://via.placeholder.com/150';
-
-      if(!title || !price) { alert('নাম ও মূল্য অবশ্যই দিতে হবে!'); return; }
+      if(!title || !price) { alert('প্রোডাক্টের নাম এবং মূল্য অবশ্যই দিতে হবে!'); return; }
 
       let products = JSON.parse(localStorage.getItem('products')) || [];
-      products.push({ id: Date.now(), title, price, category, variants, stock, image, desc });
-      localStorage.setItem('products', JSON.stringify(products));
+      let image = base64Img || imgUrl;
 
-      alert('প্রোডাক্ট সফলভাবে যোগ হয়েছে!');
-      location.reload();
+      if(editIndex > -1) {
+        if(!image) image = products[editIndex].image; // Keep old image if not changed
+        products[editIndex] = { id: products[editIndex].id, title, price, category, sizes, colors, stock, image, desc };
+        alert('প্রোডাক্ট আপডেট হয়েছে!');
+      } else {
+        if(!image) image = 'https://via.placeholder.com/150';
+        products.push({ id: Date.now(), title, price, category, sizes, colors, stock, image, desc });
+        alert('নতুন প্রোডাক্ট যোগ করা হয়েছে!');
+      }
+
+      localStorage.setItem('products', JSON.stringify(products));
+      resetForm();
+      renderAdminProducts();
+    }
+
+    function editProduct(index) {
+      let products = JSON.parse(localStorage.getItem('products')) || [];
+      const p = products[index];
+
+      document.getElementById('formTitle').innerText = 'প্রোডাক্ট এডিট করুন';
+      document.getElementById('editIndex').value = index;
+      document.getElementById('pTitle').value = p.title || '';
+      document.getElementById('pPrice').value = p.price || '';
+      document.getElementById('pCategory').value = p.category || '';
+      document.getElementById('pSizes').value = p.sizes || '';
+      document.getElementById('pColors').value = p.colors || '';
+      document.getElementById('pStock').value = p.stock || '';
+      document.getElementById('pImgUrl').value = p.image.startsWith('data:') ? '' : p.image;
+      document.getElementById('pDesc').value = p.desc || '';
+
+      document.getElementById('saveBtn').innerText = 'আপডেট করুন';
+      document.getElementById('cancelBtn').style.display = 'block';
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function resetForm() {
+      document.getElementById('formTitle').innerText = 'নতুন প্রোডাক্ট যোগ করুন';
+      document.getElementById('editIndex').value = '-1';
+      document.getElementById('pTitle').value = '';
+      document.getElementById('pPrice').value = '';
+      document.getElementById('pCategory').value = '';
+      document.getElementById('pSizes').value = '';
+      document.getElementById('pColors').value = '';
+      document.getElementById('pStock').value = '';
+      document.getElementById('pImgUrl').value = '';
+      document.getElementById('pImgFile').value = '';
+      document.getElementById('pDesc').value = '';
+      base64Img = "";
+
+      document.getElementById('saveBtn').innerText = 'প্রোডাক্ট যোগ করুন';
+      document.getElementById('cancelBtn').style.display = 'none';
     }
 
     function renderAdminProducts() {
       let products = JSON.parse(localStorage.getItem('products')) || [];
       const list = document.getElementById('adminPList');
-      list.innerHTML = '';
+      list.innerHTML = products.length === 0 ? '<p style="color:#777;">কোনো প্রোডাক্ট নেই!</p>' : '';
+
       products.forEach((p, index) => {
         list.innerHTML += `
-          <div style="display:flex; justify-content:space-between; align-items:center; padding:8px; border-bottom:1px solid #ddd;">
-            <div><strong>${p.title}</strong> - ৳${p.price}</div>
-            <button class="del-btn" onclick="deleteProduct(${index})">মুছে ফেলুন</button>
+          <div class="p-card">
+            <img src="${p.image}">
+            <div class="p-details">
+              <strong>${p.title}</strong><br>
+              <small style="color:#e53935; font-weight:bold;">৳${p.price}</small> | 
+              <small>ক্যাটাগরি: ${p.category}</small><br>
+              <small style="color:#666;">সাইজ: ${p.sizes || 'N/A'} | কালার: ${p.colors || 'N/A'}</small>
+            </div>
+            <div>
+              <button class="edit-btn" onclick="editProduct(${index})">এডিট</button>
+              <button class="del-btn" onclick="deleteProduct(${index})">ডিলিট</button>
+            </div>
           </div>
         `;
       });
     }
 
     function deleteProduct(index) {
-      let products = JSON.parse(localStorage.getItem('products')) || [];
-      products.splice(index, 1);
-      localStorage.setItem('products', JSON.stringify(products));
-      renderAdminProducts();
+      if(confirm('আপনি কি সত্যিই এই প্রোডাক্টটি মুছে ফেলতে চান?')) {
+        let products = JSON.parse(localStorage.getItem('products')) || [];
+        products.splice(index, 1);
+        localStorage.setItem('products', JSON.stringify(products));
+        renderAdminProducts();
+      }
     }
 
     renderWaNumbers();
