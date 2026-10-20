@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LiveCode Export</title>
+<style>
+
+</style>
+</head>
+<body>
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>সম্পূর্ণ এডমিন কন্ট্রোল প্যানেল</title>
+  <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Hind Siliguri', sans-serif; }
+    body { background-color: #f1f5f9; color: #0f172a; padding: 20px 10px; }
+    
+    .admin-container { max-width: 800px; margin: 0 auto; background: white; padding: 25px; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); }
+    .admin-title { font-size: 20px; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px; margin-bottom: 20px; color: #0f172a; display: flex; justify-content: space-between; align-items: center; }
+    .form-group { margin-bottom: 15px; }
+    .form-group label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 5px; color: #334155; }
+    .form-group input, .form-group textarea, .form-group select { width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 14px; }
+    
+    .btn { width: 100%; padding: 12px; border-radius: 8px; border: none; font-weight: 700; cursor: pointer; text-align: center; display: block; }
+    .btn-primary { background: #2563eb; color: white; }
+    .btn-courier { background: #16a34a; color: white; padding: 6px 12px; font-size: 12px; border-radius: 6px; border: none; cursor: pointer; font-weight: 600; }
+    .btn-danger { background: #ef4444; color: white; padding: 6px 10px; font-size: 12px; border-radius: 6px; border: none; cursor: pointer; }
+    .btn-edit { background: #f59e0b; color: white; padding: 6px 10px; font-size: 12px; border-radius: 6px; border: none; cursor: pointer; }
+
+    .order-card { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 15px; margin-bottom: 15px; }
+    .order-header { display: flex; justify-content: space-between; font-size: 13px; font-weight: 700; color: #1e293b; margin-bottom: 8px; border-bottom: 1px solid #cbd5e1; padding-bottom: 6px; }
+    .order-body { font-size: 13px; color: #475569; line-height: 1.6; }
+    .status-badge { background: #fef08a; color: #854d0e; padding: 2px 8px; border-radius: 12px; font-size: 11px; }
+
+    .admin-prod-item { display: flex; align-items: center; justify-content: space-between; padding: 10px; border: 1px solid #e2e8f0; border-radius: 8px; margin-bottom: 10px; background: #f8fafc; }
+
+    .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 2000; }
+    .modal-content { background: white; padding: 25px; border-radius: 15px; width: 90%; max-width: 420px; max-height: 90vh; overflow-y: auto; }
+  </style>
+</head>
+<body>
+
+  <!-- Login Overlay -->
+  <div id="loginSection" style="max-width:350px; margin:80px auto; background:white; padding:30px; border-radius:16px; box-shadow:0 10px 25px rgba(0,0,0,0.1); text-align:center;">
+    <i class="fa-solid fa-lock" style="font-size:40px; color:#2563eb; margin-bottom:15px;"></i>
+    <h3 style="margin-bottom:15px;">এডমিন প্যানেল লগইন</h3>
+    <div class="form-group">
+      <input type="password" id="adminPasswordInput" placeholder="পাসওয়ার্ড দিন (1234)">
+    </div>
+    <button class="btn btn-primary" onclick="checkPassword()">লগইন করুন</button>
+  </div>
+
+  <!-- Admin Content -->
+  <div class="admin-container" id="adminContent" style="display:none;">
+    <div class="admin-title">
+      <span><i class="fa-solid fa-sliders"></i> ফুল এডমিন ও কুরিয়ার প্যানেল</span>
+      <a href="index.html" target="_blank" style="font-size:12px; color:#2563eb; text-decoration:none;"><i class="fa-solid fa-external-link"></i> শপ ভিজিট করুন</a>
+    </div>
+
+    <!-- Orders Section -->
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+      <h3><i class="fa-solid fa-cart-flatbed"></i> কাস্টমার অর্ডারের তালিকা</h3>
+      <button onclick="downloadCSV()" class="btn-courier" style="background:#0284c7;"><i class="fa-solid fa-file-csv"></i> এক্সেল ডাউনলোড</button>
+    </div>
+    <div id="orderManageList"></div>
+
+    <hr style="margin:30px 0;">
+
+    <!-- General Shop Settings -->
+    <h3 style="margin-bottom:15px;"><i class="fa-solid fa-gear"></i> শপের নাম ও ব্যানার সেটিংস</h3>
+    <div class="form-group"><label>শপের নাম (Shop Name)</label><input type="text" id="adminShopNameInput"></div>
+    <div class="form-group">
+      <label>শপ লোগো (ফাইল আপলোড করুন অথবা নিচে লিংক দিন)</label>
+      <input type="file" accept="image/*" onchange="previewLogoFile(event)">
+      <input type="text" id="adminLogoUrlInput" style="margin-top:5px;" placeholder="লোগোর লিংক (https://...)">
+    </div>
+    <div class="form-group"><label>ওয়েবসাইট ব্যানার টেক্সট</label><input type="text" id="adminTitleInput"></div>
+    <div class="form-group">
+      <label>ব্যানার ইমেজ (ফাইল আপলোড করুন অথবা নিচে লিংক দিন)</label>
+      <input type="file" accept="image/*" onchange="previewHeroFile(event)">
+      <input type="text" id="adminHeroUrlInput" style="margin-top:5px;" placeholder="ব্যানারের লিংক (https://...)">
+    </div>
+    <div class="form-group"><label>কুপন কোড</label><input type="text" id="adminCouponCode"></div>
+    <div class="form-group"><label>কুপন ছাড় (টাকা)</label><input type="number" id="adminCouponAmount"></div>
+    <button class="btn btn-primary" onclick="saveSettings()">সেটিংস সেভ করুন</button>
+
+    <hr style="margin:30px 0;">
+
+    <!-- Products Management -->
+    <h3 style="margin-bottom:15px;"><i class="fa-solid fa-boxes-packing"></i> প্রোডাক্ট তালিকা (এডিট ও ডিলিট)</h3>
+    <div id="adminProductManageList"></div>
+
+    <hr style="margin:30px 0;">
+
+    <!-- Add New Product -->
+    <h3 style="margin-bottom:15px;"><i class="fa-solid fa-plus"></i> নতুন প্রোডাক্ট যোগ করুন</h3>
+    <div class="form-group"><label>প্রোডাক্টের নাম</label><input type="text" id="pName" placeholder="যেমন: স্মার্ট ওয়াচ"></div>
+    <div class="form-group">
+      <label>ক্যাটাগরি (আপনার ইচ্ছেমতো যেকোনো নাম টাইপ করুন)</label>
+      <input type="text" id="pCategory" placeholder="যেমন: Automotive, Electronics, বা শীতের পোশাক">
+    </div>
+    <div class="form-group"><label>মূল দাম</label><input type="number" id="pPrice" placeholder="১৫০০"></div>
+    <div class="form-group"><label>ডিসকাউন্ট দাম</label><input type="number" id="pDiscPrice" placeholder="১২০০"></div>
+    
+    <!-- Both File & URL Input for Product Main Image -->
+    <div class="form-group">
+      <label>প্রোডাক্ট মেইন ছবি (ফাইল আপলোড করুন অথবা নিচে লিংক দিন)</label>
+      <input type="file" accept="image/*" onchange="previewProductFile(event)">
+      <input type="text" id="pImgUrl" style="margin-top:5px;" placeholder="অথবা ছবির ডিরেক্ট লিংক (https://...)">
+    </div>
+
+    <!-- Both File & URL Input for Product Badge Logo -->
+    <div class="form-group">
+      <label>ব্র্যান্ড লোগো ব্যাজ (ফাইল আপলোড করুন অথবা নিচে লিংক দিন - অপশনাল)</label>
+      <input type="file" accept="image/*" onchange="previewProductLogoFile(event)">
+      <input type="text" id="pLogoUrl" style="margin-top:5px;" placeholder="অথবা লোগোর ডিরেক্ট লিংক (https://...)">
+    </div>
+
+    <button class="btn btn-primary" style="background:#16a34a;" onclick="addProduct()">প্রোডাক্ট এড করুন</button>
+  </div>
+
+  <!-- Edit Modal -->
+  <div class="modal" id="editModal">
+    <div class="modal-content">
+      <h3>প্রোডাক্ট এডিট করুন</h3>
+      <input type="hidden" id="editPId">
+      <div class="form-group"><label>প্রোডাক্টের নাম</label><input type="text" id="editPName"></div>
+      <div class="form-group"><label>ক্যাটাগরি</label><input type="text" id="editPCategory"></div>
+      <div class="form-group"><label>মূল দাম</label><input type="number" id="editPPrice"></div>
+      <div class="form-group"><label>ডিসকাউন্ট দাম</label><input type="number" id="editPDiscPrice"></div>
+      <div class="form-group">
+        <label>ছবি পরিবর্তন (ফাইল আপলোড বা লিংক)</label>
+        <input type="file" accept="image/*" onchange="previewEditProductFile(event)">
+        <input type="text" id="editPImg" style="margin-top:5px;">
+      </div>
+      <button class="btn btn-primary" onclick="saveProductEdit()">পরিবর্তন সেভ করুন</button>
+      <button class="btn" style="background:#cbd5e1; margin-top:8px;" onclick="closeEditModal()">বাতিল করুন</button>
+    </div>
+  </div>
+
+  <script>
+    let tempLogoImg = "";
+    let tempHeroImg = "";
+    let tempProdImg = "";
+    let tempProdLogoImg = "";
+    let tempEditProdImg = "";
+
+    let products = JSON.parse(localStorage.getItem('products')) || [];
+    let orders = JSON.parse(localStorage.getItem('orders')) || [];
+    let siteConfig = JSON.parse(localStorage.getItem('siteConfig')) || {
+      shopName: "মাই ই-কমার্স",
+      logoImg: "https://picsum.photos/100/100?random=88",
+      title: "স্বাগতম আমাদের শপে! 👋",
+      heroImg: "https://picsum.photos/800/300",
+      couponCode: "DISCOUNT50",
+      couponAmount: 50
+    };
+
+    function checkPassword() {
+      const pass = document.getElementById('adminPasswordInput').value;
+      if (pass === "1234") {
+        document.getElementById('loginSection').style.display = 'none';
+        document.getElementById('adminContent').style.display = 'block';
+        loadConfigToUI();
+        renderAdminProducts();
+        renderOrders();
+      } else { alert('ভুল পাসওয়ার্ড!'); }
+    }
+
+    function loadConfigToUI() {
+      document.getElementById('adminShopNameInput').value = siteConfig.shopName;
+      document.getElementById('adminLogoUrlInput').value = siteConfig.logoImg;
+      document.getElementById('adminTitleInput').value = siteConfig.title;
+      document.getElementById('adminHeroUrlInput').value = siteConfig.heroImg;
+      document.getElementById('adminCouponCode').value = siteConfig.couponCode;
+      document.getElementById('adminCouponAmount').value = siteConfig.couponAmount;
+    }
+
+    // File Preview Helper Functions
+    function previewLogoFile(e) {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(evt) { tempLogoImg = evt.target.result; document.getElementById('adminLogoUrlInput').value = tempLogoImg; }
+        reader.readAsDataURL(file);
+      }
+    }
+
+    function previewHeroFile(e) {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(evt) { tempHeroImg = evt.target.result; document.getElementById('adminHeroUrlInput').value = tempHeroImg; }
+        reader.readAsDataURL(file);
+      }
+    }
+
+    function previewProductFile(e) {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(evt) { tempProdImg = evt.target.result; document.getElementById('pImgUrl').value = tempProdImg; }
+        reader.readAsDataURL(file);
+      }
+    }
+
+    function previewProductLogoFile(e) {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(evt) { tempProdLogoImg = evt.target.result; document.getElementById('pLogoUrl').value = tempProdLogoImg; }
+        reader.readAsDataURL(file);
+      }
+    }
+
+    function previewEditProductFile(e) {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(evt) { tempEditProdImg = evt.target.result; document.getElementById('editPImg').value = tempEditProdImg; }
+        reader.readAsDataURL(file);
+      }
+    }
+
+    function renderAdminProducts() {
+      const adminList = document.getElementById('adminProductManageList');
+      adminList.innerHTML = '';
+      if(products.length === 0) {
+        adminList.innerHTML = '<p style="color:#64748b; font-size:13px;">কোনো প্রোডাক্ট নেই।</p>';
+        return;
+      }
+      products.forEach(p => {
+        adminList.innerHTML += `
+          <div class="admin-prod-item">
+            <div>
+              <strong>${p.name}</strong>
+              <div style="font-size:12px; color:#64748b;">ক্যাটাগরি: ${p.category || 'General'} | দাম: ৳${p.discPrice || p.price}</div>
+            </div>
+            <div style="display:flex; gap:5px;">
+              <button class="btn-edit" onclick="openEditModal(${p.id})"><i class="fa-solid fa-pen"></i> এডিট</button>
+              <button class="btn-danger" onclick="deleteProduct(${p.id})"><i class="fa-solid fa-trash"></i> ডিলিট</button>
+            </div>
+          </div>
+        `;
+      });
+    }
+
+    function renderOrders() {
+      const orderList = document.getElementById('orderManageList');
+      orderList.innerHTML = '';
+      if (orders.length === 0) {
+        orderList.innerHTML = '<p style="color:#64748b; font-size:13px;">কোনো অর্ডার নেই।</p>';
+        return;
+      }
+      orders.forEach((ord, index) => {
+        let isAdded = ord.status === "Send to Courier";
+        orderList.innerHTML += `
+          <div class="order-card">
+            <div class="order-header">
+              <span>আইডি: ${ord.id} (${ord.date})</span>
+              <span class="status-badge" style="${isAdded ? 'background:#bbf7d0; color:#166534;' : ''}">${ord.status}</span>
+            </div>
+            <div class="order-body">
+              <strong>প্রোডাক্ট:</strong> ${ord.productName} (৳${ord.price})<br>
+              <strong>গ্রাহক:</strong> ${ord.custName} (${ord.custPhone})<br>
+              <strong>ঠিকানা:</strong> ${ord.custAddress}<br>
+              <strong>কুরিয়ার:</strong> ${ord.courier}
+            </div>
+            <div style="margin-top:10px; display:flex; gap:8px;">
+              ${!isAdded ? `<button class="btn-courier" onclick="addToCourier(${index})"><i class="fa-solid fa-truck"></i> Add to ${ord.courier}</button>` : `<span style="font-size:12px; color:#16a34a; font-weight:bold;"><i class="fa-solid fa-check"></i> কুরিয়ারে পাঠানো হয়েছে</span>`}
+              <button class="btn-danger" onclick="deleteOrder(${index})"><i class="fa-solid fa-trash"></i> ডিলিট</button>
+            </div>
+          </div>
+        `;
+      });
+    }
+
+    function addToCourier(index) {
+      orders[index].status = "Send to Courier";
+      localStorage.setItem('orders', JSON.stringify(orders));
+      renderOrders();
+      alert(`অর্ডারটি ${orders[index].courier} কুরিয়ারে যুক্ত হয়েছে!`);
+    }
+
+    function deleteOrder(index) {
+      if(confirm('অর্ডারটি মুছে ফেলতে চান?')) {
+        orders.splice(index, 1);
+        localStorage.setItem('orders', JSON.stringify(orders));
+        renderOrders();
+      }
+    }
+
+    function downloadCSV() {
+      if(orders.length === 0) { alert('কোনো অর্ডার নেই!'); return; }
+      let csvContent = "data:text/csv;charset=utf-8,Order ID,Customer Name,Phone,Address,Product,Price,Courier,Status\n";
+      orders.forEach(o => {
+        csvContent += `"${o.id}","${o.custName}","${o.custPhone}","${o.custAddress}","${o.productName}","${o.price}","${o.courier}","${o.status}"\n`;
+      });
+      const encodedUri = encodeURI(csvContent);
+      const link = document.createElement("a");
+      link.setAttribute("href", encodedUri);
+      link.setAttribute("download", "Orders.csv");
+      document.body.appendChild(link);
+      link.click();
+    }
+
+    function saveSettings() {
+      siteConfig.shopName = document.getElementById('adminShopNameInput').value;
+      siteConfig.logoImg = document.getElementById('adminLogoUrlInput').value;
+      siteConfig.title = document.getElementById('adminTitleInput').value;
+      siteConfig.heroImg = document.getElementById('adminHeroUrlInput').value;
+      siteConfig.couponCode = document.getElementById('adminCouponCode').value;
+      siteConfig.couponAmount = document.getElementById('adminCouponAmount').value;
+
+      localStorage.setItem('siteConfig', JSON.stringify(siteConfig));
+      alert('সেটিংস সফলভাবে সেভ হয়েছে!');
+    }
+
+    function addProduct() {
+      const name = document.getElementById('pName').value;
+      const category = document.getElementById('pCategory').value.trim() || 'General';
+      const price = document.getElementById('pPrice').value;
+      const discPrice = document.getElementById('pDiscPrice').value;
+      const imgUrlInput = document.getElementById('pImgUrl').value;
+      const logoUrlInput = document.getElementById('pLogoUrl').value;
+
+      if(!name || !price) { alert('প্রোডাক্টের নাম ও দাম দিন!'); return; }
+
+      const finalImg = imgUrlInput.trim() !== "" ? imgUrlInput : (tempProdImg || "https://picsum.photos/200/200");
+      const finalLogo = logoUrlInput.trim() !== "" ? logoUrlInput : tempProdLogoImg;
+
+      products.push({ id: Date.now(), name, category, price: Number(price), discPrice: discPrice ? Number(discPrice) : null, rating: "4.9", stock: 10, sold: 0, img: finalImg, logoImg: finalLogo });
+      localStorage.setItem('products', JSON.stringify(products));
+      renderAdminProducts();
+      alert('নতুন প্রোডাক্ট সফলভাবে যুক্ত করা হয়েছে!');
+      
+      document.getElementById('pName').value = '';
+      document.getElementById('pCategory').value = '';
+      document.getElementById('pPrice').value = '';
+      document.getElementById('pDiscPrice').value = '';
+      document.getElementById('pImgUrl').value = '';
+      document.getElementById('pLogoUrl').value = '';
+      tempProdImg = "";
+      tempProdLogoImg = "";
+    }
+
+    function deleteProduct(id) {
+      if(confirm('প্রোডাক্টটি ডিলিট করতে চান?')) {
+        products = products.filter(p => p.id !== id);
+        localStorage.setItem('products', JSON.stringify(products));
+        renderAdminProducts();
+      }
+    }
+
+    function openEditModal(id) {
+      const p = products.find(prod => prod.id === id);
+      if(p) {
+        document.getElementById('editPId').value = p.id;
+        document.getElementById('editPName').value = p.name;
+        document.getElementById('editPCategory').value = p.category || 'General';
+        document.getElementById('editPPrice').value = p.price;
+        document.getElementById('editPDiscPrice').value = p.discPrice || '';
+        document.getElementById('editPImg').value = p.img;
+        tempEditProdImg = p.img;
+        document.getElementById('editModal').style.display = 'flex';
+      }
+    }
+
+    function closeEditModal() { document.getElementById('editModal').style.display = 'none'; }
+
+    function saveProductEdit() {
+      const id = Number(document.getElementById('editPId').value);
+      const name = document.getElementById('editPName').value;
+      const category = document.getElementById('editPCategory').value.trim() || 'General';
+      const price = Number(document.getElementById('editPPrice').value);
+      const discPrice = document.getElementById('editPDiscPrice').value ? Number(document.getElementById('editPDiscPrice').value) : null;
+      const imgInput = document.getElementById('editPImg').value;
+
+      const pIndex = products.findIndex(prod => prod.id === id);
+      if(pIndex !== -1) {
+        products[pIndex].name = name;
+        products[pIndex].category = category;
+        products[pIndex].price = price;
+        products[pIndex].discPrice = discPrice;
+        products[pIndex].img = imgInput.trim() !== "" ? imgInput : tempEditProdImg;
+
+        localStorage.setItem('products', JSON.stringify(products));
+        renderAdminProducts();
+        alert('প্রোডাক্ট আপডেট সফল হয়েছে!');
+        closeEditModal();
+      }
+    }
+  </script>
+</body>
+</html>
+<script>
+
+</script>
+</body>
+</html>
