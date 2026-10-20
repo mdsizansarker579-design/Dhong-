@@ -3,13 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>মাই ই-কমার্স শপ</title>
+  <title>ঢং শপ</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
     body { background-color: #f4f6f9; padding-bottom: 80px; }
     
     header { background: #1b5e20; color: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-    .shop-name { font-size: 20px; font-weight: bold; }
+    .shop-name { font-size: 20px; font-weight: bold; cursor: pointer; }
     .cart-btn { background: #4caf50; color: white; border: none; padding: 8px 15px; border-radius: 20px; cursor: pointer; font-weight: bold; display: flex; align-items: center; gap: 5px; }
     .cart-count { background: #e53935; color: white; border-radius: 50%; padding: 2px 7px; font-size: 12px; }
 
@@ -44,7 +44,7 @@
 <body>
 
   <header>
-    <div class="shop-name">ঢং শপ</div>
+    <div class="shop-name" onclick="window.location.href='index.html'">ঢং শপ</div>
     <button class="cart-btn" onclick="openCart()">
       🛒 কার্ট <span class="cart-count" id="cartCount">0</span>
     </button>
@@ -60,7 +60,7 @@
 
   <div class="product-grid" id="productGrid"></div>
 
-  <!-- Detail Modal -->
+  <!-- Product Detail Modal -->
   <div class="modal" id="detailModal">
     <div class="modal-content">
       <span class="close-btn" onclick="closeModal('detailModal')">&times;</span>
@@ -68,9 +68,14 @@
       <h3 id="modalTitle"></h3>
       <p id="modalPrice" style="color:#e53935; font-weight:bold; font-size:18px; margin: 5px 0;"></p>
       
-      <div class="form-group" id="variantGroup" style="display:none; margin-top:10px;">
-        <label>সাইজ/কালার সিলেক্ট করুন:</label>
-        <select id="modalVariant"></select>
+      <div class="form-group" id="sizeGroup" style="display:none;">
+        <label>সাইজ (Size) নির্বাচন করুন:</label>
+        <select id="modalSize"></select>
+      </div>
+
+      <div class="form-group" id="colorGroup" style="display:none;">
+        <label>কালার (Color) নির্বাচন করুন:</label>
+        <select id="modalColor"></select>
       </div>
 
       <p id="modalDesc" style="font-size:14px; color:#555; margin:10px 0; line-height:1.4;"></p>
@@ -96,7 +101,7 @@
         <input type="tel" id="custPhone" required placeholder="017xxxxxxxx">
       </div>
       <div class="form-group">
-        <label>পূর্ণাঙ্গ ঠিকানা (ক্যাশ অন ডেলিভারির জন্য) *</label>
+        <label>পূর্ণাঙ্গ ঠিকানা *</label>
         <textarea id="custAddress" rows="2" placeholder="বাড়ি নং, রোড নং, এলাকা, থানা, জেলা..."></textarea>
       </div>
       
@@ -132,7 +137,7 @@
         সর্বমোট মূল্য: ৳<span id="grandTotal">0</span>
       </div>
 
-      <button class="add-to-cart-btn" style="padding:12px; font-size:16px; background:#1b5e20;" onclick="placeOrder()">অর্ডার নিশ্চিত করুন (Cash on Delivery)</button>
+      <button class="add-to-cart-btn" style="padding:12px; font-size:16px; background:#1b5e20;" onclick="placeOrder()">অর্ডার নিশ্চিত করুন</button>
     </div>
   </div>
 
@@ -184,23 +189,34 @@
 
     function showDetails(id) {
       const p = products.find(prod => prod.id === id);
+      if(!p) return;
+
+      // Update URL so direct link works
+      window.history.pushState({}, '', `?product=${p.id}`);
+
       document.getElementById('modalImg').src = p.image;
       document.getElementById('modalTitle').innerText = p.title;
       document.getElementById('modalPrice').innerText = '৳' + p.price;
       document.getElementById('modalDesc').innerText = p.desc || 'কোনো বিবরণ দেওয়া নেই।';
 
-      const vGroup = document.getElementById('variantGroup');
-      const vSelect = document.getElementById('modalVariant');
-      if(p.variants && p.variants.trim() !== "") {
-        vGroup.style.display = 'block';
-        vSelect.innerHTML = p.variants.split(',').map(v => `<option value="${v.trim()}">${v.trim()}</option>`).join('');
-      } else {
-        vGroup.style.display = 'none';
-      }
+      const sGroup = document.getElementById('sizeGroup');
+      const sSelect = document.getElementById('modalSize');
+      if(p.sizes && p.sizes.trim() !== "") {
+        sGroup.style.display = 'block';
+        sSelect.innerHTML = p.sizes.split(',').map(s => `<option value="${s.trim()}">${s.trim()}</option>`).join('');
+      } else { sGroup.style.display = 'none'; }
+
+      const cGroup = document.getElementById('colorGroup');
+      const cSelect = document.getElementById('modalColor');
+      if(p.colors && p.colors.trim() !== "") {
+        cGroup.style.display = 'block';
+        cSelect.innerHTML = p.colors.split(',').map(c => `<option value="${c.trim()}">${c.trim()}</option>`).join('');
+      } else { cGroup.style.display = 'none'; }
 
       document.getElementById('modalAddBtn').onclick = function() {
-        const selectedVariant = vGroup.style.display !== 'none' ? vSelect.value : '';
-        addToCart(p, selectedVariant);
+        const selSize = sGroup.style.display !== 'none' ? sSelect.value : '';
+        const selColor = cGroup.style.display !== 'none' ? cSelect.value : '';
+        addToCart(p, selSize, selColor);
         closeModal('detailModal');
         openCart();
       };
@@ -208,10 +224,15 @@
       document.getElementById('detailModal').style.display = 'flex';
     }
 
-    function addToCart(p, variant) {
-      const item = cart.find(c => c.id === p.id && c.variant === variant);
+    function closeModal(id) { 
+      document.getElementById(id).style.display = 'none'; 
+      window.history.pushState({}, '', window.location.pathname);
+    }
+
+    function addToCart(p, size, color) {
+      const item = cart.find(c => c.id === p.id && c.size === size && c.color === color);
       if(item) item.qty++;
-      else cart.push({ id: p.id, title: p.title, price: p.price, variant: variant, qty: 1 });
+      else cart.push({ id: p.id, title: p.title, price: p.price, size: size, color: color, qty: 1 });
       updateCartUI();
     }
 
@@ -223,10 +244,15 @@
       const cartItems = document.getElementById('cartItems');
       cartItems.innerHTML = cart.length === 0 ? '<p>কার্ট খালি!</p>' : '';
       cart.forEach((item, i) => {
+        let variantText = [];
+        if(item.size) variantText.push(`সাইজ: ${item.size}`);
+        if(item.color) variantText.push(`কালার: ${item.color}`);
+        let details = variantText.length > 0 ? `(${variantText.join(', ')})` : '';
+
         cartItems.innerHTML += `
           <div class="cart-item">
             <div>
-              <strong>${item.title}</strong> ${item.variant ? `(${item.variant})` : ''}<br>
+              <strong>${item.title}</strong> ${details}<br>
               <small>৳${item.price} x ${item.qty}</small>
             </div>
             <div>
@@ -265,52 +291,21 @@
       }
     }
 
-    function closeModal(id) { document.getElementById(id).style.display = 'none'; }
-
-    // Place Order via Active WhatsApp Number from Admin
     function placeOrder() {
-      if(cart.length === 0) { alert('আপনার কার্ট খালি!'); return; }
-
-      // Get Active WhatsApp Number
-      let waList = JSON.parse(localStorage.getItem('wa_numbers')) || [];
-      let activeWa = waList.find(w => w.active);
-      let targetNumber = activeWa ? activeWa.number : '8801700000000'; // Default fallback
-
-      const name = document.getElementById('custName').value.trim();
-      const phone = document.getElementById('custPhone').value.trim();
-      const address = document.getElementById('custAddress').value.trim();
-      const zone = document.getElementById('deliveryZone').options[document.getElementById('deliveryZone').selectedIndex].text;
-      const method = document.getElementById('payMethod').value;
-
-      if(!name || !phone || !address) { alert('সবগুলো প্রয়োজনীয় ঘর পূরণ করুন!'); return; }
-
-      let orderList = cart.map(i => `• ${i.title} ${i.variant?'('+i.variant+')':''} x${i.qty} = ৳${i.price*i.qty}`).join('%0A');
-      let total = document.getElementById('grandTotal').innerText;
-
-      let msg = `*নতুন ক্যাশ অন ডেলিভারি অর্ডার!*%0A%0A` +
-                `*গ্রাহকের নাম:* ${name}%0A` +
-                `*মোবাইল:* ${phone}%0A` +
-                `*ঠিকানা:* ${address}%0A` +
-                `*ডেলিভারি এলাকা:* ${zone}%0A` +
-                `*পেমেন্ট পদ্ধতি:* ${method === 'COD' ? 'ক্যাশ অন ডেলিভারি (Cash on Delivery)' : method}%0A`;
-
-      if(method !== 'COD') {
-        msg += `*পেমেন্ট নম্বর:* ${document.getElementById('payPhone').value}%0A` +
-               `*TxnID:* ${document.getElementById('payTxn').value}%0A`;
-      }
-
-      msg += `%0A*প্রোডাক্টসমূহ:*%0A${orderList}%0A%0A` +
-             `*মোট প্রদেয় মূল্য:* ৳${total}`;
-
-      cart = [];
-      updateCartUI();
-      closeModal('cartModal');
-      
-      window.open(`https://wa.me/${targetNumber}?text=${msg}`, '_blank');
+      alert('অর্ডার সফলভাবে সম্পন্ন হয়েছে! (ডেমো)');
     }
 
-    renderProducts();
-    renderCategories();
+    // Auto-open product if link has ?product=ID
+    window.onload = function() {
+      renderProducts();
+      renderCategories();
+      
+      const urlParams = new URLSearchParams(window.location.search);
+      const productId = urlParams.get('product');
+      if(productId) {
+        showDetails(parseInt(productId));
+      }
+    };
   </script>
 </body>
 </html>
