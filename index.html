@@ -1,213 +1,249 @@
-<!DOCTYPE html>
+
+<!doctype html>
 <html lang="bn">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ঢং শপ</title>
-  <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-    body { background-color: #f9f9f9; padding-bottom: 60px; color: #333; }
-    
-    header { background: #1b5e20; color: white; padding: 12px 15px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; }
-    .brand { font-size: 18px; font-weight: bold; cursor: pointer; }
-    .admin-link { background: #fff; color: #1b5e20; padding: 4px 10px; border-radius: 4px; font-size: 11px; font-weight: bold; text-decoration: none; }
-
-    .banner { background: #e8f5e9; color: #1b5e20; padding: 15px; text-align: center; font-size: 14px; font-weight: bold; border-bottom: 1px solid #c8e6c9; }
-
-    .product-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; padding: 12px; max-width: 900px; margin: 0 auto; }
-    @media(min-width: 768px) { .product-grid { grid-template-columns: repeat(4, 1fr); } }
-
-    .product-card { background: white; border-radius: 8px; overflow: hidden; border: 1px solid #e0e0e0; display: flex; flex-direction: column; justify-content: space-between; }
-    .product-img { width: 100%; height: 150px; object-fit: cover; cursor: pointer; background: #eee; }
-    .product-info { padding: 10px; }
-    .product-title { font-size: 13px; font-weight: 600; color: #222; margin-bottom: 4px; cursor: pointer; }
-    .product-price { font-size: 15px; font-weight: bold; color: #e53935; }
-    .order-btn { background: #1b5e20; color: white; border: none; padding: 8px; border-radius: 5px; width: 100%; font-weight: bold; font-size: 13px; cursor: pointer; margin-top: 8px; }
-
-    /* Modal */
-    .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 1000; justify-content: center; align-items: center; padding: 15px; }
-    .modal-content { background: white; padding: 20px; border-radius: 10px; max-width: 450px; width: 100%; max-height: 90vh; overflow-y: auto; position: relative; }
-    .close-btn { position: absolute; right: 15px; top: 15px; font-size: 22px; cursor: pointer; font-weight: bold; color: #666; }
-
-    .form-group { margin-bottom: 10px; }
-    .form-group label { display: block; margin-bottom: 4px; font-size: 12px; font-weight: 600; }
-    .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 8px 10px; border: 1px solid #ccc; border-radius: 5px; font-size: 13px; outline: none; }
-  </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DHONG | Customer Panel</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,sans-serif;background:#f7f8fb;color:#182230}
+button,input,select,textarea{font:inherit}
+button{cursor:pointer}
+.top{background:#17243a;color:white;text-align:center;padding:10px}
+header{background:white;padding:14px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.logo{font-size:23px;font-weight:bold;color:#c83d58}
+.search{flex:1;min-width:180px;padding:11px;border:1px solid #ddd;border-radius:10px}
+button{border:0;border-radius:9px;padding:11px 15px}
+.primary{background:#e85d75;color:white;font-weight:bold}
+.hero{margin:16px auto;max-width:1100px;padding:30px 22px;border-radius:18px;background:linear-gradient(120deg,#242b49,#a23b5d,#ee9a8c);color:white}
+.hero h1{font-size:34px}
+.hero p{line-height:1.7}
+main{max-width:1100px;margin:25px auto;padding:0 14px}
+.categories{display:flex;gap:8px;overflow:auto;margin:15px 0}
+.categories button{background:white;border:1px solid #ddd;white-space:nowrap}
+.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
+.product{background:white;border:1px solid #e5e7eb;border-radius:13px;overflow:hidden}
+.art{height:160px;display:grid;place-items:center;background:linear-gradient(135deg,#f8dfe4,#e4e9f7)}
+.shape{width:90px;height:110px;border-radius:25px 25px 10px 10px;background:linear-gradient(135deg,#a04c67,#e99aa8)}
+.product:nth-child(even) .shape{background:linear-gradient(135deg,#303d67,#7785b6)}
+.info{padding:12px}
+.info h3{font-size:14px;min-height:35px}
+.price{font-size:17px;font-weight:bold}
+.old{font-size:12px;text-decoration:line-through;color:#888}
+.buy{width:100%;margin-top:12px;background:#e85d75;color:white;font-weight:bold}
+.benefits{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:25px 0}
+.benefit{background:white;border:1px solid #eee;padding:15px;border-radius:12px}
+footer{background:#17243a;color:white;padding:25px;line-height:1.8}
+.modalbg{display:none;position:fixed;inset:0;background:#0009;align-items:center;justify-content:center;padding:14px;z-index:10}
+.modalbg.show{display:flex}
+.modal{background:white;border-radius:15px;padding:20px;width:100%;max-width:500px;max-height:90vh;overflow:auto}
+.modal h2{margin-top:0}
+.field{display:block;margin:12px 0;font-size:13px;font-weight:bold}
+.field input,.field select,.field textarea{display:block;width:100%;padding:11px;margin-top:6px;border:1px solid #ddd;border-radius:8px}
+.modal .primary{width:100%;margin-top:10px}
+.close{float:right;background:#eee}
+.note{font-size:12px;color:#666;line-height:1.6}
+@media(max-width:700px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.art{height:135px}.hero h1{font-size:27px}.benefits{grid-template-columns:1fr}header{padding:10px}.search{order:3;flex-basis:100%}}
+</style>
 </head>
 <body>
 
-  <header>
-    <div class="brand" onclick="window.location.href='index.html'">ঢং শপ</div>
-    <a href="admin.html" class="admin-link">এডমিন প্যানেল</a>
-  </header>
+<div class="top">🎉 ঢং-এ স্বাগতম | ক্যাশ অন ডেলিভারি</div>
 
-  <div class="banner">🚚 ক্যাশ অন ডেলিভারি - সারা দেশে হোম ডেলিভারি!</div>
+<header>
+  <div class="logo">ঢং DHONG</div>
+  <input class="search" id="search" placeholder="পণ্য খুঁজুন..." oninput="renderProducts()">
+  <button onclick="openTrack()">📦 অর্ডার ট্র্যাক</button>
+</header>
 
-  <div class="product-grid" id="customerProductGrid"></div>
+<section class="hero">
+  <h1>আপনার স্টাইল, আপনারই গল্প।</h1>
+  <p>পছন্দের পণ্য বেছে নিন এবং অ্যাকাউন্ট ছাড়াই সরাসরি অর্ডার করুন।</p>
+  <button onclick="document.getElementById('products').scrollIntoView({behavior:'smooth'})">পণ্য দেখুন ↓</button>
+</section>
 
-  <!-- Order Modal -->
-  <div class="modal" id="orderModal">
-    <div class="modal-content">
-      <span class="close-btn" onclick="closeModal()">&times;</span>
-      <div style="display:flex; gap:10px; margin-bottom:12px; align-items:center;">
-        <img id="mImg" src="" style="width:60px; height:60px; object-fit:cover; border-radius:5px;">
-        <div>
-          <h4 id="mTitle" style="font-size:14px;"></h4>
-          <p id="mPrice" style="color:#e53935; font-weight:bold; font-size:15px;"></p>
-        </div>
-      </div>
-
-      <hr style="margin-bottom:12px; border:0; border-top:1px solid #eee;">
-
-      <div class="form-group" id="sizeBox" style="display:none;">
-        <label>সাইজ নির্বাচন করুন *</label>
-        <select id="selSize"></select>
-      </div>
-
-      <div class="form-group" id="colorBox" style="display:none;">
-        <label>কালার নির্বাচন করুন *</label>
-        <select id="selColor"></select>
-      </div>
-
-      <div class="form-group">
-        <label>আপনার নাম *</label>
-        <input type="text" id="cName" placeholder="পুরো নাম লিখুন">
-      </div>
-
-      <div class="form-group">
-        <label>মোবাইল নম্বর *</label>
-        <input type="tel" id="cPhone" placeholder="017XXXXXXXX">
-      </div>
-
-      <div class="form-group">
-        <label>পূর্ণাঙ্গ ঠিকানা *</label>
-        <textarea id="cAddress" rows="2" placeholder="বাসা নং, রোড, এলাকা, থানা, জেলা"></textarea>
-      </div>
-
-      <div class="form-group">
-        <label>ডেলিভারি এরিয়া *</label>
-        <select id="cDelivery" onchange="calculateTotal()">
-          <option value="80">ঢাকার ভেতরে (৮০ টাকা)</option>
-          <option value="150">ঢাকার বাইরে (১৫০ টাকা)</option>
-        </select>
-      </div>
-
-      <div style="background:#f4f6f9; padding:10px; border-radius:5px; font-size:14px; font-weight:bold; margin-bottom:12px;">
-        সর্বমোট মূল্য: ৳<span id="cTotal">0</span>
-      </div>
-
-      <button class="order-btn" style="padding:10px; font-size:15px;" onclick="submitOrder()">অর্ডার নিশ্চিত করুন</button>
-    </div>
+<main id="products">
+  <h2>জনপ্রিয় পণ্য</h2>
+  <div class="categories">
+    <button onclick="setCategory('সব')">সব পণ্য</button>
+    <button onclick="setCategory('পোশাক')">পোশাক</button>
+    <button onclick="setCategory('ব্যাগ')">ব্যাগ</button>
+    <button onclick="setCategory('অ্যাক্সেসরিজ')">অ্যাক্সেসরিজ</button>
   </div>
+  <div class="grid" id="grid"></div>
 
-  <script>
-    let products = JSON.parse(localStorage.getItem('products')) || [];
-    let selectedProduct = null;
+  <div class="benefits">
+    <div class="benefit">🚚 <b>সারা বাংলাদেশে ডেলিভারি</b></div>
+    <div class="benefit">💵 <b>ক্যাশ অন ডেলিভারি</b></div>
+    <div class="benefit">🔒 <b>অ্যাকাউন্ট ছাড়াই অর্ডার</b></div>
+  </div>
+</main>
 
-    function renderStore() {
-      const grid = document.getElementById('customerProductGrid');
-      grid.innerHTML = '';
-      if(products.length === 0) {
-        grid.innerHTML = '<p style="grid-column: 1/-1; text-align:center; padding:20px; color:#777;">কোনো প্রোডাক্ট পাওয়া যায়নি!</p>';
-        return;
-      }
-      products.forEach(p => {
-        grid.innerHTML += `
-          <div class="product-card">
-            <img src="${p.image || 'https://via.placeholder.com/150'}" class="product-img" onclick="openOrderModal(${p.id})">
-            <div class="product-info">
-              <div class="product-title" onclick="openOrderModal(${p.id})">${p.title}</div>
-              <div class="product-price">৳${p.price}</div>
-              <button class="order-btn" onclick="openOrderModal(${p.id})">অর্ডার করুন</button>
-            </div>
-          </div>
-        `;
-      });
-    }
+<footer>
+  <b>DHONG | ঢং</b><br>
+  আপনার পছন্দের পণ্য সহজে অর্ডার করুন।<br>
+  <button onclick="openTrack()">আমার অর্ডার ট্র্যাক করুন</button>
+</footer>
 
-    function openOrderModal(id) {
-      selectedProduct = products.find(p => p.id === id);
-      if(!selectedProduct) return;
+<div class="modalbg" id="orderModal">
+  <div class="modal">
+    <button class="close" onclick="closeModal('orderModal')">✕</button>
+    <h2>অর্ডার করুন</h2>
+    <form id="orderForm">
+      <input type="hidden" name="productId" id="productId">
 
-      window.history.pushState({}, '', `?product=${selectedProduct.id}`);
+      <label class="field">আপনার নাম
+        <input name="name" required placeholder="সম্পূর্ণ নাম">
+      </label>
 
-      document.getElementById('mImg').src = selectedProduct.image || 'https://via.placeholder.com/150';
-      document.getElementById('mTitle').innerText = selectedProduct.title;
-      document.getElementById('mPrice').innerText = '৳' + selectedProduct.price;
+      <label class="field">মোবাইল নম্বর
+        <input name="phone" required inputmode="tel"
+        pattern="01[3-9][0-9]{8}" placeholder="01XXXXXXXXX">
+      </label>
 
-      const sBox = document.getElementById('sizeBox');
-      const sSelect = document.getElementById('selSize');
-      if(selectedProduct.sizes && selectedProduct.sizes.trim() !== "") {
-        sBox.style.display = 'block';
-        sSelect.innerHTML = selectedProduct.sizes.split(',').map(s => `<option value="${s.trim()}">${s.trim()}</option>`).join('');
-      } else { sBox.style.display = 'none'; }
+      <label class="field">পরিমাণ
+        <select name="quantity" id="quantity" onchange="updateTotal()">
+          <option value="1">১টি</option>
+          <option value="2">২টি</option>
+          <option value="3">৩টি</option>
+          <option value="4">৪টি</option>
+          <option value="5">৫টি</option>
+        </select>
+      </label>
 
-      const cBox = document.getElementById('colorBox');
-      const cSelect = document.getElementById('selColor');
-      if(selectedProduct.colors && selectedProduct.colors.trim() !== "") {
-        cBox.style.display = 'block';
-        cSelect.innerHTML = selectedProduct.colors.split(',').map(c => `<option value="${c.trim()}">${c.trim()}</option>`).join('');
-      } else { cBox.style.display = 'none'; }
+      <label class="field">জেলা
+        <select name="district" required>
+          <option value="">জেলা নির্বাচন করুন</option>
+          <option>ঢাকা</option><option>গাজীপুর</option>
+          <option>নারায়ণগঞ্জ</option><option>চট্টগ্রাম</option>
+          <option>কুমিল্লা</option><option>সিলেট</option>
+          <option>রাজশাহী</option><option>খুলনা</option>
+          <option>অন্যান্য</option>
+        </select>
+      </label>
 
-      calculateTotal();
-      document.getElementById('orderModal').style.display = 'flex';
-    }
+      <label class="field">সম্পূর্ণ ঠিকানা
+        <textarea name="address" required rows="3"
+        placeholder="বাসা, রোড, এলাকা, থানা"></textarea>
+      </label>
 
-    function calculateTotal() {
-      if(!selectedProduct) return;
-      const price = parseInt(selectedProduct.price) || 0;
-      const delivery = parseInt(document.getElementById('cDelivery').value) || 0;
-      document.getElementById('cTotal').innerText = price + delivery;
-    }
+      <label class="field">পেমেন্ট পদ্ধতি
+        <select name="payment">
+          <option>ক্যাশ অন ডেলিভারি</option>
+        </select>
+      </label>
 
-    function closeModal() {
-      document.getElementById('orderModal').style.display = 'none';
-      window.history.pushState({}, '', window.location.pathname);
-    }
+      <p><b id="summary">মোট: ৳০</b></p>
+      <button class="primary" type="submit">অর্ডার নিশ্চিত করুন</button>
+      <p class="note">এটি HTML ডেমো। বাস্তব অর্ডার সংরক্ষণের জন্য সার্ভার ও ডেটাবেস প্রয়োজন।</p>
+    </form>
+  </div>
+</div>
 
-    function submitOrder() {
-      const name = document.getElementById('cName').value.trim();
-      const phone = document.getElementById('cPhone').value.trim();
-      const address = document.getElementById('cAddress').value.trim();
-      
-      if(!name || !phone || !address) {
-        alert('দয়া করে আপনার নাম, মোবাইল নম্বর এবং সম্পূর্ণ ঠিকানা লিখুন!');
-        return;
-      }
+<div class="modalbg" id="trackModal">
+  <div class="modal">
+    <button class="close" onclick="closeModal('trackModal')">✕</button>
+    <h2>অর্ডার ট্র্যাক করুন</h2>
+    <form id="trackForm">
+      <label class="field">অর্ডার নম্বর
+        <input name="orderId" required placeholder="যেমন DH-1001">
+      </label>
+      <label class="field">মোবাইল নম্বর
+        <input name="phone" required placeholder="01XXXXXXXXX">
+      </label>
+      <button class="primary" type="submit">স্ট্যাটাস দেখুন</button>
+    </form>
+    <p id="trackResult"></p>
+    <p class="note">বাস্তব ট্র্যাকিংয়ের জন্য ডেটাবেস সংযোগ করতে হবে।</p>
+  </div>
+</div>
 
-      const size = (selectedProduct.sizes && selectedProduct.sizes.trim() !== "") ? document.getElementById('selSize').value : '';
-      const color = (selectedProduct.colors && selectedProduct.colors.trim() !== "") ? document.getElementById('selColor').value : '';
-      const deliveryCharge = parseInt(document.getElementById('cDelivery').value);
-      const total = parseInt(selectedProduct.price) + deliveryCharge;
+<script>
+const products=[
+ {id:1,name:"এলিগ্যান্ট কটন কুর্তি",cat:"পোশাক",price:1250},
+ {id:2,name:"প্রিমিয়াম ক্রসব্যাগ",cat:"ব্যাগ",price:950},
+ {id:3,name:"সফট কালার থ্রি-পিস",cat:"পোশাক",price:1850},
+ {id:4,name:"ক্লাসিক হ্যান্ডব্যাগ",cat:"ব্যাগ",price:1450},
+ {id:5,name:"ডেইলি ওয়্যার টপ",cat:"পোশাক",price:780},
+ {id:6,name:"স্টাইলিশ ওয়ালেট",cat:"অ্যাক্সেসরিজ",price:550},
+ {id:7,name:"ফ্যাশন স্কার্ফ",cat:"অ্যাক্সেসরিজ",price:420},
+ {id:8,name:"মিনিমাল শোল্ডার ব্যাগ",cat:"ব্যাগ",price:1150}
+];
 
-      let orders = JSON.parse(localStorage.getItem('orders')) || [];
-      orders.push({
-        orderId: Date.now().toString().slice(-5),
-        productTitle: selectedProduct.title,
-        price: selectedProduct.price,
-        size: size,
-        color: color,
-        name: name,
-        phone: phone,
-        address: address,
-        deliveryCharge: deliveryCharge,
-        total: total,
-        date: new Date().toLocaleDateString()
-      });
+let category="সব", selectedProduct=null;
 
-      localStorage.setItem('orders', JSON.stringify(orders));
-      alert('অভিনন্দন! আপনার অর্ডারটি সফলভাবে জমা হয়েছে।');
-      closeModal();
-    }
+function money(n){
+ return "৳"+Number(n).toLocaleString("en-US");
+}
 
-    window.onload = function() {
-      renderStore();
-      const urlParams = new URLSearchParams(window.location.search);
-      const prodId = urlParams.get('product');
-      if(prodId) {
-        openOrderModal(parseInt(prodId));
-      }
-    };
-  </script>
+function renderProducts(){
+ const q=document.getElementById("search").value.toLowerCase();
+ const list=products.filter(p=>
+  (category==="সব"||p.cat===category)&&
+  p.name.toLowerCase().includes(q)
+ );
+ document.getElementById("grid").innerHTML=list.map(p=>`
+  <article class="product">
+   <div class="art"><div class="shape"></div></div>
+   <div class="info">
+    <small>${p.cat}</small>
+    <h3>${p.name}</h3>
+    <div class="price">${money(p.price)}</div>
+    <button class="buy" onclick="openOrder(${p.id})">অর্ডার করুন</button>
+   </div>
+  </article>
+ `).join("");
+}
+
+function setCategory(c){
+ category=c;
+ renderProducts();
+}
+
+function openOrder(id){
+ selectedProduct=products.find(p=>p.id===id);
+ document.getElementById("productId").value=id;
+ document.getElementById("quantity").value="1";
+ updateTotal();
+ document.getElementById("orderModal").classList.add("show");
+}
+
+function updateTotal(){
+ if(selectedProduct){
+  const qty=Number(document.getElementById("quantity").value);
+  document.getElementById("summary").textContent=
+   "মোট: "+money(selectedProduct.price*qty);
+ }
+}
+
+function openTrack(){
+ document.getElementById("trackModal").classList.add("show");
+}
+
+function closeModal(id){
+ document.getElementById(id).classList.remove("show");
+}
+
+document.getElementById("orderForm").addEventListener("submit",function(e){
+ e.preventDefault();
+ const data=new FormData(e.target);
+ const orderNo="DH-DEMO-"+Math.floor(1000+Math.random()*9000);
+ alert("ডেমো অর্ডার নম্বর: "+orderNo+
+ "\nপণ্য: "+selectedProduct.name+
+ "\nপরিমাণ: "+data.get("quantity")+
+ "\nমোট: "+money(selectedProduct.price*Number(data.get("quantity")))+
+ "\n\nএটি ডেমো। অর্ডার সার্ভারে জমা হয়নি।");
+ closeModal("orderModal");
+});
+
+document.getElementById("trackForm").addEventListener("submit",function(e){
+ e.preventDefault();
+ document.getElementById("trackResult").textContent=
+ "এটি ডেমো পেজ। বাস্তব অর্ডার স্ট্যাটাস দেখতে ডেটাবেস সংযোগ প্রয়োজন।";
+});
+
+renderProducts();
+</script>
 </body>
 </html>
