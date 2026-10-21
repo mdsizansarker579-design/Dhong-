@@ -3,54 +3,91 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>এডমিন প্যানেল - ঢং শপ</title>
+  <title>প্রফেশনাল এডমিন ড্যাশবোর্ড - ঢং শপ</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-    body { background: #f0f2f5; padding: 15px; }
-    .container { max-width: 850px; margin: 0 auto; background: white; padding: 15px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.08); }
-    h2 { color: #1b5e20; margin-bottom: 15px; font-size: 18px; border-bottom: 2px solid #1b5e20; padding-bottom: 5px; }
-    .section-box { background: #f9f9f9; padding: 15px; border: 1px solid #e0e0e0; border-radius: 8px; margin-bottom: 20px; }
-    .form-group { margin-bottom: 12px; }
-    .form-row { display: flex; gap: 10px; }
+    body { background: #f4f6f9; padding: 10px; color: #333; }
+    .container { max-width: 900px; margin: 0 auto; background: white; padding: 15px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.08); }
+    
+    /* Top Header Bar */
+    .admin-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #1b5e20; padding-bottom: 10px; margin-bottom: 15px; }
+    .admin-header h2 { color: #1b5e20; font-size: 18px; }
+    .nav-site-btn { background: #e53935; color: white; padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: bold; border: none; cursor: pointer; text-decoration: none; }
+
+    /* Dashboard Stats Box */
+    .stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 20px; }
+    .stat-card { background: #e8f5e9; border: 1px solid #c8e6c9; padding: 12px; border-radius: 8px; text-align: center; }
+    .stat-card h3 { font-size: 20px; color: #1b5e20; margin-bottom: 3px; }
+    .stat-card p { font-size: 12px; color: #555; font-weight: 600; }
+
+    /* Section Boxes */
+    .section-box { background: #fafafa; padding: 15px; border: 1px solid #ddd; border-radius: 8px; margin-bottom: 20px; }
+    .section-title { font-size: 15px; font-weight: bold; color: #1b5e20; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
+    
+    .form-group { margin-bottom: 10px; }
+    .form-row { display: flex; gap: 8px; }
     .form-row .form-group { flex: 1; }
-    label { display: block; font-weight: 600; margin-bottom: 5px; font-size: 13px; color: #333; }
-    input, select, textarea { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; font-size: 14px; outline: none; background: #fff; }
-    button { background: #1b5e20; color: white; border: none; padding: 10px 15px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 14px; }
-    button:hover { background: #144417; }
+    label { display: block; font-weight: 600; margin-bottom: 4px; font-size: 12px; color: #444; }
+    input, select, textarea { width: 100%; padding: 8px 10px; border: 1px solid #ccc; border-radius: 6px; font-size: 13px; outline: none; background: #fff; }
     
-    /* Mobile-Friendly Product Cards */
-    .product-list-card { display: flex; flex-direction: column; background: #fff; border: 1px solid #e0e0e0; border-radius: 8px; padding: 12px; margin-bottom: 12px; box-shadow: 0 1px 4px rgba(0,0,0,0.04); gap: 10px; }
-    .p-card-top { display: flex; align-items: center; gap: 12px; }
-    .product-list-card img { width: 55px; height: 55px; object-fit: cover; border-radius: 6px; background: #eee; }
-    .p-info { flex-grow: 1; }
-    .p-info h4 { font-size: 14px; color: #333; margin-bottom: 2px; }
-    .p-info p { font-size: 13px; color: #e53935; font-weight: bold; }
+    .primary-btn { background: #1b5e20; color: white; border: none; padding: 10px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 14px; width: 100%; }
+    .primary-btn:hover { background: #144417; }
+
+    /* Product Card & Order Card List */
+    .item-card { background: white; border: 1px solid #e0e0e0; border-radius: 8px; padding: 12px; margin-bottom: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
+    .item-top { display: flex; gap: 12px; align-items: center; }
+    .item-top img { width: 50px; height: 50px; object-fit: cover; border-radius: 6px; background: #eee; }
+    .item-info { flex-grow: 1; font-size: 13px; }
+    .item-info strong { color: #222; font-size: 14px; }
     
-    .p-card-actions { display: flex; gap: 6px; justify-content: flex-end; border-top: 1px solid #f0f0f0; padding-top: 8px; }
-    .action-btn { padding: 6px 10px; border-radius: 5px; font-size: 12px; font-weight: 600; border: none; cursor: pointer; color: white; }
+    .actions-bar { display: flex; gap: 6px; margin-top: 10px; justify-content: flex-end; border-top: 1px solid #f0f0f0; padding-top: 8px; }
+    .btn { padding: 5px 10px; border-radius: 4px; font-size: 11px; font-weight: 600; border: none; cursor: pointer; color: white; }
     .btn-edit { background: #2196F3; }
     .btn-copy { background: #ff9800; }
     .btn-del { background: #e53935; }
 
+    /* Order Details Box */
+    .order-box { background: #fffde7; border: 1px solid #fff59d; }
+    .order-status { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; background: #4caf50; color: white; }
+
     /* Modal */
-    .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center; padding: 15px; }
-    .modal-content { background: white; padding: 20px; border-radius: 10px; max-width: 480px; width: 100%; max-height: 90vh; overflow-y: auto; position: relative; }
+    .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 1000; justify-content: center; align-items: center; padding: 15px; }
+    .modal-content { background: white; padding: 20px; border-radius: 10px; max-width: 450px; width: 100%; max-height: 90vh; overflow-y: auto; position: relative; }
     .close-btn { position: absolute; right: 15px; top: 15px; font-size: 20px; cursor: pointer; font-weight: bold; color: #666; }
   </style>
 </head>
 <body>
 
   <div class="container">
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
-      <h2 style="margin:0; border:none;">এডমিন প্যানেল</h2>
-      <button onclick="window.location.href='index.html'" style="background:#e53935; padding:6px 12px; font-size:12px;">কাস্টমার সাইট</button>
+    <div class="admin-header">
+      <h2>📊 ঢং শপ - এডমিন ড্যাশবোর্ড</h2>
+      <a href="index.html" class="nav-site-btn" target="_blank">কাস্টমার সাইট দেখুন</a>
     </div>
 
-    <!-- Add Product Section -->
-    <div class="section-box">
-      <h3 id="formTitle" style="color:#1b5e20; margin-bottom:12px; font-size:16px;">নতুন প্রোডাক্ট যোগ করুন</h3>
-      <input type="hidden" id="editIndex" value="-1">
+    <!-- Quick Stats -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <h3 id="totalOrdersCount">0</h3>
+        <p>মোট অর্ডার</p>
+      </div>
+      <div class="stat-card">
+        <h3 id="totalProductsCount">0</h3>
+        <p>মোট প্রোডাক্ট</p>
+      </div>
+    </div>
 
+    <!-- 1. Customer Orders Management Section -->
+    <div class="section-box order-box">
+      <div class="section-title">📦 কাস্টমার অর্ডারসমূহ (Orders)</div>
+      <div id="adminOrdersList">
+        <p style="font-size: 12px; color: #777; text-align: center;">এখনো কোনো নতুন অর্ডার আসেনি!</p>
+      </div>
+    </div>
+
+    <!-- 2. Add New Product Section -->
+    <div class="section-box">
+      <div class="section-title" id="formTitleText">➕ নতুন প্রোডাক্ট যোগ করুন</div>
+      
       <div class="form-group">
         <label>প্রোডাক্টের নাম *</label>
         <input type="text" id="pTitle" placeholder="প্রোডাক্টের নাম লিখুন">
@@ -70,11 +107,11 @@
       <div class="form-row">
         <div class="form-group">
           <label>সাইজ (Size) - কমা দিয়ে</label>
-          <input type="text" id="pSizes" placeholder="S, M, L, XL">
+          <input type="text" id="pSizes" placeholder="M, L, XL">
         </div>
         <div class="form-group">
           <label>কালার (Color) - কমা দিয়ে</label>
-          <input type="text" id="pColors" placeholder="Red, Black">
+          <input type="text" id="pColors" placeholder="White, Black">
         </div>
       </div>
 
@@ -84,25 +121,26 @@
       </div>
 
       <div class="form-group">
-        <label>ছবির লিংক (Image URL অথবা ফাইল)</label>
+        <label>ছবির লিংক (Image URL)</label>
         <input type="text" id="pImgUrl" placeholder="https://...">
-        <input type="file" id="pImgFile" accept="image/*" style="margin-top:5px;" onchange="convertBase64()">
       </div>
 
-      <button id="saveBtn" onclick="saveProduct()" style="width:100%;">প্রোডাক্ট যোগ করুন</button>
-      <button id="cancelBtn" onclick="resetForm()" style="width:100%; background:#757575; margin-top:5px; display:none;">বাতিল করুন</button>
+      <button class="primary-btn" onclick="saveProduct()">প্রোডাক্ট সেভ করুন</button>
     </div>
 
-    <h2>প্রোডাক্ট তালিকা ও এডিট অপশন</h2>
-    <div id="adminPList" style="margin-top:10px;"></div>
+    <!-- 3. Product List & Management -->
+    <div class="section-box">
+      <div class="section-title">🛍️ প্রোডাক্ট তালিকা ও ম্যানেজমেন্ট</div>
+      <div id="adminProductList"></div>
+    </div>
   </div>
 
-  <!-- Edit Modal (Popup) -->
+  <!-- Edit Modal -->
   <div class="modal" id="editModal">
     <div class="modal-content">
-      <span class="close-btn" onclick="closeModal()">&times;</span>
-      <h3 style="color:#1b5e20; margin-bottom:15px;">প্রোডাক্ট এডিট করুন</h3>
-      <input type="hidden" id="modalIndex">
+      <span class="close-btn" onclick="closeEditModal()">&times;</span>
+      <h3 style="color:#1b5e20; margin-bottom:12px; font-size:16px;">প্রোডাক্ট এডিট করুন</h3>
+      <input type="hidden" id="editIndex">
 
       <div class="form-group">
         <label>প্রোডাক্টের নাম</label>
@@ -129,22 +167,74 @@
         </div>
       </div>
       <div class="form-group">
-        <label>ছবির লিংক (URL)</label>
+        <label>ছবির লিংক</label>
         <input type="text" id="mImg">
       </div>
-      <button onclick="updateProductData()" style="width:100%; background:#2196F3;">পরিবর্তন সেভ করুন</button>
+      <button class="primary-btn" style="background:#2196F3; margin-top:10px;" onclick="updateProduct()">পরিবর্তন সেভ করুন</button>
     </div>
   </div>
 
   <script>
-    let base64Img = "";
+    function loadAdminData() {
+      let products = JSON.parse(localStorage.getItem('products')) || [];
+      let orders = JSON.parse(localStorage.getItem('orders')) || [];
 
-    function convertBase64() {
-      const file = document.getElementById('pImgFile').files[0];
-      if(file) {
-        const reader = new FileReader();
-        reader.onloadend = function() { base64Img = reader.result; };
-        reader.readAsDataURL(file);
+      // Stats update
+      document.getElementById('totalProductsCount').innerText = products.length;
+      document.getElementById('totalOrdersCount').innerText = orders.length;
+
+      // Render Orders
+      const orderListDiv = document.getElementById('adminOrdersList');
+      if(orders.length === 0) {
+        orderListDiv.innerHTML = '<p style="font-size: 12px; color: #777; text-align: center;">এখনো কোনো নতুন অর্ডার আসেনি!</p>';
+      } else {
+        orderListDiv.innerHTML = '';
+        orders.slice().reverse().forEach((ord, idx) => {
+          let realIdx = orders.length - 1 - idx;
+          orderListDiv.innerHTML += `
+            <div class="item-card" style="border-left: 4px solid #fbc02d;">
+              <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
+                <strong>📦 অর্ডার #${ord.orderId || realIdx+1}</strong>
+                <span class="order-status">${ord.status || 'নতুন অর্ডার'}</span>
+              </div>
+              <p style="font-size:12px; margin-bottom:3px;"><b>প্রোডাক্ট:</b> ${ord.productTitle} (৳${ord.price})</p>
+              ${ord.size ? `<p style="font-size:12px; margin-bottom:3px;"><b>সাইজ:</b> ${ord.size} \vert{} <b>কালার:</b> ${ord.color || 'N/A'}</p>` : ''}
+              <p style="font-size:12px; margin-bottom:3px;"><b>গ্রাহক:</b> ${ord.name} (${ord.phone})</p>
+              <p style="font-size:12px; margin-bottom:6px;"><b>ঠিকানা:</b> ${ord.address} | <b>এরিয়া:</b> ৳${ord.deliveryCharge} ডেলিভারি</p>
+              <p style="font-size:13px; color:#e53935; font-weight:bold; margin-bottom:8px;">সর্বমোট: ৳${ord.total}</p>
+              <div style="display:flex; justify-content:flex-end; gap:5px;">
+                <button class="btn btn-del" onclick="deleteOrder(${realIdx})">অর্ডার ডিলিট</button>
+              </div>
+            </div>
+          `;
+        });
+      }
+
+      // Render Products
+      const prodListDiv = document.getElementById('adminProductList');
+      if(products.length === 0) {
+        prodListDiv.innerHTML = '<p style="font-size: 12px; color: #777; text-align: center;">কোনো প্রোডাক্ট নেই!</p>';
+      } else {
+        prodListDiv.innerHTML = '';
+        products.forEach((p, index) => {
+          prodListDiv.innerHTML += `
+            <div class="item-card">
+              <div class="item-top">
+                <img src="${p.image || 'https://via.placeholder.com/150'}">
+                <div class="item-info">
+                  <strong>${p.title}</strong><br>
+                  <span style="color:#e53935; font-weight:bold;">৳${p.price}</span> | স্টক: ${p.stock || '100'}<br>
+                  <small style="color:#666;">ক্যাটাগরি: ${p.category || 'সাধারণ'}</small>
+                </div>
+              </div>
+              <div class="actions-bar">
+                <button class="btn btn-copy" onclick="copyLink(${p.id})">🔗 লিংক</button>
+                <button class="btn btn-edit" onclick="openEditModal(${index})">✏️ এডিট</button>
+                <button class="btn btn-del" onclick="deleteProduct(${index})">🗑️ ডিলিট</button>
+              </div>
+            </div>
+          `;
+        });
       }
     }
 
@@ -154,52 +244,33 @@
       const category = document.getElementById('pCategory').value.trim() || 'অন্যান্য';
       const sizes = document.getElementById('pSizes').value.trim();
       const colors = document.getElementById('pColors').value.trim();
-      const stock = document.getElementById('pStock').value.trim() || '10';
-      const imgUrl = document.getElementById('pImgUrl').value.trim();
+      const stock = document.getElementById('pStock').value.trim() || '100';
+      const image = document.getElementById('pImgUrl').value.trim() || 'https://via.placeholder.com/150';
 
-      if(!title || !price) { alert('প্রোডাক্টের নাম এবং মূল্য দিন!'); return; }
+      if(!title || !price) { alert('প্রোডাক্টের নাম এবং মূল্য অবশ্যই দিতে হবে!'); return; }
 
       let products = JSON.parse(localStorage.getItem('products')) || [];
-      let image = base64Img || imgUrl || 'https://via.placeholder.com/150';
-
       products.push({ id: Date.now(), title, price, category, sizes, colors, stock, image });
       localStorage.setItem('products', JSON.stringify(products));
-      resetForm();
-      renderAdminProducts();
-      alert('প্রোডাক্ট সফলভাবে যোগ হয়েছে!');
-    }
 
-    function renderAdminProducts() {
-      let products = JSON.parse(localStorage.getItem('products')) || [];
-      const list = document.getElementById('adminPList');
-      list.innerHTML = products.length === 0 ? '<p style="color:#777; text-align:center; padding:15px;">কোনো প্রোডাক্ট নেই!</p>' : '';
+      // Reset form
+      document.getElementById('pTitle').value = '';
+      document.getElementById('pPrice').value = '';
+      document.getElementById('pCategory').value = '';
+      document.getElementById('pSizes').value = '';
+      document.getElementById('pColors').value = '';
+      document.getElementById('pStock').value = '';
+      document.getElementById('pImgUrl').value = '';
 
-      products.forEach((p, index) => {
-        list.innerHTML += `
-          <div class="product-list-card">
-            <div class="p-card-top">
-              <img src="${p.image}">
-              <div class="p-info">
-                <h4>${p.title}</h4>
-                <p>৳${p.price} <span style="font-size:11px; color:#666; font-weight:normal;">| স্টক: ${p.stock}</span></p>
-                <small style="color:#555;">ক্যাটাগরি: ${p.category} | সাইজ: ${p.sizes || 'N/A'}</small>
-              </div>
-            </div>
-            <div class="p-card-actions">
-              <button class="action-btn btn-copy" onclick="copyLink(${p.id})">🔗 লিংক</button>
-              <button class="action-btn btn-edit" onclick="openEditModal(${index})">✏️ এডিট</button>
-              <button class="action-btn btn-del" onclick="deleteProduct(${index})">🗑️ ডিলিট</button>
-            </div>
-          </div>
-        `;
-      });
+      loadAdminData();
+      alert('প্রোডাক্ট সফলভাবে যোগ করা হয়েছে!');
     }
 
     function openEditModal(index) {
       let products = JSON.parse(localStorage.getItem('products')) || [];
       const p = products[index];
 
-      document.getElementById('modalIndex').value = index;
+      document.getElementById('editIndex').value = index;
       document.getElementById('mTitle').value = p.title || '';
       document.getElementById('mPrice').value = p.price || '';
       document.getElementById('mStock').value = p.stock || '';
@@ -210,12 +281,12 @@
       document.getElementById('editModal').style.display = 'flex';
     }
 
-    function closeModal() {
+    function closeEditModal() {
       document.getElementById('editModal').style.display = 'none';
     }
 
-    function updateProductData() {
-      let index = document.getElementById('modalIndex').value;
+    function updateProduct() {
+      let index = document.getElementById('editIndex').value;
       let products = JSON.parse(localStorage.getItem('products')) || [];
 
       products[index].title = document.getElementById('mTitle').value.trim();
@@ -226,43 +297,40 @@
       products[index].image = document.getElementById('mImg').value.trim();
 
       localStorage.setItem('products', JSON.stringify(products));
-      closeModal();
-      renderAdminProducts();
-      alert('প্রোডাক্ট সফলভাবে আপডেট হয়েছে!');
+      closeEditModal();
+      loadAdminData();
+      alert('প্রোডাক্ট আপডেট হয়েছে!');
+    }
+
+    function deleteProduct(index) {
+      if(confirm('প্রোডাক্টটি ডিলিট করতে চান?')) {
+        let products = JSON.parse(localStorage.getItem('products')) || [];
+        products.splice(index, 1);
+        localStorage.setItem('products', JSON.stringify(products));
+        loadAdminData();
+      }
+    }
+
+    function deleteOrder(index) {
+      if(confirm('অর্ডারটি মুছে ফেলতে চান?')) {
+        let orders = JSON.parse(localStorage.getItem('orders')) || [];
+        orders.splice(index, 1);
+        localStorage.setItem('orders', JSON.stringify(orders));
+        loadAdminData();
+      }
     }
 
     function copyLink(id) {
       const baseUrl = window.location.href.replace('admin.html', 'index.html');
       const directLink = `${baseUrl}?product=${id}`;
       navigator.clipboard.writeText(directLink).then(() => {
-        alert('ফেসবুক বুস্টিং লিংক কপি হয়েছে!');
+        alert('ফেসবুক বুস্ট লিংক কপি হয়েছে!');
       }).catch(() => {
         prompt('লিংক কপি করুন:', directLink);
       });
     }
 
-    function deleteProduct(index) {
-      if(confirm('আপনি কি এই প্রোডাক্টটি ডিলিট করতে চান?')) {
-        let products = JSON.parse(localStorage.getItem('products')) || [];
-        products.splice(index, 1);
-        localStorage.setItem('products', JSON.stringify(products));
-        renderAdminProducts();
-      }
-    }
-
-    function resetForm() {
-      document.getElementById('pTitle').value = '';
-      document.getElementById('pPrice').value = '';
-      document.getElementById('pCategory').value = '';
-      document.getElementById('pSizes').value = '';
-      document.getElementById('pColors').value = '';
-      document.getElementById('pStock').value = '';
-      document.getElementById('pImgUrl').value = '';
-      document.getElementById('pImgFile').value = '';
-      base64Img = "";
-    }
-
-    renderAdminProducts();
+    window.onload = loadAdminData;
   </script>
 </body>
 </html>
