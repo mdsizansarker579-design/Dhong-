@@ -15,14 +15,20 @@
     .nav-site-btn { background: #e53935; color: white; padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: bold; border: none; cursor: pointer; text-decoration: none; }
 
     /* Dashboard Stats Box */
-    .stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 20px; }
-    .stat-card { background: #e8f5e9; border: 1px solid #c8e6c9; padding: 12px; border-radius: 8px; text-align: center; }
-    .stat-card h3 { font-size: 20px; color: #1b5e20; margin-bottom: 3px; }
-    .stat-card p { font-size: 12px; color: #555; font-weight: 600; }
+    .stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 15px; }
+    .stat-card { background: #e8f5e9; border: 1px solid #c8e6c9; padding: 10px; border-radius: 8px; text-align: center; }
+    .stat-card h3 { font-size: 18px; color: #1b5e20; margin-bottom: 2px; }
+    .stat-card p { font-size: 11px; color: #555; font-weight: 600; }
+
+    /* Collapsible Order Box (Message Box Style) */
+    .order-box-wrapper { background: #fffde7; border: 1px solid #fbc02d; border-radius: 8px; margin-bottom: 20px; overflow: hidden; }
+    .order-box-header { background: #fff9c4; padding: 10px 15px; font-size: 14px; font-weight: bold; color: #f57f17; display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
+    .order-scroll-container { max-height: 220px; overflow-y: auto; padding: 10px; display: none; }
+    .order-scroll-container.active { display: block; }
 
     /* Section Boxes */
     .section-box { background: #fafafa; padding: 15px; border: 1px solid #ddd; border-radius: 8px; margin-bottom: 20px; }
-    .section-title { font-size: 15px; font-weight: bold; color: #1b5e20; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
+    .section-title { font-size: 15px; font-weight: bold; color: #1b5e20; margin-bottom: 12px; }
     
     .form-group { margin-bottom: 10px; }
     .form-row { display: flex; gap: 8px; }
@@ -33,22 +39,18 @@
     .primary-btn { background: #1b5e20; color: white; border: none; padding: 10px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 14px; width: 100%; }
     .primary-btn:hover { background: #144417; }
 
-    /* Product Card & Order Card List */
-    .item-card { background: white; border: 1px solid #e0e0e0; border-radius: 8px; padding: 12px; margin-bottom: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
-    .item-top { display: flex; gap: 12px; align-items: center; }
-    .item-top img { width: 50px; height: 50px; object-fit: cover; border-radius: 6px; background: #eee; }
-    .item-info { flex-grow: 1; font-size: 13px; }
-    .item-info strong { color: #222; font-size: 14px; }
+    /* Product & Order Cards */
+    .item-card { background: white; border: 1px solid #e0e0e0; border-radius: 8px; padding: 10px; margin-bottom: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
+    .item-top { display: flex; gap: 10px; align-items: center; }
+    .item-top img { width: 45px; height: 45px; object-fit: cover; border-radius: 6px; background: #eee; }
+    .item-info { flex-grow: 1; font-size: 12px; }
+    .item-info strong { color: #222; font-size: 13px; }
     
-    .actions-bar { display: flex; gap: 6px; margin-top: 10px; justify-content: flex-end; border-top: 1px solid #f0f0f0; padding-top: 8px; }
-    .btn { padding: 5px 10px; border-radius: 4px; font-size: 11px; font-weight: 600; border: none; cursor: pointer; color: white; }
+    .actions-bar { display: flex; gap: 6px; margin-top: 8px; justify-content: flex-end; border-top: 1px solid #f0f0f0; padding-top: 6px; }
+    .btn { padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; border: none; cursor: pointer; color: white; }
     .btn-edit { background: #2196F3; }
     .btn-copy { background: #ff9800; }
     .btn-del { background: #e53935; }
-
-    /* Order Details Box */
-    .order-box { background: #fffde7; border: 1px solid #fff59d; }
-    .order-status { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; background: #4caf50; color: white; }
 
     /* Modal */
     .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 1000; justify-content: center; align-items: center; padding: 15px; }
@@ -61,7 +63,7 @@
   <div class="container">
     <div class="admin-header">
       <h2>📊 ঢং শপ - এডমিন ড্যাশবোর্ড</h2>
-      <a href="index.html" class="nav-site-btn" target="_blank">কাস্টমার সাইট দেখুন</a>
+      <a href="index.html" class="nav-site-btn" target="_blank">কাস্টমার সাইট</a>
     </div>
 
     <!-- Quick Stats -->
@@ -76,17 +78,22 @@
       </div>
     </div>
 
-    <!-- 1. Customer Orders Management Section -->
-    <div class="section-box order-box">
-      <div class="section-title">📦 কাস্টমার অর্ডারসমূহ (Orders)</div>
-      <div id="adminOrdersList">
-        <p style="font-size: 12px; color: #777; text-align: center;">এখনো কোনো নতুন অর্ডার আসেনি!</p>
+    <!-- Collapsible Order Message Box -->
+    <div class="order-box-wrapper">
+      <div class="order-box-header" onclick="toggleOrderBox()">
+        <span>📦 নতুন কাস্টমার অর্ডারসমূহ (<span id="orderBadgeCount">0</span>টি)</span>
+        <span id="toggleIcon">▼ খুলুন</span>
+      </div>
+      <div class="order-scroll-container" id="orderScrollContainer">
+        <div id="adminOrdersList">
+          <p style="font-size: 12px; color: #777; text-align: center;">কোনো অর্ডার নেই!</p>
+        </div>
       </div>
     </div>
 
-    <!-- 2. Add New Product Section -->
+    <!-- Add New Product Section -->
     <div class="section-box">
-      <div class="section-title" id="formTitleText">➕ নতুন প্রোডাক্ট যোগ করুন</div>
+      <div class="section-title">➕ নতুন প্রোডাক্ট যোগ করুন</div>
       
       <div class="form-group">
         <label>প্রোডাক্টের নাম *</label>
@@ -128,7 +135,7 @@
       <button class="primary-btn" onclick="saveProduct()">প্রোডাক্ট সেভ করুন</button>
     </div>
 
-    <!-- 3. Product List & Management -->
+    <!-- Product List & Management -->
     <div class="section-box">
       <div class="section-title">🛍️ প্রোডাক্ট তালিকা ও ম্যানেজমেন্ট</div>
       <div id="adminProductList"></div>
@@ -175,34 +182,46 @@
   </div>
 
   <script>
+    function toggleOrderBox() {
+      const container = document.getElementById('orderScrollContainer');
+      const icon = document.getElementById('toggleIcon');
+      if(container.classList.contains('active')) {
+        container.classList.remove('active');
+        icon.innerText = '▼ খুলুন';
+      } else {
+        container.classList.add('active');
+        icon.innerText = '▲ বন্ধ করুন';
+      }
+    }
+
     function loadAdminData() {
       let products = JSON.parse(localStorage.getItem('products')) || [];
       let orders = JSON.parse(localStorage.getItem('orders')) || [];
 
-      // Stats update
       document.getElementById('totalProductsCount').innerText = products.length;
       document.getElementById('totalOrdersCount').innerText = orders.length;
+      document.getElementById('orderBadgeCount').innerText = orders.length;
 
-      // Render Orders
+      // Render Orders inside message box
       const orderListDiv = document.getElementById('adminOrdersList');
       if(orders.length === 0) {
-        orderListDiv.innerHTML = '<p style="font-size: 12px; color: #777; text-align: center;">এখনো কোনো নতুন অর্ডার আসেনি!</p>';
+        orderListDiv.innerHTML = '<p style="font-size: 12px; color: #777; text-align: center;">কোনো অর্ডার নেই!</p>';
       } else {
         orderListDiv.innerHTML = '';
         orders.slice().reverse().forEach((ord, idx) => {
           let realIdx = orders.length - 1 - idx;
           orderListDiv.innerHTML += `
             <div class="item-card" style="border-left: 4px solid #fbc02d;">
-              <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
+              <div style="display:flex; justify-content:space-between; margin-bottom:4px; font-size:11px;">
                 <strong>📦 অর্ডার #${ord.orderId || realIdx+1}</strong>
-                <span class="order-status">${ord.status || 'নতুন অর্ডার'}</span>
+                <span style="color:#d32f2f; font-weight:bold;">${ord.date || ''}</span>
               </div>
-              <p style="font-size:12px; margin-bottom:3px;"><b>প্রোডাক্ট:</b> ${ord.productTitle} (৳${ord.price})</p>
-              ${ord.size ? `<p style="font-size:12px; margin-bottom:3px;"><b>সাইজ:</b> ${ord.size} \vert{} <b>কালার:</b> ${ord.color || 'N/A'}</p>` : ''}
-              <p style="font-size:12px; margin-bottom:3px;"><b>গ্রাহক:</b> ${ord.name} (${ord.phone})</p>
-              <p style="font-size:12px; margin-bottom:6px;"><b>ঠিকানা:</b> ${ord.address} | <b>এরিয়া:</b> ৳${ord.deliveryCharge} ডেলিভারি</p>
-              <p style="font-size:13px; color:#e53935; font-weight:bold; margin-bottom:8px;">সর্বমোট: ৳${ord.total}</p>
-              <div style="display:flex; justify-content:flex-end; gap:5px;">
+              <p style="font-size:12px; margin-bottom:2px;"><b>প্রোডাক্ট:</b> ${ord.productTitle} (৳${ord.price})</p>
+              ${ord.size ? `<p style="font-size:12px; margin-bottom:2px;"><b>সাইজ:</b> ${ord.size} \vert{} <b>কালার:</b> ${ord.color || 'N/A'}</p>` : ''}
+              <p style="font-size:12px; margin-bottom:2px;"><b>গ্রাহক:</b> ${ord.name} (${ord.phone})</p>
+              <p style="font-size:12px; margin-bottom:4px;"><b>ঠিকানা:</b> ${ord.address} | <b>ডেলিভারি:</b> ৳${ord.deliveryCharge}</p>
+              <p style="font-size:12px; color:#e53935; font-weight:bold; margin-bottom:6px;">সর্বমোট: ৳${ord.total}</p>
+              <div style="display:flex; justify-content:flex-end;">
                 <button class="btn btn-del" onclick="deleteOrder(${realIdx})">অর্ডার ডিলিট</button>
               </div>
             </div>
@@ -253,7 +272,6 @@
       products.push({ id: Date.now(), title, price, category, sizes, colors, stock, image });
       localStorage.setItem('products', JSON.stringify(products));
 
-      // Reset form
       document.getElementById('pTitle').value = '';
       document.getElementById('pPrice').value = '';
       document.getElementById('pCategory').value = '';
