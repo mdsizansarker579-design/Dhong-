@@ -40,7 +40,6 @@
 
   <div class="container">
 
-    <!-- Add / Edit Product Section -->
     <div class="section-box">
       <h2 id="formTitle">নতুন প্রোডাক্ট যোগ করুন</h2>
       <input type="hidden" id="editIndex" value="-1">
@@ -52,12 +51,23 @@
 
       <div class="form-row">
         <div class="form-group">
-          <label>মূল্য (৳) *</label>
+          <label>অফার মূল্য (৳) *</label>
           <input type="number" id="pPrice" placeholder="যেমন: 499">
         </div>
         <div class="form-group">
+          <label>আগের মূল্য (৳) [অপশনাল]</label>
+          <input type="number" id="pOldPrice" placeholder="যেমন: 650">
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
           <label>ক্যাটাগরি</label>
-          <input type="text" id="pCategory" placeholder="যেমন: টি-শার্ট">
+          <input type="text" id="pCategory" placeholder="যেমন: পোশাক">
+        </div>
+        <div class="form-group">
+          <label>স্টক পরিমাণ</label>
+          <input type="number" id="pStock" placeholder="যেমন: 100">
         </div>
       </div>
 
@@ -73,26 +83,15 @@
       </div>
 
       <div class="form-group">
-        <label>স্টক পরিমাণ</label>
-        <input type="number" id="pStock" placeholder="যেমন: 100">
-      </div>
-
-      <div class="form-group">
-        <label>ছবি (URL অথবা ফাইল আপলোড)</label>
+        <label>ছবি (URL অথবা লোকাল ফাইল আপলোড)</label>
         <input type="text" id="pImgUrl" placeholder="Image URL দিন">
         <input type="file" id="pImgFile" accept="image/*" style="margin-top:5px;" onchange="convertBase64()">
-      </div>
-
-      <div class="form-group">
-        <label>বিবরণ</label>
-        <textarea id="pDesc" rows="2" placeholder="সংক্ষিপ্ত বিবরণ..."></textarea>
       </div>
 
       <button id="saveBtn" onclick="saveProduct()" style="width:100%;">প্রোডাক্ট যোগ করুন</button>
       <button id="cancelBtn" onclick="resetForm()" style="width:100%; background:#757575; margin-top:5px; display:none;">বাতিল করুন</button>
     </div>
 
-    <!-- Product List Section -->
     <h2>প্রোডাক্ট তালিকা ও ফেসবুক বুস্টিং লিংক</h2>
     <div id="adminPList" style="margin-top:10px;"></div>
 
@@ -117,12 +116,12 @@
     function saveProduct() {
       const title = document.getElementById('pTitle').value.trim();
       const price = document.getElementById('pPrice').value.trim();
+      const oldPrice = document.getElementById('pOldPrice').value.trim();
       const category = document.getElementById('pCategory').value.trim() || 'অন্যান্য';
       const sizes = document.getElementById('pSizes').value.trim();
       const colors = document.getElementById('pColors').value.trim();
       const stock = document.getElementById('pStock').value.trim();
       const imgUrl = document.getElementById('pImgUrl').value.trim();
-      const desc = document.getElementById('pDesc').value.trim();
       const editIndex = parseInt(document.getElementById('editIndex').value);
 
       if(!title || !price) { alert('নাম এবং মূল্য অবশ্যই দিতে হবে!'); return; }
@@ -132,10 +131,10 @@
 
       if(editIndex > -1) {
         if(!image) image = products[editIndex].image;
-        products[editIndex] = { id: products[editIndex].id, title, price, category, sizes, colors, stock, image, desc };
+        products[editIndex] = { id: products[editIndex].id, title, price, oldPrice, category, sizes, colors, stock, image };
       } else {
         if(!image) image = 'https://via.placeholder.com/150';
-        products.push({ id: Date.now(), title, price, category, sizes, colors, stock, image, desc });
+        products.push({ id: Date.now(), title, price, oldPrice, category, sizes, colors, stock, image });
       }
 
       localStorage.setItem('products', JSON.stringify(products));
@@ -151,12 +150,12 @@
       document.getElementById('editIndex').value = index;
       document.getElementById('pTitle').value = p.title || '';
       document.getElementById('pPrice').value = p.price || '';
+      document.getElementById('pOldPrice').value = p.oldPrice || '';
       document.getElementById('pCategory').value = p.category || '';
       document.getElementById('pSizes').value = p.sizes || '';
       document.getElementById('pColors').value = p.colors || '';
       document.getElementById('pStock').value = p.stock || '';
       document.getElementById('pImgUrl').value = p.image.startsWith('data:') ? '' : p.image;
-      document.getElementById('pDesc').value = p.desc || '';
 
       document.getElementById('saveBtn').innerText = 'আপডেট করুন';
       document.getElementById('cancelBtn').style.display = 'block';
@@ -168,7 +167,7 @@
       const directLink = `${baseUrl}?product=${id}`;
       
       navigator.clipboard.writeText(directLink).then(() => {
-        alert('লিংক কপি হয়েছে! ফেসবুকে এড/বুস্টের সময় এই লিংকটি ব্যবহার করুন:\n\n' + directLink);
+        alert('লিংক কপি হয়েছে! ফেসবুকে এড/বুস্টের সময় এই লিংকটি ব্যবহার করুন:\n\n' + directLink);
       }).catch(() => {
         prompt('নিচের লিংকটি কপি করে নিন:', directLink);
       });
@@ -179,13 +178,13 @@
       document.getElementById('editIndex').value = '-1';
       document.getElementById('pTitle').value = '';
       document.getElementById('pPrice').value = '';
+      document.getElementById('pOldPrice').value = '';
       document.getElementById('pCategory').value = '';
       document.getElementById('pSizes').value = '';
       document.getElementById('pColors').value = '';
       document.getElementById('pStock').value = '';
       document.getElementById('pImgUrl').value = '';
       document.getElementById('pImgFile').value = '';
-      document.getElementById('pDesc').value = '';
       base64Img = "";
 
       document.getElementById('saveBtn').innerText = 'প্রোডাক্ট যোগ করুন';
@@ -203,7 +202,8 @@
             <img src="${p.image}">
             <div class="p-details">
               <strong>${p.title}</strong><br>
-              <small style="color:#e53935; font-weight:bold;">৳${p.price}</small> | 
+              <small style="color:#e53935; font-weight:bold;">৳${p.price}</small> 
+              ${p.oldPrice ? `<small style="text-decoration:line-through; color:#888;">৳${p.oldPrice}</small>` : ''}<br>
               <small>স্টক: ${p.stock || '100'}</small>
             </div>
             <div>
