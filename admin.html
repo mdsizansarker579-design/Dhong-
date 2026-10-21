@@ -18,13 +18,12 @@
     button { background: #1b5e20; color: white; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer; font-weight: bold; font-size: 14px; }
     button:hover { background: #144417; }
     
-    .wa-item { display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; background: white; border: 1px solid #e0e0e0; margin-top: 6px; border-radius: 5px; }
-    .del-btn { background: #e53935; color: white; padding: 5px 10px; border-radius: 4px; font-size: 12px; border: none; cursor: pointer; }
-    .edit-btn { background: #2196F3; color: white; padding: 5px 10px; border-radius: 4px; font-size: 12px; border: none; cursor: pointer; margin-right: 5px; }
-    .active-badge { background: #4caf50; color: white; padding: 2px 8px; border-radius: 12px; font-size: 11px; margin-left: 5px; }
+    .del-btn { background: #e53935; color: white; padding: 6px 10px; border-radius: 4px; font-size: 12px; border: none; cursor: pointer; }
+    .edit-btn { background: #2196F3; color: white; padding: 6px 10px; border-radius: 4px; font-size: 12px; border: none; cursor: pointer; margin-right: 3px; }
+    .copy-btn { background: #ff9800; color: white; padding: 6px 10px; border-radius: 4px; font-size: 12px; border: none; cursor: pointer; margin-right: 3px; }
 
-    .p-card { display: flex; align-items: center; gap: 15px; padding: 10px; border: 1px solid #eee; border-radius: 6px; margin-bottom: 10px; background: white; }
-    .p-card img { width: 50px; height: 50px; object-fit: cover; border-radius: 5px; }
+    .p-card { display: flex; align-items: center; gap: 15px; padding: 12px; border: 1px solid #eee; border-radius: 6px; margin-bottom: 10px; background: white; }
+    .p-card img { width: 60px; height: 60px; object-fit: cover; border-radius: 5px; }
     .p-details { flex-grow: 1; }
   </style>
 </head>
@@ -41,75 +40,60 @@
 
   <div class="container">
 
-    <!-- 1. WhatsApp Number Section -->
-    <div class="section-box">
-      <h2>📲 WhatsApp নম্বর সেটিংস</h2>
-      <p style="font-size:12px; color:#666; margin-bottom:10px;">নম্বর যোগ করার সময় অবশ্যই দেশি কোডসহ লিখুন (যেমন: 8801700000000)</p>
-      
-      <div class="form-row" style="margin-bottom:10px;">
-        <input type="text" id="waLabel" placeholder="নাম/লেবেল (যেমন: মেইন সাপোর্ট)">
-        <input type="text" id="waNum" placeholder="8801700000000">
-        <button onclick="addWaNumber()" style="white-space:nowrap;">যোগ করুন</button>
-      </div>
-
-      <div id="waList"></div>
-    </div>
-
-    <!-- 2. Add / Edit Product Section -->
+    <!-- Add / Edit Product Section -->
     <div class="section-box">
       <h2 id="formTitle">নতুন প্রোডাক্ট যোগ করুন</h2>
       <input type="hidden" id="editIndex" value="-1">
 
       <div class="form-group">
         <label>প্রোডাক্টের নাম *</label>
-        <input type="text" id="pTitle" placeholder="প্রোডাক্টের শিরোনাম">
+        <input type="text" id="pTitle" placeholder="প্রোডাক্টের নাম">
       </div>
 
       <div class="form-row">
         <div class="form-group">
           <label>মূল্য (৳) *</label>
-          <input type="number" id="pPrice" placeholder="যেমন: 1200">
+          <input type="number" id="pPrice" placeholder="যেমন: 499">
         </div>
         <div class="form-group">
           <label>ক্যাটাগরি</label>
-          <input type="text" id="pCategory" placeholder="যেমন: পোশাক, এক্সেসরিজ">
+          <input type="text" id="pCategory" placeholder="যেমন: টি-শার্ট">
         </div>
       </div>
 
-      <!-- Separate Size & Color Options -->
       <div class="form-row">
         <div class="form-group">
-          <label>সাইজ (Size) - কমা দিয়ে আলাদা করুন</label>
-          <input type="text" id="pSizes" placeholder="যেমন: S, M, L, XL">
+          <label>সাইজ (Size) - কমা দিয়ে লিখুন</label>
+          <input type="text" id="pSizes" placeholder="M, L, XL">
         </div>
         <div class="form-group">
-          <label>কালার (Color) - কমা দিয়ে আলাদা করুন</label>
-          <input type="text" id="pColors" placeholder="যেমন: Red, Blue, Black">
+          <label>কালার (Color) - কমা দিয়ে লিখুন</label>
+          <input type="text" id="pColors" placeholder="White, Black">
         </div>
       </div>
 
       <div class="form-group">
         <label>স্টক পরিমাণ</label>
-        <input type="number" id="pStock" placeholder="যেমন: 15">
+        <input type="number" id="pStock" placeholder="যেমন: 100">
       </div>
 
       <div class="form-group">
-        <label>ছবি (URL অথবা লোকাল ছবি ফাইল আপলোড)</label>
+        <label>ছবি (URL অথবা ফাইল আপলোড)</label>
         <input type="text" id="pImgUrl" placeholder="Image URL দিন">
         <input type="file" id="pImgFile" accept="image/*" style="margin-top:5px;" onchange="convertBase64()">
       </div>
 
       <div class="form-group">
-        <label>বিস্তারিত বিবরণ (Description)</label>
-        <textarea id="pDesc" rows="3" placeholder="প্রোডাক্টের সংক্ষিপ্ত বা বিস্তারিত বিবরণ লিখুন..."></textarea>
+        <label>বিবরণ</label>
+        <textarea id="pDesc" rows="2" placeholder="সংক্ষিপ্ত বিবরণ..."></textarea>
       </div>
 
       <button id="saveBtn" onclick="saveProduct()" style="width:100%;">প্রোডাক্ট যোগ করুন</button>
       <button id="cancelBtn" onclick="resetForm()" style="width:100%; background:#757575; margin-top:5px; display:none;">বাতিল করুন</button>
     </div>
 
-    <!-- 3. Product List Section -->
-    <h2>প্রোডাক্ট তালিকা</h2>
+    <!-- Product List Section -->
+    <h2>প্রোডাক্ট তালিকা ও ফেসবুক বুস্টিং লিংক</h2>
     <div id="adminPList" style="margin-top:10px;"></div>
 
   </div>
@@ -123,60 +107,6 @@
       } else { alert('ভুল পাসওয়ার্ড!'); }
     }
 
-    // WhatsApp Numbers Logic
-    function renderWaNumbers() {
-      let waList = JSON.parse(localStorage.getItem('wa_numbers')) || [];
-      const container = document.getElementById('waList');
-      container.innerHTML = waList.length === 0 ? '<p style="font-size:12px; color:#888;">কোনো নম্বর পাওয়া যায়নি!</p>' : '';
-
-      waList.forEach((item, i) => {
-        container.innerHTML += `
-          <div class="wa-item">
-            <div>
-              <strong>${item.label}</strong> (${item.number})
-              ${item.active ? '<span class="active-badge">Active</span>' : ''}
-            </div>
-            <div>
-              ${!item.active ? `<button style="background:#2196F3; padding:3px 8px; font-size:11px;" onclick="setActiveWa(${i})">Set Active</button>` : ''}
-              <button class="del-btn" onclick="deleteWa(${i})">X</button>
-            </div>
-          </div>
-        `;
-      });
-    }
-
-    function addWaNumber() {
-      const label = document.getElementById('waLabel').value.trim();
-      const number = document.getElementById('waNum').value.trim();
-
-      if(!label || !number) { alert('নাম ও নম্বর দুটোই দিন!'); return; }
-
-      let waList = JSON.parse(localStorage.getItem('wa_numbers')) || [];
-      const isActive = waList.length === 0;
-      waList.push({ label, number, active: isActive });
-
-      localStorage.setItem('wa_numbers', JSON.stringify(waList));
-      document.getElementById('waLabel').value = '';
-      document.getElementById('waNum').value = '';
-      renderWaNumbers();
-    }
-
-    function setActiveWa(index) {
-      let waList = JSON.parse(localStorage.getItem('wa_numbers')) || [];
-      waList.forEach((w, i) => w.active = (i === index));
-      localStorage.setItem('wa_numbers', JSON.stringify(waList));
-      renderWaNumbers();
-    }
-
-    function deleteWa(index) {
-      let waList = JSON.parse(localStorage.getItem('wa_numbers')) || [];
-      waList.splice(index, 1);
-      if(waList.length > 0 && !waList.some(w => w.active)) waList[0].active = true;
-      localStorage.setItem('wa_numbers', JSON.stringify(waList));
-      renderWaNumbers();
-    }
-
-    // Product Add / Edit Logic
     function convertBase64() {
       const file = document.getElementById('pImgFile').files[0];
       const reader = new FileReader();
@@ -195,19 +125,17 @@
       const desc = document.getElementById('pDesc').value.trim();
       const editIndex = parseInt(document.getElementById('editIndex').value);
 
-      if(!title || !price) { alert('প্রোডাক্টের নাম এবং মূল্য অবশ্যই দিতে হবে!'); return; }
+      if(!title || !price) { alert('নাম এবং মূল্য অবশ্যই দিতে হবে!'); return; }
 
       let products = JSON.parse(localStorage.getItem('products')) || [];
       let image = base64Img || imgUrl;
 
       if(editIndex > -1) {
-        if(!image) image = products[editIndex].image; // Keep old image if not changed
+        if(!image) image = products[editIndex].image;
         products[editIndex] = { id: products[editIndex].id, title, price, category, sizes, colors, stock, image, desc };
-        alert('প্রোডাক্ট আপডেট হয়েছে!');
       } else {
         if(!image) image = 'https://via.placeholder.com/150';
         products.push({ id: Date.now(), title, price, category, sizes, colors, stock, image, desc });
-        alert('নতুন প্রোডাক্ট যোগ করা হয়েছে!');
       }
 
       localStorage.setItem('products', JSON.stringify(products));
@@ -233,6 +161,17 @@
       document.getElementById('saveBtn').innerText = 'আপডেট করুন';
       document.getElementById('cancelBtn').style.display = 'block';
       window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function copyLink(id) {
+      const baseUrl = window.location.href.replace('admin.html', 'index.html');
+      const directLink = `${baseUrl}?product=${id}`;
+      
+      navigator.clipboard.writeText(directLink).then(() => {
+        alert('লিংক কপি হয়েছে! ফেসবুকে এড/বুস্টের সময় এই লিংকটি ব্যবহার করুন:\n\n' + directLink);
+      }).catch(() => {
+        prompt('নিচের লিংকটি কপি করে নিন:', directLink);
+      });
     }
 
     function resetForm() {
@@ -265,10 +204,10 @@
             <div class="p-details">
               <strong>${p.title}</strong><br>
               <small style="color:#e53935; font-weight:bold;">৳${p.price}</small> | 
-              <small>ক্যাটাগরি: ${p.category}</small><br>
-              <small style="color:#666;">সাইজ: ${p.sizes || 'N/A'} | কালার: ${p.colors || 'N/A'}</small>
+              <small>স্টক: ${p.stock || '100'}</small>
             </div>
             <div>
+              <button class="copy-btn" onclick="copyLink(${p.id})">🔗 কপি লিংক</button>
               <button class="edit-btn" onclick="editProduct(${index})">এডিট</button>
               <button class="del-btn" onclick="deleteProduct(${index})">ডিলিট</button>
             </div>
@@ -278,7 +217,7 @@
     }
 
     function deleteProduct(index) {
-      if(confirm('আপনি কি সত্যিই এই প্রোডাক্টটি মুছে ফেলতে চান?')) {
+      if(confirm('মুছে ফেলতে চান?')) {
         let products = JSON.parse(localStorage.getItem('products')) || [];
         products.splice(index, 1);
         localStorage.setItem('products', JSON.stringify(products));
@@ -286,7 +225,6 @@
       }
     }
 
-    renderWaNumbers();
     renderAdminProducts();
   </script>
 </body>
