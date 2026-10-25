@@ -10,21 +10,21 @@
 body{margin:0;font-family:Arial,sans-serif;background:#f7f8fb;color:#182230}
 button,input,select,textarea{font:inherit}
 button{cursor:pointer}
-.top{background:var(--top-bg);color:white;text-align:center;padding:10px}
-header{background:white;padding:14px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
-.logo{font-size:23px;font-weight:bold;color:var(--primary-color)}
-.search{flex:1;min-width:180px;padding:11px;border:1px solid #ddd;border-radius:10px}
-button{border:0;border-radius:9px;padding:11px 15px}
+.top{background:var(--top-bg);color:white;text-align:center;padding:8px 10px;font-size:13px}
+header{background:white;padding:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.logo{font-size:22px;font-weight:bold;color:var(--primary-color)}
+.search{flex:1;min-width:160px;padding:9px;border:1px solid #ddd;border-radius:8px}
+button{border:0;border-radius:8px;padding:9px 13px}
 .primary{background:var(--primary-color);color:white;font-weight:bold}
-.hero{margin:16px auto;max-width:1100px;padding:30px 22px;border-radius:18px;background:linear-gradient(120deg,#242b49,#a23b5d,#ee9a8c);color:white}
-.hero h1{font-size:34px}
-.hero p{line-height:1.7}
-.timer-box{background:rgba(0,0,0,0.25);padding:10px 15px;border-radius:10px;display:inline-block;margin:12px 0;font-size:15px;font-weight:bold}
-main{max-width:1100px;margin:25px auto;padding:0 14px}
-.categories{display:flex;gap:8px;overflow:auto;margin:15px 0}
-.categories button{background:white;border:1px solid #ddd;white-space:nowrap}
-.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
-.product{background:white;border:1px solid #e5e7eb;border-radius:13px;overflow:hidden;cursor:pointer;transition:0.2s;position:relative}
+.hero{margin:10px auto;max-width:1100px;padding:16px 14px;border-radius:14px;background:linear-gradient(120deg,#242b49,#a23b5d,#ee9a8c);color:white}
+.hero h1{font-size:20px;margin:0 0 6px 0;line-height:1.3}
+.hero p{font-size:12px;line-height:1.4;margin:0 0 8px 0;opacity:0.9}
+.timer-box{background:rgba(0,0,0,0.25);padding:6px 10px;border-radius:8px;display:inline-block;margin:6px 0;font-size:12px;font-weight:bold}
+main{max-width:1100px;margin:15px auto;padding:0 12px}
+.categories{display:flex;gap:8px;overflow:auto;margin:12px 0}
+.categories button{background:white;border:1px solid #ddd;white-space:nowrap;padding:7px 12px;font-size:12px}
+.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.product{background:white;border:1px solid #e5e7eb;border-radius:12px;overflow:hidden;cursor:pointer;transition:0.2s;position:relative}
 .product:hover{transform:translateY(-3px);box-shadow:0 4px 12px rgba(0,0,0,0.08)}
 .art{height:160px;display:grid;place-items:center;background:#f0f2f5;position:relative;overflow:hidden}
 .art img{width:100%;height:100%;object-fit:cover}
@@ -32,39 +32,45 @@ main{max-width:1100px;margin:25px auto;padding:0 14px}
 .stock-badge{background:#e8f7ef;color:#16754e;padding:3px 6px;border-radius:4px;font-weight:bold}
 .stock-badge.out{background:#fde8e8;color:#c53030}
 .rating-badge{color:#ff9800;font-weight:bold;background:rgba(0,0,0,0.6);padding:2px 6px;border-radius:4px}
-.info{padding:12px}
-.info h3{font-size:14px;min-height:35px;margin:5px 0}
-.price-box{display:flex;gap:8px;align-items:center;margin-top:4px}
-.price{font-size:17px;font-weight:bold;color:var(--primary-color)}
-.old-price{font-size:13px;text-decoration:line-through;color:#888}
-.buy{width:100%;margin-top:12px;background:var(--primary-color);color:white;font-weight:bold}
+.info{padding:10px}
+.info h3{font-size:13px;min-height:32px;margin:4px 0}
+.price-box{display:flex;gap:6px;align-items:center;margin-top:2px}
+.price{font-size:16px;font-weight:bold;color:var(--primary-color)}
+.old-price{font-size:12px;text-decoration:line-through;color:#888}
+.buy{width:100%;margin-top:10px;background:var(--primary-color);color:white;font-weight:bold;padding:8px}
 .buy:disabled{background:#ccc;cursor:not-allowed}
 .sales-badge{color:#666;font-size:11px;margin-top:4px}
-.benefits{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:25px 0}
-.benefit{background:white;border:1px solid #eee;padding:15px;border-radius:12px;text-align:center}
-footer{background:var(--top-bg);color:white;padding:25px;line-height:1.8}
+.benefits{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:20px 0}
+.benefit{background:white;border:1px solid #eee;padding:12px;border-radius:10px;text-align:center;font-size:12px}
+footer{background:var(--top-bg);color:white;padding:20px;line-height:1.6;font-size:13px}
 .modalbg{display:none;position:fixed;inset:0;background:#0009;align-items:center;justify-content:center;padding:14px;z-index:10}
 .modalbg.show{display:flex}
 .modal{background:white;border-radius:15px;padding:20px;width:100%;max-width:580px;max-height:90vh;overflow:auto}
 .modal h2{margin-top:0}
 .field{display:block;margin:12px 0;font-size:13px;font-weight:bold}
-.field input,.field select,.field textarea{display:block;width:100%;padding:11px;margin-top:6px;border:1px solid #ddd;border-radius:8px}
+.field input,.field select,.field textarea{display:block;width:100%;padding:10px;margin-top:6px;border:1px solid #ddd;border-radius:8px}
 .modal .primary{width:100%;margin-top:10px}
 .close{float:right;background:#eee;padding:5px 10px;font-weight:bold}
-.float-support{position:fixed;bottom:20px;right:20px;display:flex;flex-direction:column;gap:10px;z-index:99}
-.support-btn{background:#25d366;color:white;padding:12px 16px;border-radius:30px;font-weight:bold;text-decoration:none;box-shadow:0 4px 10px rgba(0,0,0,0.2);display:flex;align-items:center;gap:8px;font-size:14px}
+.float-support{position:fixed;bottom:20px;right:20px;display:flex;flex-direction:column;gap:8px;z-index:99}
+.support-btn{background:#25d366;color:white;padding:10px 14px;border-radius:30px;font-weight:bold;text-decoration:none;box-shadow:0 4px 10px rgba(0,0,0,0.2);display:flex;align-items:center;gap:6px;font-size:13px}
 .support-btn.call{background:#007bff}
 .support-btn.wa-order{background:#25d366;width:100%;justify-content:center;margin-top:8px}
-.trust-icons{display:flex;gap:10px;justify-content:center;margin:15px 0;font-size:12px;color:#555}
-.trust-item{display:flex;align-items:center;gap:4px;background:#f8f9fa;padding:6px 10px;border-radius:6px}
-.video-container{position:relative;padding-bottom:56.25%;height:0;overflow:hidden;border-radius:10px;margin:12px 0}
-.video-container iframe{position:absolute;top:0;left:0;width:100%;height:100%;border:0}
-.color-thumbs{display:flex;gap:8px;margin:10px 0;justify-content:center;flex-wrap:wrap}
-.color-thumb{width:45px;height:45px;border-radius:8px;border:2px solid #ddd;cursor:pointer;object-fit:cover}
-.color-thumb.active{border-color:var(--primary-color);transform:scale(1.08)}
-.comments-sec{margin-top:15px;text-align:left;border-top:1px solid #eee;padding-top:15px}
-.comment-item{background:#f9f9f9;padding:8px 12px;border-radius:8px;margin:6px 0;font-size:13px}
-@media(max-width:700px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.art{height:135px}.hero h1{font-size:27px}.benefits{grid-template-columns:1fr}header{padding:10px}.search{order:3;flex-basis:100%}}
+.trust-icons{display:flex;gap:8px;justify-content:center;margin:12px 0;font-size:11px;color:#555}
+.trust-item{display:flex;align-items:center;gap:4px;background:#f8f9fa;padding:5px 8px;border-radius:6px}
+
+/* নতুন ইমেজ স্লাইডার স্টাইল */
+.slider-container{position:relative;width:100%;max-height:300px;overflow:hidden;border-radius:12px;background:#000}
+.slider-track{display:flex;transition:transform 0.3s ease-in-out;height:280px}
+.slider-item{min-width:100%;height:100%;display:grid;place-items:center}
+.slider-item img{width:100%;height:100%;object-fit:cover}
+.item-counter{position:absolute;bottom:10px;left:10px;background:rgba(0,0,0,0.6);color:white;padding:3px 8px;border-radius:12px;font-size:11px}
+.color-thumbs{display:flex;gap:8px;margin:12px 0;overflow-x:auto;padding-bottom:5px}
+.color-thumb{width:55px;height:55px;border-radius:8px;border:2px solid #ddd;cursor:pointer;object-fit:cover;flex-shrink:0}
+.color-thumb.active{border-color:var(--primary-color);transform:scale(1.05)}
+
+.comments-sec{margin-top:12px;text-align:left;border-top:1px solid #eee;padding-top:12px}
+.comment-item{background:#f9f9f9;padding:6px 10px;border-radius:6px;margin:4px 0;font-size:12px}
+@media(max-width:700px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.art{height:135px}.hero h1{font-size:18px}.benefits{grid-template-columns:1fr}header{padding:10px}.search{order:3;flex-basis:100%}}
 </style>
 </head>
 <body>
@@ -74,20 +80,20 @@ footer{background:var(--top-bg);color:white;padding:25px;line-height:1.8}
 <header>
   <div class="logo" id="logoText">DHONG DHONG</div>
   <input class="search" id="search" placeholder="পণ্য খুঁজুন..." oninput="renderProducts()">
-  <button onclick="openTrack()" class="primary">📦 অর্ডার ট্র্যাক</button>
+  <button onclick="openTrack()" class="primary">📦 ট্র্যাক</button>
 </header>
 
 <section class="hero">
-  <h1>আপনার স্টাইল, আপনারই গল্প।</h1>
+  <h1 id="heroTitle">আপনার স্টাইল, আপনারই গল্প।</h1>
   <p id="heroSubtext">১০০% প্রিমিয়াম কোয়ালিটি নিশ্চিতকরণে ক্যাশ অন ডেলিভারিতে অর্ডার করুন।</p>
   <div class="timer-box" id="countdownTimer">⏳ অফার শেষ হতে বাকি: --:--:--</div>
   <div>
-    <button onclick="document.getElementById('products').scrollIntoView({behavior:'smooth'})" class="primary" style="background:white;color:#182230">পণ্য দেখুন ↓</button>
+    <button onclick="document.getElementById('products').scrollIntoView({behavior:'smooth'})" class="primary" id="heroBtnText" style="background:white;color:#182230;padding:6px 12px;font-size:12px">পণ্য দেখুন ↓</button>
   </div>
 </section>
 
 <main id="products">
-  <h2>জনপ্রিয় পণ্য</h2>
+  <h2 style="font-size:18px;margin:10px 0">জনপ্রিয় পণ্য</h2>
   <div class="categories">
     <button onclick="setCategory('সব')">সব পণ্য</button>
     <button onclick="setCategory('পোশাক')">পোশাক</button>
@@ -106,7 +112,7 @@ footer{background:var(--top-bg);color:white;padding:25px;line-height:1.8}
 <footer>
   <b id="footerLogo">DHONG | ঢং</b><br>
   আপনার পছন্দের পণ্য সহজে ও নিরাপদে অর্ডার করুন।<br>
-  <button onclick="openTrack()" style="margin-top:10px">আমার অর্ডার ট্র্যাক করুন করুন</button>
+  <button onclick="openTrack()" style="margin-top:8px;font-size:12px">আমার অর্ডার ট্র্যাক করুন</button>
 </footer>
 
 <div class="float-support" id="supportButtons"></div>
@@ -204,7 +210,11 @@ let settings = JSON.parse(localStorage.getItem("dhong_settings")) || {
   whatsapp: "8801700000000",
   phone: "01700000000",
   adminEmail: "",
-  freeThreshold: "3000"
+  freeThreshold: "3000",
+  topBannerText: "🎉 ঢং-এ স্বাগতম | প্রথম অর্ডারে ১০% ছাড় ও ক্যাশ অন ডেলিভারি",
+  heroTitleText: "আপনার স্টাইল, আপনারই গল্প।",
+  heroSubtextText: "১০০% প্রিমিয়াম কোয়ালিটি নিশ্চিতকরণে ক্যাশ অন ডেলিভারিতে অর্ডার করুন।",
+  heroBtnLabel: "পণ্য দেখুন ↓"
 };
 
 document.documentElement.style.setProperty('--primary-color', settings.themeColor);
@@ -212,13 +222,18 @@ document.getElementById("logoText").textContent = settings.siteName;
 document.getElementById("footerLogo").textContent = settings.siteName;
 document.getElementById("siteTitle").textContent = settings.siteName + " | Customer Panel";
 
+document.getElementById("topBanner").textContent = settings.topBannerText || "🎉 ঢং-এ স্বাগতম | প্রথম অর্ডারে ১০% ছাড়";
+document.getElementById("heroTitle").textContent = settings.heroTitleText || "আপনার স্টাইল, আপনারই গল্প।";
+document.getElementById("heroSubtext").textContent = settings.heroSubtextText || "১০০% প্রিমিয়াম কোয়ালিটি নিশ্চিতকরণে অর্ডার করুন।";
+document.getElementById("heroBtnText").textContent = settings.heroBtnLabel || "পণ্য দেখুন ↓";
+
 document.getElementById("deliveryFee").innerHTML = `
   <option value="${settings.dhakaFee}">ঢাকা ভেতরে (৳${settings.dhakaFee})</option>
   <option value="${settings.outsiderFee}">ঢাকা বাইরে / সারা দেশ (৳${settings.outsiderFee})</option>
 `;
 
 let products = JSON.parse(localStorage.getItem("dhong_products")) || [
- {id:1,name:"এলিগ্যান্ট কটন কুর্তি",cat:"পোশাক",price:1250,oldPrice:1500,stock:10,rating:4.8,sales:142,quality:"১০০% সুতি কটন",img:"",video:"",colors:[],desc:"আরামদায়ক প্রিমিয়াম কটন কাপড়ের তৈরি আকর্ষণীয় কুর্তি।",comments:[{name:"সুমাইয়া",text:"খুব সুন্দর কাপড়, ধন্যবাদ!"}]},
+ {id:1,name:"এলিগ্যান্ট কটন কুর্তি",cat:"পোশাক",price:1250,oldPrice:1500,stock:10,rating:4.8,sales:142,quality:"১০০% সুতি কটন",img:"",video:"",colors:[],desc:"আরামদায়ক প্রিমিয়াম কটন কাপড়ের তৈরি আকর্ষণীয় কুর্তি।",comments:[]},
  {id:2,name:"প্রিমিয়াম ক্রসব্যাগ",cat:"ব্যাগ",price:950,oldPrice:1200,stock:5,rating:4.9,sales:89,quality:"হাই গ্রেড ওয়াটারপ্রুফ চামড়া",img:"",video:"",colors:[],desc:"স্টাইলিশ ও টেকসই চামড়ার ক্রসব্যাগ।",comments:[]}
 ];
 
@@ -273,54 +288,62 @@ function showProductDetail(id){
   const videoEmbed = getYoutubeEmbed(p.video);
   document.getElementById("supportButtons").style.display = "none";
 
-  let colorImagesHtml = "";
-  let activeImg = p.img;
+  // সব ছবি একত্র করা (প্রধান ছবি + কালার ভ্যারিয়েন্ট ছবিগুলো)
+  let allImages = [];
+  if(p.img) allImages.push(p.img);
   if(p.colors && p.colors.length > 0) {
-    colorImagesHtml = `<div style="margin:10px 0"><b>কালার ভ্যারিয়েন্ট সিলেক্ট করুন:</b><div class="color-thumbs" id="colorThumbsBox">` + 
-    p.colors.map((imgUrl, i) => `<img src="${imgUrl}" class="color-thumb ${i===0?'active':''}" onclick="changeMainImage('${imgUrl}', this)">`).join("") + 
-    `</div></div>`;
-    activeImg = p.colors[0] || p.img;
+    p.colors.forEach(imgUrl => { if(!allImages.includes(imgUrl)) allImages.push(imgUrl); });
   }
-  
+  if(allImages.length === 0) allImages = [];
+
+  let sliderHtml = "";
+  if(allImages.length > 0) {
+    let slides = allImages.map((img, idx) => `<div class="slider-item"><img src="${img}"></div>`).join("");
+    let thumbs = allImages.map((img, idx) => `<img src="${img}" class="color-thumb ${idx===0?'active':''}" onclick="slideImage(${idx}, this)">`).join("");
+    
+    sliderHtml = `
+      <div class="slider-container" id="sliderContainer">
+        <div class="slider-track" id="sliderTrack" style="width:${allImages.length * 100}%">
+          ${slides}
+        </div>
+        <div class="item-counter" id="itemCounter">Item 1/${allImages.length} | Size | Color</div>
+      </div>
+      <div class="color-thumbs">${thumbs}</div>
+    `;
+  } else {
+    sliderHtml = `<div style="font-size:60px;padding:20px;background:#f0f2f5;border-radius:12px">🛍️</div>`;
+  }
+
   const commentsList = (p.comments || []).map(c=>`
     <div class="comment-item"><b>${c.name}:</b> ${c.text}</div>
-  `).join("") || "<small style='color:#888'>এখনো কোনো রিভিউ নেই। প্রথম মন্তব্যটি আপনার হোক!</small>";
+  `).join("") || "<small style='color:#888'>এখনো কোনো রিভিউ নেই।</small>";
 
   let waOrderText = encodeURIComponent(`আসসালামু আলাইকুম, আমি এই পণ্যটি অর্ডার করতে চাই:\nনাম: ${p.name}\nমূল্য: ${money(p.price)}\nলিংক: ${window.location.href}`);
 
   document.getElementById("detailContent").innerHTML = `
     <div style="text-align:center">
-      <div id="mainImageContainer">
-        ${activeImg ? `<img id="activeProductImg" src="${activeImg}" style="max-height:260px;max-width:100%;object-fit:cover;border-radius:12px">` : `<div style="font-size:60px;padding:15px">🛍️</div>`}
-      </div>
-      
-      ${colorImagesHtml}
+      ${sliderHtml}
 
-      <h2 style="margin:10px 0">${p.name}</h2>
-      <div style="display:flex;justify-content:center;gap:12px;font-size:13px;color:#555">
+      <h2 style="margin:8px 0;font-size:18px">${p.name}</h2>
+      <div style="display:flex;justify-content:center;gap:10px;font-size:12px;color:#555">
         <span><b>রেটিং:</b> ⭐ ${p.rating || '5.0'}</span>
         <span><b>বিক্রি:</b> ${p.sales || 0}+ পিস</span>
         <span><b>স্টক:</b> ${p.stock ?? 0}</span>
       </div>
-      <div style="display:flex;justify-content:center;gap:10px;align-items:center;margin:8px 0">
+      <div style="display:flex;justify-content:center;gap:8px;align-items:center;margin:6px 0">
         <h3 style="color:${settings.themeColor};margin:0">${money(p.price)}</h3>
-        ${p.oldPrice ? `<span style="text-decoration:line-through;color:#888">${money(p.oldPrice)}</span>` : ''}
+        ${p.oldPrice ? `<span style="text-decoration:line-through;color:#888;font-size:12px">${money(p.oldPrice)}</span>` : ''}
       </div>
-      ${p.quality ? `<p style="font-size:13px;color:#16754e;background:#e8f7ef;padding:6px;border-radius:6px;margin:5px 0"><b>পণ্যের মান:</b> ${p.quality}</p>` : ''}
-      <p style="text-align:left;background:#f9f9f9;padding:10px;border-radius:8px;font-size:13px">${p.desc || 'কোনো বিবরণ দেওয়া হয়নি।'}</p>
+      ${p.quality ? `<p style="font-size:12px;color:#16754e;background:#e8f7ef;padding:6px;border-radius:6px;margin:5px 0"><b>পণ্যের মান:</b> ${p.quality}</p>` : ''}
+      <p style="text-align:left;background:#f9f9f9;padding:8px;border-radius:8px;font-size:12px">${p.desc || 'কোনো বিবরণ দেওয়া হয়নি।'}</p>
 
       ${videoEmbed ? `
-        <div style="text-align:left;margin-top:10px"><b>📹 ভিডিও রিভিউ:</b></div>
+        <div style="text-align:left;margin-top:8px;font-size:12px"><b>📹 ভিডিও রিভিউ:</b></div>
         <div class="video-container">
           <iframe src="${videoEmbed}" allowfullscreen></iframe>
         </div>
       ` : ''}
       
-      <div class="trust-icons">
-        <div class="trust-item">🛡️ কোয়ালিটি চেকড</div>
-        <div class="trust-item">📦 ইন-স্টক</div>
-      </div>
-
       <button class="primary" ${p.stock <= 0 ? 'disabled' : ''} onclick="closeModal('detailModal'); openOrder(${p.id})">${p.stock <= 0 ? 'স্টক শেষ' : 'সরাসরি ফর্ম পূরণ করে অর্ডার করুন'}</button>
       
       ${settings.whatsapp ? `<a href="https://wa.me/${settings.whatsapp}?text=${waOrderText}" target="_blank" class="support-btn wa-order">💬 WhatsApp-এ এই পণ্যটি অর্ডার করুন</a>` : ''}
@@ -328,22 +351,54 @@ function showProductDetail(id){
       <div class="comments-sec">
         <b>💬 কাস্টমার রিভিউ ও কমেন্ট</b>
         <div id="commentBox">${commentsList}</div>
-        <form onsubmit="addComment(event, ${p.id})" style="margin-top:10px">
+        <form onsubmit="addComment(event, ${p.id})" style="margin-top:8px">
           <input id="cName" placeholder="আপনার নাম" required style="font-size:12px;padding:6px;margin-bottom:4px">
-          <textarea id="cText" placeholder="আপনার অনুভূতি বা মতামত লিখুন..." required rows="2" style="font-size:12px;padding:6px"></textarea>
-          <button class="primary" type="submit" style="font-size:12px;padding:6px 12px;margin-top:4px">মতামত দিন</button>
+          <textarea id="cText" placeholder="আপনার মতামত লিখুন..." required rows="2" style="font-size:12px;padding:6px"></textarea>
+          <button class="primary" type="submit" style="font-size:11px;padding:6px 10px;margin-top:4px">মতামত দিন</button>
         </form>
       </div>
     </div>
   `;
   document.getElementById("detailModal").classList.add("show");
+  initTouchSlider(allImages.length);
 }
 
-function changeMainImage(url, el) {
-  document.getElementById("activeProductImg").src = url;
+// টাচ ও স্লাইড করার লজিক (Swipe Slider)
+function slideImage(index, el) {
+  const track = document.getElementById("sliderTrack");
+  const counter = document.getElementById("itemCounter");
+  if(track) {
+    track.style.transform = `translateX(-${index * 100}%)`;
+    const total = track.children.length;
+    counter.textContent = `Item ${index + 1}/${total} | Size | Color`;
+  }
   document.querySelectorAll(".color-thumb").forEach(t => t.classList.remove("active"));
-  el.classList.add("active");
-  document.getElementById("selectedColorInput").value = url;
+  if(el) el.classList.add("active");
+}
+
+function initTouchSlider(totalItems) {
+  const container = document.getElementById("sliderContainer");
+  if(!container || totalItems <= 1) return;
+  let startX = 0;
+  let currentIndex = 0;
+
+  container.addEventListener("touchstart", e => {
+    startX = e.touches[0].clientX;
+  });
+
+  container.addEventListener("touchend", e => {
+    let endX = e.changedTouches[0].clientX;
+    let diff = startX - endX;
+    if(Math.abs(diff) > 50) {
+      if(diff > 0 && currentIndex < totalItems - 1) {
+        currentIndex++;
+      } else if(diff < 0 && currentIndex > 0) {
+        currentIndex--;
+      }
+      const thumbs = document.querySelectorAll(".color-thumb");
+      slideImage(currentIndex, thumbs[currentIndex]);
+    }
+  });
 }
 
 function addComment(e, prodId){
@@ -382,9 +437,9 @@ function updateTotal(){
 
   const total = (subtotal - discount) + delivery;
   let summaryText = `মূল্য: ৳${subtotal}`;
-  if(discount > 0) summaryText += ` | ওয়েলকাম ডিসকাউন্ট (১০%): -৳${discount}`;
-  if(delivery === 0) summaryText += ` | ডেলিভারি চার্জ: ফ্রি`;
-  else summaryText += ` | ডেলিভারি চার্জ: ৳${delivery}`;
+  if(discount > 0) summaryText += ` | ডিসকাউন্ট (১০%): -৳${discount}`;
+  if(delivery === 0) summaryText += ` | ডেলিভারি: ফ্রি`;
+  else summaryText += ` | ডেলিভারি: ৳${delivery}`;
   summaryText += ` | মোট: ৳${total}`;
 
   document.getElementById("summary").textContent = summaryText;
@@ -448,7 +503,7 @@ document.getElementById("orderForm").addEventListener("submit", function(e){
 
  if(settings.adminEmail) {
    const mailSubject = encodeURIComponent(`নতুন অর্ডার #${newOrder.id} - ${settings.siteName}`);
-   const mailBody = encodeURIComponent(`নতুন অর্ডার এসেছে!\nঅর্ডার ID: #DH-${newOrder.id}\nকাস্টমার নাম: ${newOrder.customer_name}\nফোন: ${newOrder.phone}\nঠিকানা: ${newOrder.address}\nপণ্য: ${selectedProduct.name} (রং: ${formData.get("color")}, সাইজ: ${formData.get("size")})\nমোট টাকা: ${totalPrice}`);
+   const mailBody = encodeURIComponent(`নতুন অর্ডার এসেছে!\nঅর্ডার ID: #DH-${newOrder.id}\nকাস্টমার নাম: ${newOrder.customer_name}\nফোন: ${newOrder.phone}\nঠিকানা: ${newOrder.address}\nপণ্য: ${selectedProduct.name}\nমোট টাকা: ${totalPrice}`);
    window.open(`mailto:${settings.adminEmail}?subject=${mailSubject}&body=${mailBody}`, '_blank');
  }
 
