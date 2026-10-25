@@ -276,7 +276,7 @@ footer{background:var(--top-bg);color:white;padding:20px;line-height:1.6;font-si
           if(found) {
             showProductDetail(found.id);
           }
-        }, 300);
+        }, 200);
       }
     }
   });
@@ -643,13 +643,11 @@ function startTimer() {
   let hours = Number(settings.timerHours) || 24;
   let totalSeconds = hours * 3600;
 
-  // লোকালস্টোরেজ থেকে শেষ লক্ষ্য বা শুরুর সময় চেক করা
   let savedEndTime = localStorage.getItem("dhong_timer_end");
   let savedHoursSetting = localStorage.getItem("dhong_timer_hours_setting");
 
   let now = Math.floor(Date.now() / 1000);
 
-  // যদি এডমিন প্যানেল থেকে ঘণ্টার হিসাব পরিবর্তন করা হয় অথবা প্রথমবার ওপেন হয়
   if(!savedEndTime || savedHoursSetting !== String(hours)) {
     savedEndTime = now + totalSeconds;
     localStorage.setItem("dhong_timer_end", savedEndTime);
