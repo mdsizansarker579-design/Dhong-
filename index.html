@@ -237,20 +237,22 @@ footer{background:var(--top-bg);color:white;padding:20px;line-height:1.6;font-si
     return null;
   }
 
+  // পেজ লোড হওয়ার সাথে সাথেই ব্যাকগ্রাউন্ড থেকে ডেটা নিয়ে এসে প্রোডাক্ট পপআপ ওপেন করবে
   db.ref('dhong_products').on('value', snapshot => {
     let data = snapshot.val();
     products = data ? (Array.isArray(data) ? data : Object.values(data)) : [];
+    
+    // প্রথমে সম্পূর্ণ পেজের প্রোডাক্ট রেন্ডার করে দেব, যাতে পেজ কখনো ফাঁকা না থাকে
     renderProducts();
 
+    // এরপর চেক করবে লিংকে নির্দিষ্ট কোনো প্রোডাক্ট আইডি আছে কি না, থাকলে পপআপ ওপেন করবে
     if (!hasOpenedPopup && products.length > 0) {
       let targetProductId = getUrlParameter('product');
       if (targetProductId) {
         let found = products.find(p => String(p.id) === String(targetProductId));
         if (found) {
           hasOpenedPopup = true;
-          setTimeout(() => {
-            showProductDetail(found.id);
-          }, 100);
+          showProductDetail(found.id);
         }
       }
     }
@@ -620,7 +622,7 @@ document.getElementById("orderForm").addEventListener("submit", function(e){
    db.ref('dhong_products').set(products);
  }
 
- alert(`✅ অর্ডার সফলভাবে গ্রহণ করা হয়েছে!\nঅর্ডার নম্বর: #DH-${newOrder.id}\nমোট: ${money(totalPrice)}`);
+ alert(`✅ অর্ডার সফলভাবে গ্রহণ করা হয়েছে!\nঅর্ডার নম্বর: #DH-${newOrder.id}\nমোট: ঠিক আছে`);
  e.target.reset();
  closeModal("orderModal");
  renderProducts();
