@@ -10,12 +10,12 @@
 body{margin:0;background:var(--bg);font-family:Arial,sans-serif;color:var(--text)}
 button,input,select,textarea{font:inherit}
 .layout{display:flex;min-height:100vh}
-.sidebar{width:240px;background:var(--dark);color:white;padding:20px 10px;flex-shrink:0}
-.brand{font-size:22px;font-weight:900;letter-spacing:1px;padding:8px 10px;word-break:break-all}
+.sidebar{width:240px;background:var(--dark);color:white;padding:20px 14px;flex-shrink:0}
+.brand{font-size:22px;font-weight:900;letter-spacing:1px;padding:8px 0;word-break:break-all;color:white}
 .brand small{display:block;font-size:10px;color:#aeb7ca;letter-spacing:0.5px;margin-top:4px}
-.nav{margin-top:20px}
-.nav button{width:100%;text-align:left;border:0;background:transparent;color:#cbd2e1;padding:11px 10px;border-radius:8px;margin:3px 0;cursor:pointer;font-size:13px;display:flex;align-items:center;gap:6px}
-.nav button.active,.nav button:hover{background:#343b54;color:white}
+.nav{margin-top:15px;display:flex;flex-direction:column;gap:4px}
+.nav button{width:100%;text-align:left;border:0;background:transparent;color:#cbd2e1;padding:11px 12px;border-radius:8px;cursor:pointer;font-size:13px;display:flex;align-items:center;gap:6px}
+.nav button.active,.nav button:hover{background:#343b54;color:white;font-weight:bold}
 .main{flex:1;min-width:0;padding:20px}
 .top{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:20px;flex-wrap:wrap}
 .top h1{font-size:22px;margin:0}
@@ -28,7 +28,7 @@ button,input,select,textarea{font:inherit}
 .stat{font-size:24px;font-weight:800;margin:10px 0 4px}
 .section-title{font-size:16px;font-weight:750;margin:0 0 12px}
 input,select,textarea{border:1px solid #dce1eb;background:white;border-radius:8px;padding:10px;width:100%;margin-top:4px}
-.field-group{margin-bottom:10px;font-size:12px;font-weight:bold}
+.field-group{margin-bottom:12px;font-size:12px;font-weight:bold}
 .btn{border:0;border-radius:8px;padding:10px 12px;cursor:pointer;font-weight:650}
 .primary{background:var(--accent);color:white}
 table{width:100%;border-collapse:collapse;min-width:550px}
@@ -41,11 +41,15 @@ th{color:var(--muted);font-weight:600}
 
 @media(max-width:768px){
   .layout{flex-direction:column}
-  .sidebar{width:100%;padding:12px}
-  .nav{display:flex;flex-wrap:wrap;gap:4px;margin-top:10px}
-  .nav button{width:auto;flex:1;min-width:110px;padding:8px;font-size:11px;text-align:center;justify-content:center}
+  .sidebar{width:100%;padding:15px;text-align:center}
+  .brand{font-size:20px;padding:0;margin-bottom:10px}
+  .nav{display:grid;grid-template-columns:repeat(3, 1fr);gap:6px;margin-top:10px}
+  .nav button{width:100%;padding:8px 4px;font-size:11px;justify-content:center;text-align:center;border:1px solid #2d364f}
   .grid{grid-template-columns:1fr 1fr}
   .main{padding:12px}
+}
+@media(max-width:480px){
+  .nav{grid-template-columns:repeat(2, 1fr)}
 }
 </style>
 </head>
@@ -89,6 +93,7 @@ th{color:var(--muted);font-weight:600}
 <section class="page" id="orders">
   <div class="card">
     <h3 class="section-title">অর্ডার ম্যানেজমেন্ট</h3>
+    <input type="text" id="orderSearch" placeholder="🔍 কাস্টমার নাম বা ফোন নম্বর দিয়ে খুঁজুন..." oninput="loadAdminData()" style="margin-bottom:12px">
     <div class="table-wrap"><table><thead><tr><th>ID</th><th>কাস্টমার</th><th>ফোন</th><th>ঠিকানা</th><th>পণ্যের বিবরণ</th><th>মোট</th><th>স্ট্যাটাস</th><th>তারিখ</th><th>অ্যাকশন</th></tr></thead>
     <tbody id="orderRows"><tr><td colspan="9" class="empty">কোনো অর্ডার নেই।</td></tr></tbody></table></div>
   </div>
@@ -117,9 +122,19 @@ th{color:var(--muted);font-weight:600}
       <div class="field-group">মোট সেলস সংখ্যা <input type="number" id="pSales" placeholder="100"></div>
       <div class="field-group">পণ্যের মান (Quality) <input id="pQuality" placeholder="যেমন: ১০০% সুতি কটন"></div>
       
-      <div class="field-group">প্রধান ছবির লিংক (Image URL) <input id="pImg" placeholder="https://..." oninput="document.getElementById('previewImage').src=this.value; document.getElementById('previewImage').style.display='block';"></div>
+      <div class="field-group" style="background:#f0f4ff;padding:10px;border-radius:8px;border:1px dashed #6558e8">
+        📸 প্রধান ছবি আপলোড (গ্যালারি থেকে সিলেক্ট করুন):
+        <input type="file" id="pImgFile" accept="image/*" onchange="convertMainImage(this)">
+        <div style="margin-top:6px;font-size:11px;color:#666">অথবা সরাসরি ছবির লিংক দিতে পারেন:</div>
+        <input id="pImg" placeholder="https://..." oninput="document.getElementById('previewImage').src=this.value; document.getElementById('previewImage').style.display='block';">
+      </div>
       
-      <div class="field-group">কালার ভ্যারিয়েন্ট ইমেজ লিংকসমূহ (কমা দিয়ে আলাদা করুন, যেমন: link1, link2, link3) <input id="pColors" placeholder="https://img1..., https://img2..."></div>
+      <div class="field-group" style="background:#f9f9f9;padding:10px;border-radius:8px;border:1px solid #ddd">
+        🎨 কালার ভ্যারিয়েন্টের ছবি আপলোড (একাধিক সিলেক্ট করুন):
+        <input type="file" id="pColorFiles" accept="image/*" multiple onchange="convertColorImages(this)">
+        <div style="margin-top:6px;font-size:11px;color:#666">অথবা কালার ইমেজের লিংকসমূহ (কমা দিয়ে আলাদা করুন):</div>
+        <input id="pColors" placeholder="https://img1..., https://img2...">
+      </div>
 
       <div class="field-group">ইউটিউব ভিডিও রিভিউ লিংক (YouTube URL) <input id="pVideo" placeholder="https://www.youtube.com/watch?v=..."></div>
       <div class="field-group">পণ্যের বিবরণ <textarea id="pDesc" rows="2" placeholder="সংক্ষিপ্ত বিবরণ..."></textarea></div>
@@ -171,6 +186,34 @@ th{color:var(--muted);font-weight:600}
 </div>
 
 <script>
+let uploadedMainBase64 = "";
+let uploadedColorsBase64 = [];
+
+function convertMainImage(fileInput) {
+  if (fileInput.files && fileInput.files[0]) {
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      uploadedMainBase64 = e.target.result;
+      document.getElementById("previewImage").src = uploadedMainBase64;
+      document.getElementById("previewImage").style.display = "block";
+    }
+    reader.readAsDataURL(fileInput.files[0]);
+  }
+}
+
+function convertColorImages(fileInput) {
+  uploadedColorsBase64 = [];
+  if (fileInput.files) {
+    Array.from(fileInput.files).forEach(file => {
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        uploadedColorsBase64.push(e.target.result);
+      }
+      reader.readAsDataURL(file);
+    });
+  }
+}
+
 document.querySelectorAll(".nav button").forEach(button=>{
   button.addEventListener("click",()=>{
     document.querySelectorAll(".nav button").forEach(b=>b.classList.remove("active"));
@@ -189,13 +232,20 @@ function loadAdminData() {
   const totalSales = orders.reduce((sum, o) => sum + Number(o.total || 0), 0);
   document.getElementById("totalSalesAmount").textContent = "৳ " + totalSales.toLocaleString();
 
-  // প্রফিট রিপোর্ট ক্যালকুলেশন
   document.getElementById("profitTotalSales").textContent = "৳ " + totalSales.toLocaleString();
-  let estimatedProfit = totalSales * 0.35; // ধরে নেওয়া হলো গড়ে ৩৫% প্রফিট মার্জিন
+  let estimatedProfit = totalSales * 0.35;
   document.getElementById("netProfitAmount").textContent = "৳ " + Math.round(estimatedProfit).toLocaleString();
 
-  document.getElementById("orderRows").innerHTML = orders.length === 0 ? "<tr><td colspan='9' class='empty'>কোনো অর্ডার নেই।</td></tr>" : 
-  orders.map((order, idx) => {
+  // অর্ডার সার্চ ফিল্টার লজিক
+  const searchQ = (document.getElementById("orderSearch")?.value || "").toLowerCase();
+  const filteredOrders = orders.filter(o => 
+    o.customer_name.toLowerCase().includes(searchQ) || 
+    o.phone.includes(searchQ) || 
+    String(o.id).includes(searchQ)
+  );
+
+  document.getElementById("orderRows").innerHTML = filteredOrders.length === 0 ? "<tr><td colspan='9' class='empty'>কোনো অর্ডার পাওয়া যায়নি।</td></tr>" : 
+  filteredOrders.map((order, idx) => {
     let itemsText = "";
     try {
       const items = JSON.parse(order.items_json);
@@ -210,7 +260,7 @@ function loadAdminData() {
       <td>${itemsText}</td>
       <td>৳ ${order.total}</td>
       <td>
-        <select onchange="updateOrderStatus(${idx}, this.value)" style="padding:4px;font-size:11px;border-radius:6px">
+        <select onchange="updateOrderStatus('${order.id}', this.value)" style="padding:4px;font-size:11px;border-radius:6px">
           <option ${order.status==='Pending'?'selected':''}>Pending</option>
           <option ${order.status==='Processing'?'selected':''}>Processing</option>
           <option ${order.status==='Completed'?'selected':''}>Completed</option>
@@ -256,10 +306,11 @@ function loadAdminData() {
   document.getElementById("setPhone").value = settings.phone || "";
 }
 
-function updateOrderStatus(idx, newStatus){
+function updateOrderStatus(orderId, newStatus){
   let orders = JSON.parse(localStorage.getItem("dhong_orders")) || [];
-  if(orders[idx]) {
-    orders[idx].status = newStatus;
+  let ord = orders.find(o => String(o.id) === String(orderId));
+  if(ord) {
+    ord.status = newStatus;
     localStorage.setItem("dhong_orders", JSON.stringify(orders));
     alert("✅ অর্ডার স্ট্যাটাস আপডেট হয়েছে!");
     loadAdminData();
@@ -281,8 +332,13 @@ document.getElementById("productForm").addEventListener("submit", function(e){
   let products = JSON.parse(localStorage.getItem("dhong_products")) || [];
   let editIdx = document.getElementById("editIndex").value;
   
+  let finalImg = uploadedMainBase64 || document.getElementById("pImg").value;
+  
   let colorsInput = document.getElementById("pColors").value;
   let colorsArray = colorsInput ? colorsInput.split(',').map(s => s.trim()).filter(Boolean) : [];
+  if(uploadedColorsBase64.length > 0) {
+    colorsArray = [...colorsArray, ...uploadedColorsBase64];
+  }
 
   const productData = {
     id: editIdx !== "" ? products[editIdx].id : Date.now(),
@@ -294,7 +350,7 @@ document.getElementById("productForm").addEventListener("submit", function(e){
     rating: document.getElementById("pRating").value || "5.0",
     sales: Number(document.getElementById("pSales").value) || 0,
     quality: document.getElementById("pQuality").value,
-    img: document.getElementById("pImg").value,
+    img: finalImg,
     colors: colorsArray,
     video: document.getElementById("pVideo").value,
     desc: document.getElementById("pDesc").value,
@@ -311,6 +367,8 @@ document.getElementById("productForm").addEventListener("submit", function(e){
 
   localStorage.setItem("dhong_products", JSON.stringify(products));
   e.target.reset();
+  uploadedMainBase64 = "";
+  uploadedColorsBase64 = [];
   document.getElementById("previewImage").style.display = "none";
   document.getElementById("editIndex").value = "";
   document.getElementById("formTitle").textContent = "পণ্য যোগ / তথ্য এডিট";
@@ -367,4 +425,4 @@ document.getElementById("settingsForm").addEventListener("submit", function(e){
 window.onload = loadAdminData;
 </script>
 </body>
-</html>
+</html
