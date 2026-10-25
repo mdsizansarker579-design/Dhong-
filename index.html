@@ -223,7 +223,9 @@ footer{background:var(--top-bg);color:white;padding:20px;line-height:1.6;font-si
   let products = [];
   let orders = [];
   let currentSelectedImg = "";
-  let isTimerExpired = false; // টাইমার শেষ হয়েছে কি না তা ট্র্যাক করার জন্য
+  let isTimerExpired = false;
+  let timerInterval = null;
+
   let settings = {
     siteName: "ঢং DHONG",
     themeColor: "#e85d75",
@@ -264,8 +266,11 @@ footer{background:var(--top-bg);color:white;padding:20px;line-height:1.6;font-si
 
   db.ref('dhong_settings').on('value', snapshot => {
     let data = snapshot.val();
-    if(data) settings = { ...settings, ...data };
-    applySettings();
+    if(data) {
+      settings = { ...settings, ...data };
+      applySettings();
+      startTimer(); // সেটিংস বদলানোর সাথে সাথে নতুন সময় অনুযায়ী টাইমার রি-স্টার্ট হবে
+    }
   });
 
 function applySettings() {
@@ -325,7 +330,6 @@ function renderProducts(){
  const list=products.filter(p=>(category==="সব"||p.cat===category)&&p.name.toLowerCase().includes(q));
  
  document.getElementById("grid").innerHTML=list.map(p=>{
-  // টাইমার শেষ হয়ে গেলে বর্তমান মূল্য হবে oldPrice (আগের দাম), আর অফার চলাকালীন price (অফার দাম)
   let activePrice = (isTimerExpired && p.oldPrice) ? p.oldPrice : p.price;
   let displayOldPrice = (!isTimerExpired && p.oldPrice && p.oldPrice > p.price) ? p.oldPrice : "";
 
@@ -516,7 +520,6 @@ function updateTotal(){
   const qty=Number(document.getElementById("quantity").value);
   let delivery=Number(document.getElementById("deliveryFee").value);
   
-  // অর্ডার করার সময়ও চেক করা হবে টাইমার শেষ হয়েছে কি না
   let activeUnitPrice = (isTimerExpired && selectedProduct.oldPrice) ? selectedProduct.oldPrice : selectedProduct.price;
   const subtotal = activeUnitPrice * qty;
   
@@ -612,9 +615,10 @@ document.getElementById("trackForm").addEventListener("submit", function(e){
  }
 });
 
-let timerInterval = null;
 function startTimer() {
   if(timerInterval) clearInterval(timerInterval);
+  
+  // এডমিন প্যানেল থেকে দেওয়া ঘণ্টা (যেমন: ৩ বা ৬) ডায়নামিকালি রিড করবে
   let hours = Number(settings.timerHours) || 24;
   let time = hours * 3600;
 
@@ -631,16 +635,14 @@ function startTimer() {
         timerEl.textContent = `${tText} ${h}:${m}:${s}`;
         time--;
       } else {
-        // টাইম শেষ হলে অফার বন্ধ হয়ে আগের দাম শো করবে
         isTimerExpired = true;
         timerEl.textContent = "⏳ অফার শেষ!";
-        renderProducts(); // দাম আপডেট করার জন্য পেজ রি-রেন্ডার হবে
+        renderProducts();
         clearInterval(timerInterval);
       }
     }
   }, 1000);
 }
-startTimer();
 
 window.addEventListener("DOMContentLoaded", () => {
   const params = new URLSearchParams(window.location.search);
