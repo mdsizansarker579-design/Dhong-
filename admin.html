@@ -8,7 +8,7 @@
 :root{--bg:#f4f6fb;--card:#fff;--text:#182230;--muted:#667085;--dark:#151b2b;--accent:#6558e8;--line:#e7eaf0;--green:#12805c}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);font-family:Arial,sans-serif;color:var(--text)}
-button,input,select{font:inherit}
+button,input,select,textarea{font:inherit}
 .layout{display:flex;min-height:100vh}
 .sidebar{width:235px;background:var(--dark);color:white;padding:22px 14px;flex-shrink:0}
 .brand{font-size:25px;font-weight:900;letter-spacing:2px;padding:8px 12px}
@@ -27,8 +27,7 @@ button,input,select{font:inherit}
 .stat-label{color:var(--muted);font-size:13px}
 .stat{font-size:27px;font-weight:800;margin:12px 0 6px}
 .section-title{font-size:18px;font-weight:750;margin:0 0 15px}
-.toolbar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:15px}
-input,select{border:1px solid #dce1eb;background:white;border-radius:9px;padding:11px;width:100%;margin-top:5px}
+input,select,textarea{border:1px solid #dce1eb;background:white;border-radius:9px;padding:11px;width:100%;margin-top:5px}
 .field-group{margin-bottom:12px;font-size:13px;font-weight:bold}
 .btn{border:0;border-radius:9px;padding:11px 14px;cursor:pointer;font-weight:650}
 .primary{background:var(--accent);color:white}
@@ -49,7 +48,10 @@ th{color:var(--muted);font-weight:600}
   <nav class="nav">
     <button class="active" data-page="dashboard">▦ Dashboard</button>
     <button data-page="orders">▤ Orders</button>
-    <button data-page="products">◈ Products</button>
+    <button data-page="products">◈ Products & Edit</button>
+    <button data-page="courier">➤ Courier</button>
+    <button data-page="ads">◉ Ads Manager</button>
+    <button data-page="profit">৳ Profit Report</button>
     <button data-page="api">⚙ API & Settings</button>
   </nav>
 </aside>
@@ -63,7 +65,6 @@ th{color:var(--muted);font-weight:600}
   <div class="admin">● Connected</div>
 </header>
 
-<!-- ড্যাশবোর্ড -->
 <section class="page active" id="dashboard">
   <div class="grid">
     <div class="card"><div class="stat-label">মোট অর্ডার</div><div class="stat" id="totalOrdersCount">০</div></div>
@@ -77,7 +78,6 @@ th{color:var(--muted);font-weight:600}
   </div>
 </section>
 
-<!-- অর্ডার তালিকা -->
 <section class="page" id="orders">
   <div class="card">
     <h3 class="section-title">অর্ডার ম্যানেজমেন্ট</h3>
@@ -86,38 +86,59 @@ th{color:var(--muted);font-weight:600}
   </div>
 </section>
 
-<!-- পণ্য ম্যানেজমেন্ট -->
 <section class="page" id="products">
   <div class="card">
-    <h3 class="section-title">নতুন পণ্য যোগ করুন</h3>
+    <h3 class="section-title" id="formTitle">পণ্য যোগ / তথ্য এডিট</h3>
     <form id="productForm">
+      <input type="hidden" id="editIndex" value="">
       <div class="field-group">পণ্যের নাম <input id="pName" required placeholder="কুর্তি বা ব্যাগ"></div>
       <div class="field-group">ক্যাটাগরি 
         <select id="pCat">
-          <option>পোশাক</option>
-          <option>ব্যাগ</option>
-          <option>অ্যাক্সেসরিজ</option>
+          <option>পোশাক</option><option>ব্যাগ</option><option>অ্যাক্সেসরিজ</option>
         </select>
       </div>
-      <div class="field-group">মূল্য (৳) <input type="number" id="pPrice" required placeholder="১২৫০"></div>
+      <div class="field-group">বর্তমান মূল্য (৳) <input type="number" id="pPrice" required placeholder="১২৫০"></div>
+      <div class="field-group">পূর্বের মূল্য / ডিসকাউন্ট (৳) <input type="number" id="pOldPrice" placeholder="১৫০০"></div>
+      <div class="field-group">স্টক পরিমাণ <input type="number" id="pStock" required placeholder="১০"></div>
+      <div class="field-group">রেটিং (যেমন: 4.8) <input type="number" step="0.1" id="pRating" placeholder="4.8"></div>
+      <div class="field-group">মোট সেলস সংখ্যা <input type="number" id="pSales" placeholder="100"></div>
+      <div class="field-group">পণ্যের মান (Quality) <input id="pQuality" placeholder="যেমন: ১০০% সুতি কটন"></div>
+      <div class="field-group">ছবির ফাইল আপলোড (অথবা নিচে URL দিন)
+        <input type="file" id="pImgFile" accept="image/*" onchange="convertImageToBase64(this)">
+      </div>
       <div class="field-group">ছবির লিংক (Image URL) <input id="pImg" placeholder="https://..."></div>
-      <button class="btn primary" type="submit">পণ্য যোগ করুন</button>
+      <div class="field-group">ইউটিউব ভিডিও রিভিউ লিংক (YouTube URL) <input id="pVideo" placeholder="https://www.youtube.com/watch?v=..."></div>
+      <div class="field-group">পণ্যের বিবরণ <textarea id="pDesc" rows="2" placeholder="সংক্ষিপ্ত বিবরণ..."></textarea></div>
+      <button class="btn primary" type="submit" id="saveProductBtn">পণ্য সংরক্ষণ করুন</button>
     </form>
   </div>
   <div class="card">
-    <h3 class="section-title">বর্তমান পণ্যসমূহ</h3>
+    <h3 class="section-title">বর্তমান পণ্য তালিকা</h3>
     <div id="productList"></div>
   </div>
 </section>
 
-<!-- API ও সেটিংস (WhatsApp, Phone, Google Sheet Link) -->
+<section class="page" id="courier">
+  <div class="card"><h3 class="section-title">কুরিয়ার ইন্টিগ্রেশন</h3><input placeholder="API Key দিন"><button class="btn primary" style="margin-top:10px">সংরক্ষণ করুন</button></div>
+</section>
+<section class="page" id="ads">
+  <div class="card"><h3 class="section-title">ফেসবুক অ্যাড পিক্সেল</h3><input placeholder="Pixel ID দিন"><button class="btn primary" style="margin-top:10px">সংরক্ষণ করুন</button></div>
+</section>
+<section class="page" id="profit">
+  <div class="card"><h3 class="section-title">প্রফিট রিপোর্ট</h3><p class="muted">হিসাব তথ্য।</p></div>
+</section>
+
 <section class="page" id="api">
   <div class="card">
-    <h3 class="section-title">কাস্টমার সার্ভিস ও গুগল শিট সেটিংস</h3>
+    <h3 class="section-title">ওয়েবসাইট ও নোটিফিকেশন সেটিংস</h3>
     <form id="settingsForm">
-      <div class="field-group">WhatsApp নম্বর (যেমন: 88017XXXXXXXX) <input id="setWhatsapp" placeholder="88017..."></div>
-      <div class="field-group">কাস্টমার সার্ভিস ফোন নম্বর <input id="setPhone" placeholder="017XXXXXXXX"></div>
-      <div class="field-group">Google Sheet / API Link (যদি ব্যবহার করতে চান) <input id="setSheet" placeholder="https://script.google.com/..."></div>
+      <div class="field-group">অর্ডার নোটিফিকেশন জিমেইল (Email) <input type="email" id="setAdminEmail" placeholder="yourname@gmail.com"></div>
+      <div class="field-group">ওয়েবসাইটের নাম <input id="setSiteName" placeholder="ঢং DHONG"></div>
+      <div class="field-group">থিম কালার <input type="color" id="setThemeColor" style="height:40px;padding:0"></div>
+      <div class="field-group">ঢাকা ভেতরে ডেলিভারি চার্জ (৳) <input type="number" id="setDhaka" placeholder="60"></div>
+      <div class="field-group">ঢাকা বাইরে ডেলিভারি চার্জ (৳) <input type="number" id="setOutsider" placeholder="120"></div>
+      <div class="field-group">WhatsApp নম্বর <input id="setWhatsapp" placeholder="88017..."></div>
+      <div class="field-group">কাস্টমার সার্ভিস ফোন নম্বর (Call Now) <input id="setPhone" placeholder="017..."></div>
       <button class="btn primary" type="submit">সেটিংস সেভ করুন</button>
     </form>
   </div>
@@ -127,7 +148,18 @@ th{color:var(--muted);font-weight:600}
 </div>
 
 <script>
-// পেজ ন্যাভিগেশন
+let uploadedBase64 = "";
+
+function convertImageToBase64(fileInput) {
+  if (fileInput.files && fileInput.files[0]) {
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      uploadedBase64 = e.target.result;
+    }
+    reader.readAsDataURL(fileInput.files[0]);
+  }
+}
+
 document.querySelectorAll(".nav button").forEach(button=>{
   button.addEventListener("click",()=>{
     document.querySelectorAll(".nav button").forEach(b=>b.classList.remove("active"));
@@ -141,79 +173,105 @@ document.querySelectorAll(".nav button").forEach(button=>{
 
 function loadAdminData() {
   let orders = JSON.parse(localStorage.getItem("dhong_orders")) || [];
-  
-  // ড্যাশবোর্ড ও স্ট্যাটাস
   document.getElementById("totalOrdersCount").textContent = orders.length;
   document.getElementById("newOrdersCount").textContent = orders.filter(o => o.status === 'pending').length;
   const totalSales = orders.reduce((sum, o) => sum + Number(o.total || 0), 0);
   document.getElementById("totalSalesAmount").textContent = "৳ " + totalSales.toLocaleString();
 
-  // অর্ডার টেবিল
-  const tbody = document.getElementById("orderRows");
-  tbody.innerHTML = orders.length === 0 ? "<tr><td colspan='8' class='empty'>কোনো অর্ডার নেই।</td></tr>" : 
+  document.getElementById("orderRows").innerHTML = orders.length === 0 ? "<tr><td colspan='8' class='empty'>কোনো অর্ডার নেই।</td></tr>" : 
   orders.map(order => {
     let itemsText = "";
     try {
       const items = JSON.parse(order.items_json);
       itemsText = items.map(i => `<b>${i.name}</b><br>রং: ${i.color}, সাইজ: ${i.size}, পিস: ${i.quantity}`).join("<br>");
     } catch { itemsText = order.items_json; }
-    return `<tr>
-      <td>#DH-${order.id}</td>
-      <td><strong>${order.customer_name}</strong></td>
-      <td>${order.phone}</td>
-      <td>${order.address}</td>
-      <td>${itemsText}</td>
-      <td>৳ ${order.total}</td>
-      <td><span class="pill pending">${order.status}</span></td>
-      <td>${new Date(order.created_at).toLocaleString()}</td>
-    </tr>`;
+    return `<tr><td>#DH-${order.id}</td><td><strong>${order.customer_name}</strong></td><td>${order.phone}</td><td>${order.address}</td><td>${itemsText}</td><td>৳ ${order.total}</td><td><span class="pill pending">${order.status}</span></td><td>${new Date(order.created_at).toLocaleString()}</td></tr>`;
   }).join("");
 
-  // সাম্প্রতিক অর্ডার
   document.getElementById("recentOrders").innerHTML = orders.slice(0, 5).map(o => `
     <tr><td>#DH-${o.id}</td><td>${o.customer_name}</td><td>৳ ${o.total}</td><td><span class="pill pending">${o.status}</span></td></tr>
   `).join("") || "<tr><td colspan='4' class='empty'>কোনো অর্ডার নেই।</td></tr>";
 
-  // পণ্যের তালিকা রেন্ডার
   let products = JSON.parse(localStorage.getItem("dhong_products")) || [];
-  document.getElementById("productList").innerHTML = products.map(p => `
-    <div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid #eee">
-      <span><b>${p.name}</b> (${p.cat}) - ৳${p.price}</span>
-      <button class="btn" style="background:#ff4d4d;color:white;padding:5px 10px" onclick="deleteProduct(${p.id})">ডিলিট</button>
+  document.getElementById("productList").innerHTML = products.map((p, idx) => `
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #eee">
+      <div>
+        <b>${p.name}</b> (${p.cat}) - ৳${p.price} <br>
+        <small style="color:green">স্টক: ${p.stock ?? 0} | রেটিং: ⭐${p.rating || '5.0'} | বিক্রি: ${p.sales || 0} পিস</small>
+      </div>
+      <div style="display:flex;gap:6px">
+        <button class="btn" style="background:#007bff;color:white;padding:5px 10px" onclick="editProduct(${idx})">এডিট</button>
+        <button class="btn" style="background:#ff4d4d;color:white;padding:5px 10px" onclick="deleteProduct(${p.id})">ডিলিট</button>
+      </div>
     </div>
   `).join("");
 
-  // সেটিংস ফর্ম ফিল আপ
   let settings = JSON.parse(localStorage.getItem("dhong_settings")) || {};
+  document.getElementById("setAdminEmail").value = settings.adminEmail || "";
+  document.getElementById("setSiteName").value = settings.siteName || "ঢং DHONG";
+  document.getElementById("setThemeColor").value = settings.themeColor || "#e85d75";
+  document.getElementById("setDhaka").value = settings.dhakaFee || "60";
+  document.getElementById("setOutsider").value = settings.outsiderFee || "120";
   document.getElementById("setWhatsapp").value = settings.whatsapp || "";
   document.getElementById("setPhone").value = settings.phone || "";
-  document.getElementById("setSheet").value = settings.sheetUrl || "";
 }
 
-// পণ্য যোগ করা
 document.getElementById("productForm").addEventListener("submit", function(e){
   e.preventDefault();
-  let products = JSON.parse(localStorage.getItem("dhong_products")) || [
-    {id:1,name:"এলিগ্যান্ট কটন কুর্তি",cat:"পোশাক",price:1250,img:""},
-    {id:2,name:"প্রিমিয়াম ক্রসব্যাগ",cat:"ব্যাগ",price:950,img:""},
-    {id:3,name:"সফট কালার থ্রি-পিস",cat:"পোশাক",price:1850,img:""},
-    {id:4,name:"ক্লাসিক হ্যান্ডব্যাগ",cat:"ব্যাগ",price:1450,img:""}
-  ];
+  let products = JSON.parse(localStorage.getItem("dhong_products")) || [];
+  let editIdx = document.getElementById("editIndex").value;
+  let finalImg = uploadedBase64 || document.getElementById("pImg").value;
 
-  const newP = {
-    id: Date.now(),
+  const productData = {
+    id: editIdx !== "" ? products[editIdx].id : Date.now(),
     name: document.getElementById("pName").value,
     cat: document.getElementById("pCat").value,
     price: Number(document.getElementById("pPrice").value),
-    img: document.getElementById("pImg").value
+    oldPrice: Number(document.getElementById("pOldPrice").value) || 0,
+    stock: Number(document.getElementById("pStock").value),
+    rating: document.getElementById("pRating").value || "5.0",
+    sales: Number(document.getElementById("pSales").value) || 0,
+    quality: document.getElementById("pQuality").value,
+    img: finalImg,
+    video: document.getElementById("pVideo").value,
+    desc: document.getElementById("pDesc").value,
+    comments: editIdx !== "" ? (products[editIdx].comments || []) : []
   };
 
-  products.push(newP);
+  if(editIdx !== "") {
+    products[editIdx] = productData;
+    alert("✅ পণ্য আপডেট সম্পন্ন!");
+  } else {
+    products.push(productData);
+    alert("✅ নতুন পণ্য যোগ করা হয়েছে!");
+  }
+
   localStorage.setItem("dhong_products", JSON.stringify(products));
-  alert("✅ পণ্য সফলভাবে যোগ করা হয়েছে!");
   e.target.reset();
+  uploadedBase64 = "";
+  document.getElementById("editIndex").value = "";
+  document.getElementById("formTitle").textContent = "পণ্য যোগ / তথ্য এডিট";
   loadAdminData();
 });
+
+function editProduct(idx) {
+  let products = JSON.parse(localStorage.getItem("dhong_products")) || [];
+  let p = products[idx];
+  document.getElementById("editIndex").value = idx;
+  document.getElementById("pName").value = p.name;
+  document.getElementById("pCat").value = p.cat;
+  document.getElementById("pPrice").value = p.price;
+  document.getElementById("pOldPrice").value = p.oldPrice || "";
+  document.getElementById("pStock").value = p.stock || 0;
+  document.getElementById("pRating").value = p.rating || "5.0";
+  document.getElementById("pSales").value = p.sales || 0;
+  document.getElementById("pQuality").value = p.quality || "";
+  document.getElementById("pImg").value = p.img || "";
+  document.getElementById("pVideo").value = p.video || "";
+  document.getElementById("pDesc").value = p.desc || "";
+  document.getElementById("formTitle").textContent = "পণ্যের তথ্য এডিট করুন (" + p.name + ")";
+  window.scrollTo({top: 0, behavior: 'smooth'});
+}
 
 function deleteProduct(id){
   let products = JSON.parse(localStorage.getItem("dhong_products")) || [];
@@ -222,16 +280,19 @@ function deleteProduct(id){
   loadAdminData();
 }
 
-// সেটিংস সেভ করা
 document.getElementById("settingsForm").addEventListener("submit", function(e){
   e.preventDefault();
   const settings = {
+    adminEmail: document.getElementById("setAdminEmail").value,
+    siteName: document.getElementById("setSiteName").value,
+    themeColor: document.getElementById("setThemeColor").value,
+    dhakaFee: document.getElementById("setDhaka").value,
+    outsiderFee: document.getElementById("setOutsider").value,
     whatsapp: document.getElementById("setWhatsapp").value,
-    phone: document.getElementById("setPhone").value,
-    sheetUrl: document.getElementById("setSheet").value
+    phone: document.getElementById("setPhone").value
   };
   localStorage.setItem("dhong_settings", JSON.stringify(settings));
-  alert("✅ সেটিংস সফলভাবে সেভ করা হয়েছে!");
+  alert("✅ সেটিংস সফলভাবে সেভ হয়েছে!");
 });
 
 window.onload = loadAdminData;
