@@ -1,4 +1,4 @@
-!doctype html>
+<!doctype html>
 <html lang="bn">
 <head>
 <meta charset="utf-8">
@@ -26,8 +26,12 @@ main{max-width:1100px;margin:25px auto;padding:0 14px}
 .grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
 .product{background:white;border:1px solid #e5e7eb;border-radius:13px;overflow:hidden;cursor:pointer;transition:0.2s;position:relative}
 .product:hover{transform:translateY(-3px);box-shadow:0 4px 12px rgba(0,0,0,0.08)}
-.art{height:160px;display:grid;place-items:center;background:#f0f2f5}
+.art{height:160px;display:grid;place-items:center;background:#f0f2f5;position:relative;overflow:hidden}
 .art img{width:100%;height:100%;object-fit:cover}
+.badge-row{position:absolute;top:8px;left:8px;right:8px;display:flex;justify-content:space-between;align-items:center;font-size:11px;z-index:2}
+.stock-badge{background:#e8f7ef;color:#16754e;padding:3px 6px;border-radius:4px;font-weight:bold}
+.stock-badge.out{background:#fde8e8;color:#c53030}
+.rating-badge{color:#ff9800;font-weight:bold;background:rgba(0,0,0,0.6);padding:2px 6px;border-radius:4px}
 .info{padding:12px}
 .info h3{font-size:14px;min-height:35px;margin:5px 0}
 .price-box{display:flex;gap:8px;align-items:center;margin-top:4px}
@@ -35,10 +39,6 @@ main{max-width:1100px;margin:25px auto;padding:0 14px}
 .old-price{font-size:13px;text-decoration:line-through;color:#888}
 .buy{width:100%;margin-top:12px;background:var(--primary-color);color:white;font-weight:bold}
 .buy:disabled{background:#ccc;cursor:not-allowed}
-.badge-row{display:flex;justify-content:space-between;align-items:center;font-size:11px}
-.stock-badge{background:#e8f7ef;color:#16754e;padding:3px 6px;border-radius:4px;font-weight:bold}
-.stock-badge.out{background:#fde8e8;color:#c53030}
-.rating-badge{color:#ff9800;font-weight:bold}
 .sales-badge{color:#666;font-size:11px;margin-top:4px}
 .benefits{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:25px 0}
 .benefit{background:white;border:1px solid #eee;padding:15px;border-radius:12px;text-align:center}
@@ -51,9 +51,10 @@ footer{background:var(--top-bg);color:white;padding:25px;line-height:1.8}
 .field input,.field select,.field textarea{display:block;width:100%;padding:11px;margin-top:6px;border:1px solid #ddd;border-radius:8px}
 .modal .primary{width:100%;margin-top:10px}
 .close{float:right;background:#eee;padding:5px 10px;font-weight:bold}
-.float-support{position:fixed;bottom:20px;right:20px;display:flex;flex-direction:column;gap:10px;z-index:99;transition:0.3s}
+.float-support{position:fixed;bottom:20px;right:20px;display:flex;flex-direction:column;gap:10px;z-index:99}
 .support-btn{background:#25d366;color:white;padding:12px 16px;border-radius:30px;font-weight:bold;text-decoration:none;box-shadow:0 4px 10px rgba(0,0,0,0.2);display:flex;align-items:center;gap:8px;font-size:14px}
 .support-btn.call{background:#007bff}
+.support-btn.wa-order{background:#25d366;width:100%;justify-content:center;margin-top:8px}
 .trust-icons{display:flex;gap:10px;justify-content:center;margin:15px 0;font-size:12px;color:#555}
 .trust-item{display:flex;align-items:center;gap:4px;background:#f8f9fa;padding:6px 10px;border-radius:6px}
 .video-container{position:relative;padding-bottom:56.25%;height:0;overflow:hidden;border-radius:10px;margin:12px 0}
@@ -71,7 +72,7 @@ footer{background:var(--top-bg);color:white;padding:25px;line-height:1.8}
 <div class="top" id="topBanner">🎉 ঢং-এ স্বাগতম | প্রথম অর্ডারে ১০% ছাড় ও ক্যাশ অন ডেলিভারি</div>
 
 <header>
-  <div class="logo" id="logoText">ঢং DHONG</div>
+  <div class="logo" id="logoText">DHONG DHONG</div>
   <input class="search" id="search" placeholder="পণ্য খুঁজুন..." oninput="renderProducts()">
   <button onclick="openTrack()" class="primary">📦 অর্ডার ট্র্যাক</button>
 </header>
@@ -105,7 +106,7 @@ footer{background:var(--top-bg);color:white;padding:25px;line-height:1.8}
 <footer>
   <b id="footerLogo">DHONG | ঢং</b><br>
   আপনার পছন্দের পণ্য সহজে ও নিরাপদে অর্ডার করুন।<br>
-  <button onclick="openTrack()" style="margin-top:10px">আমার অর্ডার ট্র্যাক করুন</button>
+  <button onclick="openTrack()" style="margin-top:10px">আমার অর্ডার ট্র্যাক করুন করুন</button>
 </footer>
 
 <div class="float-support" id="supportButtons"></div>
@@ -237,12 +238,14 @@ function renderProducts(){
  const list=products.filter(p=>(category==="সব"||p.cat===category)&&p.name.toLowerCase().includes(q));
  document.getElementById("grid").innerHTML=list.map(p=>`
   <article class="product" onclick="showProductDetail(${p.id})">
-   <div class="art">${p.img ? `<img src="${p.img}" alt="${p.name}">` : `<div style="font-size:30px">🛍️</div>`}</div>
-   <div class="info">
+   <div class="art">
     <div class="badge-row">
       <span class="stock-badge ${p.stock <= 0 ? 'out' : ''}">${p.stock <= 0 ? 'Stock Out' : 'স্টক: ' + p.stock}</span>
       <span class="rating-badge">★ ${p.rating || '5.0'}</span>
     </div>
+    ${p.img ? `<img src="${p.img}" alt="${p.name}">` : `<div style="font-size:30px">🛍️</div>`}
+   </div>
+   <div class="info">
     <h3>${p.name}</h3>
     <div class="price-box">
      <div class="price">${money(p.price)}</div>
@@ -268,14 +271,12 @@ function showProductDetail(id){
   const p = products.find(prod => prod.id === id);
   if(!p) return;
   const videoEmbed = getYoutubeEmbed(p.video);
-  
-  // পপআপ ওপেন হলে নিচের ফ্লোটিং সাপোর্ট বাটন হাইড করা হবে
   document.getElementById("supportButtons").style.display = "none";
 
   let colorImagesHtml = "";
   let activeImg = p.img;
   if(p.colors && p.colors.length > 0) {
-    colorImagesHtml = `<div style="margin:10px 0"><b>কালر ভ্যারিয়েন্ট সিলেক্ট করুন:</b><div class="color-thumbs" id="colorThumbsBox">` + 
+    colorImagesHtml = `<div style="margin:10px 0"><b>কালার ভ্যারিয়েন্ট সিলেক্ট করুন:</b><div class="color-thumbs" id="colorThumbsBox">` + 
     p.colors.map((imgUrl, i) => `<img src="${imgUrl}" class="color-thumb ${i===0?'active':''}" onclick="changeMainImage('${imgUrl}', this)">`).join("") + 
     `</div></div>`;
     activeImg = p.colors[0] || p.img;
@@ -284,6 +285,8 @@ function showProductDetail(id){
   const commentsList = (p.comments || []).map(c=>`
     <div class="comment-item"><b>${c.name}:</b> ${c.text}</div>
   `).join("") || "<small style='color:#888'>এখনো কোনো রিভিউ নেই। প্রথম মন্তব্যটি আপনার হোক!</small>";
+
+  let waOrderText = encodeURIComponent(`আসসালামু আলাইকুম, আমি এই পণ্যটি অর্ডার করতে চাই:\nনাম: ${p.name}\nমূল্য: ${money(p.price)}\nলিংক: ${window.location.href}`);
 
   document.getElementById("detailContent").innerHTML = `
     <div style="text-align:center">
@@ -318,12 +321,9 @@ function showProductDetail(id){
         <div class="trust-item">📦 ইন-স্টক</div>
       </div>
 
-      <div style="display:flex;gap:10px;margin-bottom:12px">
-        ${settings.whatsapp ? `<a href="https://wa.me/${settings.whatsapp}" target="_blank" class="support-btn" style="flex:1;justify-content:center;border-radius:9px;padding:10px">💬 WhatsApp চ্যাট</a>` : ''}
-        ${settings.phone ? `<a href="tel:${settings.phone}" class="support-btn call" style="flex:1;justify-content:center;border-radius:9px;padding:10px">📞 Call Now</a>` : ''}
-      </div>
-
-      <button class="primary" ${p.stock <= 0 ? 'disabled' : ''} onclick="closeModal('detailModal'); openOrder(${p.id})">${p.stock <= 0 ? 'স্টক শেষ' : 'এই পণ্যটি সরাসরি অর্ডার করুন'}</button>
+      <button class="primary" ${p.stock <= 0 ? 'disabled' : ''} onclick="closeModal('detailModal'); openOrder(${p.id})">${p.stock <= 0 ? 'স্টক শেষ' : 'সরাসরি ফর্ম পূরণ করে অর্ডার করুন'}</button>
+      
+      ${settings.whatsapp ? `<a href="https://wa.me/${settings.whatsapp}?text=${waOrderText}" target="_blank" class="support-btn wa-order">💬 WhatsApp-এ এই পণ্যটি অর্ডার করুন</a>` : ''}
 
       <div class="comments-sec">
         <b>💬 কাস্টমার রিভিউ ও কমেন্ট</b>
@@ -350,7 +350,6 @@ function addComment(e, prodId){
   e.preventDefault();
   const name = document.getElementById("cName").value;
   const text = document.getElementById("cText").value;
-  
   let p = products.find(prod => prod.id === prodId);
   if(p){
     if(!p.comments) p.comments = [];
@@ -396,7 +395,6 @@ function openTrack(){ document.getElementById("trackModal").classList.add("show"
 
 function closeModal(id){ 
   document.getElementById(id).classList.remove("show"); 
-  // পপআপ বন্ধ হলে ফ্লোটিং সাপোর্ট বাটন আবার ফিরিয়ে আনা হবে
   document.getElementById("supportButtons").style.display = "flex";
 }
 
@@ -437,8 +435,16 @@ document.getElementById("orderForm").addEventListener("submit", function(e){
  localStorage.setItem("dhong_orders", JSON.stringify(orders));
  localStorage.setItem("dhong_ordered_before", "true");
 
- selectedProduct.stock = Math.max(0, (selectedProduct.stock || 0) - qty);
- localStorage.setItem("dhong_products", JSON.stringify(products));
+ selectedProduct.stock = Math.max(0, (Number(selectedProduct.stock) || 0) - qty);
+ selectedProduct.sales = (Number(selectedProduct.sales) || 0) + qty;
+
+ let allProducts = JSON.parse(localStorage.getItem("dhong_products")) || [];
+ const pIndex = allProducts.findIndex(p => p.id === selectedProduct.id);
+ if(pIndex !== -1) {
+   allProducts[pIndex] = selectedProduct;
+   localStorage.setItem("dhong_products", JSON.stringify(allProducts));
+   products = allProducts;
+ }
 
  if(settings.adminEmail) {
    const mailSubject = encodeURIComponent(`নতুন অর্ডার #${newOrder.id} - ${settings.siteName}`);
