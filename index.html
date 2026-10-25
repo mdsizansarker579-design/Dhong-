@@ -4,6 +4,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title id="siteTitle">DHONG | Customer Panel</title>
+<!-- Firebase App & Realtime Database CDN -->
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
 <style>
 :root{--primary-color:#e85d75;--top-bg:#17243a;}
 *{box-sizing:border-box}
@@ -198,57 +201,91 @@ footer{background:var(--top-bg);color:white;padding:20px;line-height:1.6;font-si
 </div>
 
 <script>
-let settings = JSON.parse(localStorage.getItem("dhong_settings")) || {
-  siteName: "ঢং DHONG",
-  themeColor: "#e85d75",
-  dhakaFee: "60",
-  outsiderFee: "120",
-  whatsapp: "8801700000000",
-  phone: "01700000000",
-  adminEmail: "",
-  freeThreshold: "3000",
-  topBannerText: "🎉 ঢং-এ স্বাগতম | প্রথম অর্ডারে ১০% ছাড় ও ক্যাশ অন ডেলিভারি",
-  heroTitleText: "আপনার স্টাইল, আপনারই গল্প।",
-  heroSubtextText: "১০০% প্রিমিয়াম কোয়ালিটি নিশ্চিতকরণে ক্যাশ অন ডেলিভারিতে অর্ডার করুন।",
-  timerText: "⏳ অফার শেষ হতে বাকি:",
-  heroPadding: "14px",
-  heroBg: "linear-gradient(120deg,#242b49,#a23b5d,#ee9a8c)",
-  btnTrackText: "📦 ট্র্যাক",
-  btnViewProductsText: "পণ্য দেখুন ↓",
-  btnBuyNowText: "অর্ডার করুন",
-  btnDetailOrderText: "সরাসরি ফর্ম পূরণ করে অর্ডার করুন",
-  btnWaOrderText: "💬 WhatsApp-এ এই পণ্যটি অর্ডার করুন",
-  btnConfirmOrderText: "অর্ডার নিশ্চিত করুন",
-  btnWaChatText: "💬 WhatsApp চ্যাট",
-  btnCallNowText: "📞 Call Now"
-};
+  // Firebase Configuration from your project
+  const firebaseConfig = {
+    apiKey: "AIzaSyBNQLZU6KiVHp6IcAh4G70Trf7ThTcuLqw",
+    authDomain: "dhong-c897d.firebaseapp.com",
+    projectId: "dhong-c897d",
+    storageBucket: "dhong-c897d.firebasestorage.app",
+    messagingSenderId: "14236976798",
+    appId: "1:14236976798:web:d8ae40a5add4a70b2a1d8f",
+    measurementId: "G-J2RC81D0WB"
+  };
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.database();
 
-document.documentElement.style.setProperty('--primary-color', settings.themeColor);
-document.getElementById("logoText").textContent = settings.siteName;
-document.getElementById("footerLogo").textContent = settings.siteName;
-document.getElementById("siteTitle").textContent = settings.siteName + " | Customer Panel";
+  let products = [];
+  let orders = [];
+  let settings = {
+    siteName: "ঢং DHONG",
+    themeColor: "#e85d75",
+    dhakaFee: "60",
+    outsiderFee: "120",
+    whatsapp: "8801700000000",
+    phone: "01700000000",
+    adminEmail: "",
+    freeThreshold: "3000",
+    topBannerText: "🎉 ঢং-এ স্বাগতম | প্রথম অর্ডারে ১০% ছাড় ও ক্যাশ অন ডেলিভারি",
+    heroTitleText: "আপনার স্টাইল, আপনারই গল্প।",
+    heroSubtextText: "১০০% প্রিমিয়াম কোয়ালিটি নিশ্চিতকরণে ক্যাশ অন ডেলিভারিতে অর্ডার করুন।",
+    timerText: "⏳ অফার শেষ হতে বাকি:",
+    heroPadding: "14px",
+    heroBg: "linear-gradient(120deg,#242b49,#a23b5d,#ee9a8c)",
+    btnTrackText: "📦 ট্র্যাক",
+    btnViewProductsText: "পণ্য দেখুন ↓",
+    btnBuyNowText: "অর্ডার করুন",
+    btnDetailOrderText: "সরাসরি ফর্ম পূরণ করে অর্ডার করুন",
+    btnWaOrderText: "💬 WhatsApp-এ এই পণ্যটি অর্ডার করুন",
+    btnConfirmOrderText: "অর্ডার নিশ্চিত করুন",
+    btnWaChatText: "💬 WhatsApp চ্যাট",
+    btnCallNowText: "📞 Call Now"
+  };
 
-document.getElementById("topBanner").textContent = settings.topBannerText || "🎉 ঢং-এ স্বাগতম | প্রথম অর্ডারে ১০% ছাড়";
-document.getElementById("heroTitle").textContent = settings.heroTitleText || "আপনার স্টাইল, আপনারই গল্প।";
-document.getElementById("heroSubtext").textContent = settings.heroSubtextText || "১০০% প্রিমিয়াম কোয়ালিটি নিশ্চিতকরণে অর্ডার করুন।";
-document.getElementById("heroBtnText").textContent = settings.btnViewProductsText || "পণ্য দেখুন ↓";
-document.getElementById("btnTrackEl").textContent = settings.btnTrackText || "📦 ট্র্যাক";
-document.getElementById("footerTrackBtn").textContent = settings.btnTrackText ? "আমার " + settings.btnTrackText : "আমার অর্ডার ট্র্যাক করুন";
-document.getElementById("submitBtn").textContent = settings.btnConfirmOrderText || "অর্ডার নিশ্চিত করুন";
+  // Real-time synchronization listeners
+  db.ref('dhong_products').on('value', snapshot => {
+    let data = snapshot.val();
+    products = data ? (Array.isArray(data) ? data : Object.values(data)) : [
+      {id:1,name:"এলিগ্যান্ট কটন কুর্তি",cat:"পোশাক",price:1250,oldPrice:1500,stock:10,rating:4.8,sales:142,quality:"১০০% সুতি কটন",img:"",video:"",colors:[],desc:"আরামদায়ক প্রিমিয়াম কটন কাপড়ের তৈরি আকর্ষণীয় কুর্তি."},
+      {id:2,name:"প্রিমিয়াম ক্রসব্যাগ",cat:"ব্যাগ",price:950,oldPrice:1200,stock:5,rating:4.9,sales:89,quality:"হাই গ্রেড ওয়াটারপ্রুফ চামড়া",img:"",video:"",colors:[],desc:"স্টাইলিশ ও টেকসই চামড়ার ক্রসব্যাগ."}
+    ];
+    renderProducts();
+  });
 
-const heroEl = document.getElementById("heroBox");
-heroEl.style.padding = settings.heroPadding || "14px";
-heroEl.style.background = settings.heroBg || "linear-gradient(120deg,#242b49,#a23b5d,#ee9a8c)";
+  db.ref('dhong_orders').on('value', snapshot => {
+    let data = snapshot.val();
+    orders = data ? (Array.isArray(data) ? data : Object.values(data)) : [];
+  });
 
-document.getElementById("deliveryFee").innerHTML = `
-  <option value="${settings.dhakaFee}">ঢাকা ভেতরে (৳${settings.dhakaFee})</option>
-  <option value="${settings.outsiderFee}">ঢাকা বাইরে / সারা দেশ (৳${settings.outsiderFee})</option>
-`;
+  db.ref('dhong_settings').on('value', snapshot => {
+    let data = snapshot.val();
+    if(data) settings = { ...settings, ...data };
+    applySettings();
+  });
 
-let products = JSON.parse(localStorage.getItem("dhong_products")) || [
- {id:1,name:"এলিগ্যান্ট কটন কুর্তি",cat:"পোশাক",price:1250,oldPrice:1500,stock:10,rating:4.8,sales:142,quality:"১০০% সুতি কটন",img:"",video:"",colors:[],desc:"আরামদায়ক প্রিমিয়াম কটন কাপড়ের তৈরি আকর্ষণীয় কুর্তি."},
- {id:2,name:"প্রিমিয়াম ক্রসব্যাগ",cat:"ব্যাগ",price:950,oldPrice:1200,stock:5,rating:4.9,sales:89,quality:"হাই গ্রেড ওয়াটারপ্রুফ চামড়া",img:"",video:"",colors:[],desc:"স্টাইলিশ ও টেকসই চামড়ার ক্রসব্যাগ."}
-];
+function applySettings() {
+  document.documentElement.style.setProperty('--primary-color', settings.themeColor);
+  document.getElementById("logoText").textContent = settings.siteName;
+  document.getElementById("footerLogo").textContent = settings.siteName;
+  document.getElementById("siteTitle").textContent = settings.siteName + " | Customer Panel";
+
+  document.getElementById("topBanner").textContent = settings.topBannerText || "🎉 ঢং-এ স্বাগতম | প্রথম অর্ডারে ১০% ছাড়";
+  document.getElementById("heroTitle").textContent = settings.heroTitleText || "আপনার স্টাইল, আপনারই গল্প।";
+  document.getElementById("heroSubtext").textContent = settings.heroSubtextText || "১০০% প্রিমিয়াম কোয়ালিটি নিশ্চিতকরণে অর্ডার করুন।";
+  document.getElementById("heroBtnText").textContent = settings.btnViewProductsText || "পণ্য দেখুন ↓";
+  document.getElementById("btnTrackEl").textContent = settings.btnTrackText || "📦 ট্র্যাক";
+  document.getElementById("footerTrackBtn").textContent = settings.btnTrackText ? "আমার " + settings.btnTrackText : "আমার অর্ডার ট্র্যাক করুন";
+  document.getElementById("submitBtn").textContent = settings.btnConfirmOrderText || "অর্ডার নিশ্চিত করুন";
+
+  const heroEl = document.getElementById("heroBox");
+  heroEl.style.padding = settings.heroPadding || "14px";
+  heroEl.style.background = settings.heroBg || "linear-gradient(120deg,#242b49,#a23b5d,#ee9a8c)";
+
+  document.getElementById("deliveryFee").innerHTML = `
+    <option value="${settings.dhakaFee}">ঢাকা ভেতরে (৳${settings.dhakaFee})</option>
+    <option value="${settings.outsiderFee}">ঢাকা বাইরে / সারা দেশ (৳${settings.outsiderFee})</option>
+  `;
+  renderSupport();
+}
 
 function renderSupport(){
   const box = document.getElementById("supportButtons");
@@ -428,7 +465,7 @@ function addComment(e, prodId){
   if(p){
     if(!p.comments) p.comments = [];
     p.comments.push({name, text});
-    localStorage.setItem("dhong_products", JSON.stringify(products));
+    db.ref('dhong_products').set(products);
     showProductDetail(prodId);
   }
 }
@@ -504,20 +541,17 @@ document.getElementById("orderForm").addEventListener("submit", function(e){
    created_at: new Date().toISOString()
  };
 
- let orders = JSON.parse(localStorage.getItem("dhong_orders")) || [];
  orders.unshift(newOrder);
- localStorage.setItem("dhong_orders", JSON.stringify(orders));
+ db.ref('dhong_orders').set(orders);
  localStorage.setItem("dhong_ordered_before", "true");
 
  selectedProduct.stock = Math.max(0, (Number(selectedProduct.stock) || 0) - qty);
  selectedProduct.sales = (Number(selectedProduct.sales) || 0) + qty;
 
- let allProducts = JSON.parse(localStorage.getItem("dhong_products")) || [];
- const pIndex = allProducts.findIndex(p => p.id === selectedProduct.id);
+ const pIndex = products.findIndex(p => p.id === selectedProduct.id);
  if(pIndex !== -1) {
-   allProducts[pIndex] = selectedProduct;
-   localStorage.setItem("dhong_products", JSON.stringify(allProducts));
-   products = allProducts;
+   products[pIndex] = selectedProduct;
+   db.ref('dhong_products').set(products);
  }
 
  alert(`✅ অর্ডার সফলভাবে গ্রহণ করা হয়েছে!\nঅর্ডার নম্বর: #DH-${newOrder.id}\nমোট: ${money(totalPrice)}`);
@@ -530,7 +564,6 @@ document.getElementById("trackForm").addEventListener("submit", function(e){
  e.preventDefault();
  const orderId = e.target.orderId.value.replace(/[^0-9]/g, '');
  const resultEl = document.getElementById("trackResult");
- let orders = JSON.parse(localStorage.getItem("dhong_orders")) || [];
  const order = orders.find(o => String(o.id) === orderId);
 
  if(order) {
@@ -557,10 +590,11 @@ window.addEventListener("DOMContentLoaded", () => {
   const params = new URLSearchParams(window.location.search);
   const prodParam = params.get("product");
   if(prodParam) {
-    const found = products.find(p => p.id == prodParam);
-    if(found) showProductDetail(found.id);
+    setTimeout(() => {
+      const found = products.find(p => p.id == prodParam);
+      if(found) showProductDetail(found.id);
+    }, 500);
   }
-  renderProducts();
   renderSupport();
 });
 </script>
