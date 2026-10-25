@@ -111,8 +111,8 @@ th{color:var(--muted);font-weight:600}
 
       <div class="field-group">পণ্যের নাম <input id="pName" required placeholder="কুর্তি বা ব্যাগ"></div>
       
-      <div class="field-group">ক্যাটাগরি (নিজের ইচ্ছামতো নাম লিখুন বা সিলেক্ট করুন) 
-        <input id="pCat" list="categoryList" required placeholder="যেমন: পোশাক, ব্যাগ, জুতো, কসমেটিক্স">
+      <div class="field-group">ক্যাটাগরি 
+        <input id="pCat" list="categoryList" required placeholder="যেমন: পোশাক, ব্যাগ, জুতো">
         <datalist id="categoryList">
           <option value="পোশাক">
           <option value="ব্যাগ">
@@ -128,20 +128,20 @@ th{color:var(--muted);font-weight:600}
       <div class="field-group">পণ্যের মান (Quality) <input id="pQuality" placeholder="যেমন: ১০০% সুতি কটন"></div>
       
       <div class="field-group" style="background:#f0f4ff;padding:10px;border-radius:8px;border:1px dashed #6558e8">
-        📸 প্রধান ছবি আপলোড (গ্যালারি থেকে সিলেক্ট করুন):
+        📸 প্রধান ছবি আপলোড:
         <input type="file" id="pImgFile" accept="image/*" onchange="convertMainImage(this)">
-        <div style="margin-top:6px;font-size:11px;color:#666">অথবা সরাসরি ছবির লিংক দিতে পারেন:</div>
+        <div style="margin-top:6px;font-size:11px;color:#666">অথবা সরাসরি লিংক:</div>
         <input id="pImg" placeholder="https://..." oninput="document.getElementById('previewImage').src=this.value; document.getElementById('previewImage').style.display='block';">
       </div>
       
       <div class="field-group" style="background:#f9f9f9;padding:10px;border-radius:8px;border:1px solid #ddd">
-        🎨 কালার ভ্যারিয়েন্টের ছবি আপলোড (একাধিক সিলেক্ট করুন):
+        🎨 কালার ভ্যারিয়েন্টের ছবি আপলোড:
         <input type="file" id="pColorFiles" accept="image/*" multiple onchange="convertColorImages(this)">
-        <div style="margin-top:6px;font-size:11px;color:#666">অথবা কালার ইমেজের লিংকসমূহ (কমা দিয়ে আলাদা করুন):</div>
+        <div style="margin-top:6px;font-size:11px;color:#666">অথবা লিংকসমূহ (কমা দিয়ে):</div>
         <input id="pColors" placeholder="https://img1..., https://img2...">
       </div>
 
-      <div class="field-group">ইউটিউব ভিডিও রিভিউ লিংক (YouTube URL) <input id="pVideo" placeholder="https://www.youtube.com/watch?v=..."></div>
+      <div class="field-group">ইউটিউব ভিডিও রিভিউ লিংক <input id="pVideo" placeholder="https://www.youtube.com/watch?v=..."></div>
       <div class="field-group">পণ্যের বিবরণ <textarea id="pDesc" rows="2" placeholder="সংক্ষিপ্ত বিবরণ..."></textarea></div>
       <button class="btn primary" type="submit" id="saveProductBtn">পণ্য সংরক্ষণ করুন</button>
     </form>
@@ -153,55 +153,54 @@ th{color:var(--muted);font-weight:600}
 </section>
 
 <section class="page" id="courier">
-  <div class="card"><h3 class="section-title">কুরিয়ার ইন্টিগ্রেশন (Steadfast / RedX)</h3><input placeholder="API Key দিন"><button class="btn primary" style="margin-top:10px">সংরক্ষণ করুন</button></div>
+  <div class="card"><h3 class="section-title">কুরিয়ার ইন্টিগ্রেশন</h3><input placeholder="API Key দিন"><button class="btn primary" style="margin-top:10px">সংরক্ষণ করুন</button></div>
 </section>
 <section class="page" id="ads">
-  <div class="card"><h3 class="section-title">ফেসবুক অ্যাড পিক্সেল ও ক্যাটালগ</h3><input placeholder="Pixel ID দিন"><button class="btn primary" style="margin-top:10px">সংরক্ষণ করুন</button></div>
+  <div class="card"><h3 class="section-title">ফেসবুক অ্যাড পিক্সেল</h3><input placeholder="Pixel ID দিন"><button class="btn primary" style="margin-top:10px">সংরক্ষণ করুন</button></div>
 </section>
 
 <section class="page" id="profit">
   <div class="card">
-    <h3 class="section-title">প্রফিট রিপোর্ট (Profit & Loss)</h3>
+    <h3 class="section-title">প্রফিট রিপোর্ট</h3>
     <div class="grid" style="margin-bottom:15px">
       <div class="card" style="margin:0"><div class="stat-label">মোট সেলস রেভিনিউ</div><div class="stat" id="profitTotalSales">৳ ০</div></div>
-      <div class="card" style="margin:0"><div class="stat-label">আনুমানিক প্রফিট (লাভ)</div><div class="stat" id="netProfitAmount" style="color:var(--green)">৳ ০</div></div>
+      <div class="card" style="margin:0"><div class="stat-label">আনুমানিক প্রফিট</div><div class="stat" id="netProfitAmount" style="color:var(--green)">৳ ০</div></div>
     </div>
-    <p class="muted">প্রতিটি সফল বা প্রসেসিং অর্ডারের ভিত্তিতে মোট লাভের হিসাব এখানে দেখানো হচ্ছে।</p>
   </div>
 </section>
 
 <section class="page" id="api">
   <div class="card">
-    <h3 class="section-title">ওয়েবসাইট ও নোটিফিকেশন সেটিংস</h3>
+    <h3 class="section-title">ওয়েবসাইট ও নোটিফিকেশন সেটিংস</h3>
     <form id="settingsForm">
-      <div class="field-group">অর্ডার নোটিফিকেশন জিমেইল (Email) <input type="email" id="setAdminEmail" placeholder="yourname@gmail.com"></div>
+      <div class="field-group">অর্ডার নোটিফিকেশন জিমেইল <input type="email" id="setAdminEmail" placeholder="yourname@gmail.com"></div>
       <div class="field-group">ওয়েবসাইটের নাম <input id="setSiteName" placeholder="ঢং DHONG"></div>
       <div class="field-group">থিম কালার <input type="color" id="setThemeColor" style="height:40px;padding:0"></div>
       <div class="field-group">ঢাকা ভেতরে ডেলিভারি চার্জ (৳) <input type="number" id="setDhaka" placeholder="60"></div>
       <div class="field-group">ঢাকা বাইরে ডেলিভারি চার্জ (৳) <input type="number" id="setOutsider" placeholder="120"></div>
-      <div class="field-group">ফ্রি ডেলিভারি থ্রেশহোল্ড (ন্যূনতম কেনাকাটা ৳) <input type="number" id="setThreshold" placeholder="3000"></div>
+      <div class="field-group">ফ্রি ডেলিভারি থ্রেশহোল্ড (৳) <input type="number" id="setThreshold" placeholder="3000"></div>
       <div class="field-group">WhatsApp নম্বর <input id="setWhatsapp" placeholder="88017..."></div>
-      <div class="field-group">কাস্টমার সার্ভিস ফোন নম্বর (Call Now) <input id="setPhone" placeholder="017..."></div>
+      <div class="field-group">ফোন নম্বর (Call Now) <input id="setPhone" placeholder="017..."></div>
 
       <hr style="margin:15px 0;border:0;border-top:1px dashed #ccc">
       <h3 class="section-title" style="color:var(--accent)">📢 ব্যানার ও ডিজাইন সেটিংস</h3>
       <div class="field-group">ওপরের অফার নোটিফিকেশন বার টেক্সট <input id="setTopBanner" placeholder="🎉 ঢং-এ স্বাগতম..."></div>
-      <div class="field-group">ব্যানার মেইন টাইটেল/শিরোনাম <input id="setHeroTitle" placeholder="আপনার স্টাইল..."></div>
-      <div class="field-group">ব্যানার সাবটাইটেল/বিবরণ <input id="setHeroSubtext" placeholder="১০০% প্রিমিয়াম..."></div>
+      <div class="field-group">ব্যানার মেইন টাইটেল <input id="setHeroTitle" placeholder="আপনার স্টাইল..."></div>
+      <div class="field-group">ব্যানার সাবটাইটেল <input id="setHeroSubtext" placeholder="১০০% প্রিমিয়াম..."></div>
       <div class="field-group">ব্যানার কাউন্টডাউন টেক্সট <input id="setTimerText" placeholder="⏳ অফার শেষ হতে বাকি:"></div>
       <div class="field-group">ব্যানার সাইজ / প্যাডিং <input id="setHeroPadding" placeholder="14px"></div>
       <div class="field-group">ব্যানার ব্যাকগ্রাউন্ড কালার/গ্রেডিয়েন্ট <input id="setHeroBg" placeholder="linear-gradient(...)"></div>
 
       <hr style="margin:15px 0;border:0;border-top:1px dashed #ccc">
-      <h3 class="section-title" style="color:var(--accent)">🎛️ অ্যাকশন বাটন টেক্সট এডিট</h3>
-      <div class="field-group">অর্ডার ট্র্যাক বাটন টেক্সট <input id="btnTrack" placeholder="📦 ট্র্যাক"></div>
-      <div class="field-group">পণ্য দেখুন বাটন টেক্সট <input id="btnViewProducts" placeholder="পণ্য দেখুন ↓"></div>
-      <div class="field-group">প্রোডাক্ট কার্ডের 'অর্ডার করুন' বাটন টেক্সট <input id="btnBuyNow" placeholder="অর্ডার করুন"></div>
-      <div class="field-group">বিস্তারিত পপআপের 'সরাসরি অর্ডার' বাটন টেক্সট <input id="btnDetailOrder" placeholder="সরাসরি ফর্ম পূরণ করে অর্ডার করুন"></div>
-      <div class="field-group">WhatsApp অর্ডার বাটন টেক্সট <input id="btnWaOrder" placeholder="💬 WhatsApp-এ এই পণ্যটি অর্ডার করুন"></div>
-      <div class="field-group">অর্ডার ফর্মের 'নিশ্চিত করুন' বাটন টেক্সট <input id="btnConfirmOrder" placeholder="অর্ডার নিশ্চিত করুন"></div>
-      <div class="field-group">ফ্লোটিং WhatsApp চ্যাট বাটন টেক্সট <input id="btnWaChat" placeholder="💬 WhatsApp চ্যাট"></div>
-      <div class="field-group">ফ্লোটিং Call Now বাটন টেক্সট <input id="btnCallNow" placeholder="📞 Call Now"></div>
+      <h3 class="section-title" style="color:var(--accent)">🎛️ অ্যাকশন বাটন টেক্সট</h3>
+      <div class="field-group">অর্ডার ট্র্যাক বাটন <input id="btnTrack" placeholder="📦 ট্র্যাক"></div>
+      <div class="field-group">পণ্য দেখুন বাটন <input id="btnViewProducts" placeholder="পণ্য দেখুন ↓"></div>
+      <div class="field-group">অর্ডার করুন বাটন (কার্ডে) <input id="btnBuyNow" placeholder="অর্ডার করুন"></div>
+      <div class="field-group">সরাসরি ফর্ম অর্ডার বাটন <input id="btnDetailOrder" placeholder="সরাসরি ফর্ম পূরণ করে অর্ডার করুন"></div>
+      <div class="field-group">WhatsApp অর্ডার বাটন <input id="btnWaOrder" placeholder="💬 WhatsApp-এ এই পণ্যটি অর্ডার করুন"></div>
+      <div class="field-group">অর্ডার নিশ্চিত করুন বাটন <input id="btnConfirmOrder" placeholder="অর্ডার নিশ্চিত করুন"></div>
+      <div class="field-group">WhatsApp চ্যাট বাটন <input id="btnWaChat" placeholder="💬 WhatsApp চ্যাট"></div>
+      <div class="field-group">Call Now বাটন <input id="btnCallNow" placeholder="📞 Call Now"></div>
 
       <button class="btn primary" type="submit" style="margin-top:15px">সেটিংস সেভ করুন</button>
     </form>
