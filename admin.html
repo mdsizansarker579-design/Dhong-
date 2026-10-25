@@ -131,14 +131,14 @@ th{color:var(--muted);font-weight:600}
       <div class="field-group">পণ্যের মান (Quality) <input id="pQuality" placeholder="যেমন: ১০০% সুতি কটন"></div>
       
       <div class="field-group" style="background:#f0f4ff;padding:10px;border-radius:8px;border:1px dashed #6558e8">
-        📸 প্রধান ছবি আপলোড:
+        📸 প্রধান ছবি আপলোড (অটো-রিসাইজ ও অপটিমাইজড):
         <input type="file" id="pImgFile" accept="image/*" onchange="convertMainImage(this)">
         <div style="margin-top:6px;font-size:11px;color:#666">অথবা সরাসরি লিংক:</div>
         <input id="pImg" placeholder="https://..." oninput="document.getElementById('previewImage').src=this.value; document.getElementById('previewImage').style.display='block';">
       </div>
       
       <div class="field-group" style="background:#f9f9f9;padding:10px;border-radius:8px;border:1px solid #ddd">
-        🎨 কালার ভ্যারিয়েন্টের ছবি আপলোড:
+        🎨 কালার ভ্যারিয়েন্টের ছবি আপলোড (অটো-রিসাইজ):
         <input type="file" id="pColorFiles" accept="image/*" multiple onchange="convertColorImages(this)">
         <div style="margin-top:6px;font-size:11px;color:#666">অথবা লিংকসমূহ (কমা দিয়ে):</div>
         <input id="pColors" placeholder="https://img1..., https://img2...">
@@ -256,9 +256,37 @@ function convertMainImage(fileInput) {
   if (fileInput.files && fileInput.files[0]) {
     const reader = new FileReader();
     reader.onload = function(e) {
-      uploadedMainBase64 = e.target.result;
-      document.getElementById("previewImage").src = uploadedMainBase64;
-      document.getElementById("previewImage").style.display = "block";
+      const img = new Image();
+      img.onload = function() {
+        const canvas = document.createElement('canvas');
+        let width = img.width;
+        let height = img.height;
+        
+        const MAX_WIDTH = 800;
+        const MAX_HEIGHT = 800;
+
+        if (width > height) {
+          if (width > MAX_WIDTH) {
+            height = Math.round((height * MAX_WIDTH) / width);
+            width = MAX_WIDTH;
+          }
+        } else {
+          if (height > MAX_HEIGHT) {
+            width = Math.round((width * MAX_HEIGHT) / height);
+            height = MAX_HEIGHT;
+          }
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, width, height);
+
+        uploadedMainBase64 = canvas.toDataURL('image/jpeg', 0.7);
+        document.getElementById("previewImage").src = uploadedMainBase64;
+        document.getElementById("previewImage").style.display = "block";
+      };
+      img.src = e.target.result;
     }
     reader.readAsDataURL(fileInput.files[0]);
   }
@@ -270,7 +298,35 @@ function convertColorImages(fileInput) {
     Array.from(fileInput.files).forEach(file => {
       const reader = new FileReader();
       reader.onload = function(e) {
-        uploadedColorsBase64.push(e.target.result);
+        const img = new Image();
+        img.onload = function() {
+          const canvas = document.createElement('canvas');
+          let width = img.width;
+          let height = img.height;
+          const MAX_WIDTH = 800;
+          const MAX_HEIGHT = 800;
+
+          if (width > height) {
+            if (width > MAX_WIDTH) {
+              height = Math.round((height * MAX_WIDTH) / width);
+              width = MAX_WIDTH;
+            }
+          } else {
+            if (height > MAX_HEIGHT) {
+              width = Math.round((width * MAX_HEIGHT) / height);
+              height = MAX_HEIGHT;
+            }
+          }
+
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, width, height);
+
+          const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.7);
+          uploadedColorsBase64.push(compressedDataUrl);
+        };
+        img.src = e.target.result;
       }
       reader.readAsDataURL(file);
     });
