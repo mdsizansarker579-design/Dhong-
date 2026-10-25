@@ -10,35 +10,43 @@
 body{margin:0;background:var(--bg);font-family:Arial,sans-serif;color:var(--text)}
 button,input,select,textarea{font:inherit}
 .layout{display:flex;min-height:100vh}
-.sidebar{width:235px;background:var(--dark);color:white;padding:22px 14px;flex-shrink:0}
-.brand{font-size:25px;font-weight:900;letter-spacing:2px;padding:8px 12px}
-.brand small{display:block;font-size:11px;color:#aeb7ca;letter-spacing:1px;margin-top:5px}
-.nav{margin-top:25px}
-.nav button{width:100%;text-align:left;border:0;background:transparent;color:#cbd2e1;padding:13px 12px;border-radius:10px;margin:3px 0;cursor:pointer}
+.sidebar{width:240px;background:var(--dark);color:white;padding:20px 10px;flex-shrink:0}
+.brand{font-size:22px;font-weight:900;letter-spacing:1px;padding:8px 10px;word-break:break-all}
+.brand small{display:block;font-size:10px;color:#aeb7ca;letter-spacing:0.5px;margin-top:4px}
+.nav{margin-top:20px}
+.nav button{width:100%;text-align:left;border:0;background:transparent;color:#cbd2e1;padding:11px 10px;border-radius:8px;margin:3px 0;cursor:pointer;font-size:13px;display:flex;align-items:center;gap:6px}
 .nav button.active,.nav button:hover{background:#343b54;color:white}
-.main{flex:1;min-width:0;padding:25px}
-.top{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:25px}
-.top h1{font-size:25px;margin:0}
-.muted{color:var(--muted);font-size:13px;margin-top:7px}
-.admin{background:white;border:1px solid var(--line);padding:10px 13px;border-radius:12px;font-size:13px}
+.main{flex:1;min-width:0;padding:20px}
+.top{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:20px;flex-wrap:wrap}
+.top h1{font-size:22px;margin:0}
+.muted{color:var(--muted);font-size:12px;margin-top:5px}
+.admin{background:white;border:1px solid var(--line);padding:8px 12px;border-radius:10px;font-size:12px}
 .page{display:none}.page.active{display:block}
-.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:15px}
-.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px;margin-bottom:16px}
-.stat-label{color:var(--muted);font-size:13px}
-.stat{font-size:27px;font-weight:800;margin:12px 0 6px}
-.section-title{font-size:18px;font-weight:750;margin:0 0 15px}
-input,select,textarea{border:1px solid #dce1eb;background:white;border-radius:9px;padding:11px;width:100%;margin-top:5px}
-.field-group{margin-bottom:12px;font-size:13px;font-weight:bold}
-.btn{border:0;border-radius:9px;padding:11px 14px;cursor:pointer;font-weight:650}
+.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:14px}
+.stat-label{color:var(--muted);font-size:12px}
+.stat{font-size:24px;font-weight:800;margin:10px 0 4px}
+.section-title{font-size:16px;font-weight:750;margin:0 0 12px}
+input,select,textarea{border:1px solid #dce1eb;background:white;border-radius:8px;padding:10px;width:100%;margin-top:4px}
+.field-group{margin-bottom:10px;font-size:12px;font-weight:bold}
+.btn{border:0;border-radius:8px;padding:10px 12px;cursor:pointer;font-weight:650}
 .primary{background:var(--accent);color:white}
-table{width:100%;border-collapse:collapse;min-width:590px}
-th,td{text-align:left;padding:13px 10px;border-bottom:1px solid var(--line);font-size:13px}
+table{width:100%;border-collapse:collapse;min-width:550px}
+th,td{text-align:left;padding:11px 8px;border-bottom:1px solid var(--line);font-size:12px}
 th{color:var(--muted);font-weight:600}
 .table-wrap{overflow-x:auto}
-.pill{display:inline-block;padding:6px 9px;border-radius:20px;font-size:11px;font-weight:700;background:#e8f7ef;color:#16754e}
+.pill{display:inline-block;padding:5px 8px;border-radius:20px;font-size:10px;font-weight:700;background:#e8f7ef;color:#16754e}
 .pending{background:#fff2db;color:#9a5b08}
-.empty{padding:22px;text-align:center;color:var(--muted)}
-@media(max-width:900px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.sidebar{width:205px}.main{padding:18px}}
+.empty{padding:20px;text-align:center;color:var(--muted)}
+
+@media(max-width:768px){
+  .layout{flex-direction:column}
+  .sidebar{width:100%;padding:12px}
+  .nav{display:flex;flex-wrap:wrap;gap:4px;margin-top:10px}
+  .nav button{width:auto;flex:1;min-width:110px;padding:8px;font-size:11px;text-align:center;justify-content:center}
+  .grid{grid-template-columns:1fr 1fr}
+  .main{padding:12px}
+}
 </style>
 </head>
 <body>
@@ -92,8 +100,7 @@ th{color:var(--muted);font-weight:600}
     <form id="productForm">
       <input type="hidden" id="editIndex" value="">
       
-      <!-- ফিচার ৫: এডিট পেজের একদম উপরে বড় ছবি প্রিভিউ ও রেটিং -->
-      <div style="text-align:center;margin-bottom:15px">
+      <div style="text-align:center;margin-bottom:12px">
         <img id="previewImage" src="" style="max-height:120px;max-width:100%;border-radius:8px;display:none;margin:0 auto">
       </div>
 
@@ -203,7 +210,7 @@ function loadAdminData() {
       <td>${itemsText}</td>
       <td>৳ ${order.total}</td>
       <td>
-        <select onchange="updateOrderStatus(${idx}, this.value)" style="padding:4px;font-size:12px;border-radius:6px">
+        <select onchange="updateOrderStatus(${idx}, this.value)" style="padding:4px;font-size:11px;border-radius:6px">
           <option ${order.status==='Pending'?'selected':''}>Pending</option>
           <option ${order.status==='Processing'?'selected':''}>Processing</option>
           <option ${order.status==='Completed'?'selected':''}>Completed</option>
@@ -222,16 +229,16 @@ function loadAdminData() {
   document.getElementById("productList").innerHTML = products.map((p, idx) => {
     let shareLink = window.location.origin + window.location.pathname.replace("admin.html", "index.html") + "?product=" + p.id;
     return `
-      <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid #eee;flex-wrap:wrap;gap:10px">
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #eee;flex-wrap:wrap;gap:8px">
         <div>
           <b>${p.name}</b> (${p.cat}) - ৳${p.price} <br>
           <small style="color:green">স্টক: ${p.stock ?? 0} | রেটিং: ⭐${p.rating || '5.0'} | বিক্রি: ${p.sales || 0} পিস</small><br>
-          <small style="color:#666">লিংক: <a href="${shareLink}" target="_blank">${shareLink}</a></small>
+          <small style="color:#666;word-break:break-all">লিংক: <a href="${shareLink}" target="_blank">${shareLink}</a></small>
         </div>
-        <div style="display:flex;gap:6px">
-          <button class="btn" style="background:#6c757d;color:white;padding:6px 10px;font-size:11px" onclick="navigator.clipboard.writeText('${shareLink}'); alert('✅ প্রোডাক্ট লিংক কপি হয়েছে!');">লিংক কপি</button>
-          <button class="btn" style="background:#007bff;color:white;padding:6px 10px;font-size:11px" onclick="editProduct(${idx})">এডিট</button>
-          <button class="btn" style="background:#ff4d4d;color:white;padding:6px 10px;font-size:11px" onclick="deleteProduct(${p.id})">ডিলিট</button>
+        <div style="display:flex;gap:5px">
+          <button class="btn" style="background:#6c757d;color:white;padding:5px 8px;font-size:11px" onclick="navigator.clipboard.writeText('${shareLink}'); alert('✅ প্রোডাক্ট লিংক কপি হয়েছে!');">লিংক কপি</button>
+          <button class="btn" style="background:#007bff;color:white;padding:5px 8px;font-size:11px" onclick="editProduct(${idx})">এডিট</button>
+          <button class="btn" style="background:#ff4d4d;color:white;padding:5px 8px;font-size:11px" onclick="deleteProduct(${p.id})">ডিলিট</button>
         </div>
       </div>
     `;
@@ -277,7 +284,7 @@ document.getElementById("productForm").addEventListener("submit", function(e){
     img: finalImg,
     video: document.getElementById("pVideo").value,
     desc: document.getElementById("pDesc").value,
-    comments: editIdx !== "" ? (products[editidx].comments || []) : []
+    comments: editIdx !== "" ? (products[editIdx].comments || []) : []
   };
 
   if(editIdx !== "") {
