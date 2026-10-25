@@ -1,4 +1,4 @@
-<!doctype html>
+!doctype html>
 <html lang="bn">
 <head>
 <meta charset="utf-8">
@@ -51,13 +51,16 @@ footer{background:var(--top-bg);color:white;padding:25px;line-height:1.8}
 .field input,.field select,.field textarea{display:block;width:100%;padding:11px;margin-top:6px;border:1px solid #ddd;border-radius:8px}
 .modal .primary{width:100%;margin-top:10px}
 .close{float:right;background:#eee;padding:5px 10px;font-weight:bold}
-.float-support{position:fixed;bottom:20px;right:20px;display:flex;flex-direction:column;gap:10px;z-index:99}
+.float-support{position:fixed;bottom:20px;right:20px;display:flex;flex-direction:column;gap:10px;z-index:99;transition:0.3s}
 .support-btn{background:#25d366;color:white;padding:12px 16px;border-radius:30px;font-weight:bold;text-decoration:none;box-shadow:0 4px 10px rgba(0,0,0,0.2);display:flex;align-items:center;gap:8px;font-size:14px}
 .support-btn.call{background:#007bff}
 .trust-icons{display:flex;gap:10px;justify-content:center;margin:15px 0;font-size:12px;color:#555}
 .trust-item{display:flex;align-items:center;gap:4px;background:#f8f9fa;padding:6px 10px;border-radius:6px}
 .video-container{position:relative;padding-bottom:56.25%;height:0;overflow:hidden;border-radius:10px;margin:12px 0}
 .video-container iframe{position:absolute;top:0;left:0;width:100%;height:100%;border:0}
+.color-thumbs{display:flex;gap:8px;margin:10px 0;justify-content:center;flex-wrap:wrap}
+.color-thumb{width:45px;height:45px;border-radius:8px;border:2px solid #ddd;cursor:pointer;object-fit:cover}
+.color-thumb.active{border-color:var(--primary-color);transform:scale(1.08)}
 .comments-sec{margin-top:15px;text-align:left;border-top:1px solid #eee;padding-top:15px}
 .comment-item{background:#f9f9f9;padding:8px 12px;border-radius:8px;margin:6px 0;font-size:13px}
 @media(max-width:700px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.art{height:135px}.hero h1{font-size:27px}.benefits{grid-template-columns:1fr}header{padding:10px}.search{order:3;flex-basis:100%}}
@@ -120,6 +123,7 @@ footer{background:var(--top-bg);color:white;padding:25px;line-height:1.8}
     <h2>অর্ডার ফর্ম</h2>
     <form id="orderForm">
       <input type="hidden" name="productId" id="productId">
+      <input type="hidden" name="selectedColor" id="selectedColorInput">
 
       <label class="field">আপনার নাম
         <input name="name" required placeholder="সম্পূর্ণ নাম">
@@ -213,8 +217,8 @@ document.getElementById("deliveryFee").innerHTML = `
 `;
 
 let products = JSON.parse(localStorage.getItem("dhong_products")) || [
- {id:1,name:"এলিগ্যান্ট কটন কুর্তি",cat:"পোশাক",price:1250,oldPrice:1500,stock:10,rating:4.8,sales:142,quality:"১০০% সুতি কটন",img:"",video:"",desc:"আরামদায়ক প্রিমিয়াম কটন কাপড়ের তৈরি আকর্ষণীয় কুর্তি।",comments:[{name:"সুমাইয়া",text:"খুব সুন্দর কাপড়, ধন্যবাদ!"}]},
- {id:2,name:"প্রিমিয়াম ক্রসব্যাগ",cat:"ব্যাগ",price:950,oldPrice:1200,stock:5,rating:4.9,sales:89,quality:"হাই গ্রেড ওয়াটারপ্রুফ চামড়া",img:"",video:"",desc:"স্টাইলিশ ও টেকসই চামড়ার ক্রসব্যাগ।",comments:[]}
+ {id:1,name:"এলিগ্যান্ট কটন কুর্তি",cat:"পোশাক",price:1250,oldPrice:1500,stock:10,rating:4.8,sales:142,quality:"১০০% সুতি কটন",img:"",video:"",colors:[],desc:"আরামদায়ক প্রিমিয়াম কটন কাপড়ের তৈরি আকর্ষণীয় কুর্তি।",comments:[{name:"সুমাইয়া",text:"খুব সুন্দর কাপড়, ধন্যবাদ!"}]},
+ {id:2,name:"প্রিমিয়াম ক্রসব্যাগ",cat:"ব্যাগ",price:950,oldPrice:1200,stock:5,rating:4.9,sales:89,quality:"হাই গ্রেড ওয়াটারপ্রুফ চামড়া",img:"",video:"",colors:[],desc:"স্টাইলিশ ও টেকসই চামড়ার ক্রসব্যাগ।",comments:[]}
 ];
 
 function renderSupport(){
@@ -265,13 +269,30 @@ function showProductDetail(id){
   if(!p) return;
   const videoEmbed = getYoutubeEmbed(p.video);
   
+  // পপআপ ওপেন হলে নিচের ফ্লোটিং সাপোর্ট বাটন হাইড করা হবে
+  document.getElementById("supportButtons").style.display = "none";
+
+  let colorImagesHtml = "";
+  let activeImg = p.img;
+  if(p.colors && p.colors.length > 0) {
+    colorImagesHtml = `<div style="margin:10px 0"><b>কালر ভ্যারিয়েন্ট সিলেক্ট করুন:</b><div class="color-thumbs" id="colorThumbsBox">` + 
+    p.colors.map((imgUrl, i) => `<img src="${imgUrl}" class="color-thumb ${i===0?'active':''}" onclick="changeMainImage('${imgUrl}', this)">`).join("") + 
+    `</div></div>`;
+    activeImg = p.colors[0] || p.img;
+  }
+  
   const commentsList = (p.comments || []).map(c=>`
     <div class="comment-item"><b>${c.name}:</b> ${c.text}</div>
   `).join("") || "<small style='color:#888'>এখনো কোনো রিভিউ নেই। প্রথম মন্তব্যটি আপনার হোক!</small>";
 
   document.getElementById("detailContent").innerHTML = `
     <div style="text-align:center">
-      ${p.img ? `<img src="${p.img}" style="max-height:260px;max-width:100%;object-fit:cover;border-radius:12px">` : `<div style="font-size:60px;padding:15px">🛍️</div>`}
+      <div id="mainImageContainer">
+        ${activeImg ? `<img id="activeProductImg" src="${activeImg}" style="max-height:260px;max-width:100%;object-fit:cover;border-radius:12px">` : `<div style="font-size:60px;padding:15px">🛍️</div>`}
+      </div>
+      
+      ${colorImagesHtml}
+
       <h2 style="margin:10px 0">${p.name}</h2>
       <div style="display:flex;justify-content:center;gap:12px;font-size:13px;color:#555">
         <span><b>রেটিং:</b> ⭐ ${p.rating || '5.0'}</span>
@@ -316,6 +337,13 @@ function showProductDetail(id){
     </div>
   `;
   document.getElementById("detailModal").classList.add("show");
+}
+
+function changeMainImage(url, el) {
+  document.getElementById("activeProductImg").src = url;
+  document.querySelectorAll(".color-thumb").forEach(t => t.classList.remove("active"));
+  el.classList.add("active");
+  document.getElementById("selectedColorInput").value = url;
 }
 
 function addComment(e, prodId){
@@ -365,7 +393,12 @@ function updateTotal(){
 }
 
 function openTrack(){ document.getElementById("trackModal").classList.add("show"); }
-function closeModal(id){ document.getElementById(id).classList.remove("show"); }
+
+function closeModal(id){ 
+  document.getElementById(id).classList.remove("show"); 
+  // পপআপ বন্ধ হলে ফ্লোটিং সাপোর্ট বাটন আবার ফিরিয়ে আনা হবে
+  document.getElementById("supportButtons").style.display = "flex";
+}
 
 document.getElementById("orderForm").addEventListener("submit", function(e){
  e.preventDefault();
