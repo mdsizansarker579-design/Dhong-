@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="bn">
 <head>
@@ -35,7 +34,6 @@ input{flex:1;min-width:130px}
 .btn{border:0;border-radius:9px;padding:11px 14px;cursor:pointer;font-weight:650}
 .primary{background:var(--accent);color:white}
 .secondary{background:#eeedff;color:#5144ce}
-.darkbtn{background:#252d40;color:white}
 table{width:100%;border-collapse:collapse;min-width:590px}
 th,td{text-align:left;padding:13px 10px;border-bottom:1px solid var(--line);font-size:13px}
 th{color:var(--muted);font-weight:600}
@@ -50,8 +48,6 @@ th{color:var(--muted);font-weight:600}
 label{display:block;font-size:13px;font-weight:650;margin:12px 0 6px}
 .field{width:100%}
 .note{font-size:12px;line-height:1.7;color:var(--muted)}
-.mobile-menu{display:none}
-.empty{padding:22px;text-align:center;color:var(--muted)}
 @media(max-width:900px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.sidebar{width:205px}.main{padding:18px}.two{grid-template-columns:1fr}}
 @media(max-width:600px){
  .layout{display:block}.sidebar{width:100%;padding:12px}.brand{font-size:21px}
@@ -82,52 +78,45 @@ label{display:block;font-size:13px;font-weight:650;margin:12px 0 6px}
 <header class="top">
   <div>
     <h1 id="pageTitle">Dashboard</h1>
-    <div class="muted">স্বাগতম! আপনার DHONG স্টোরের সারসংক্ষেপ</div>
+    <div class="muted">স্বাগতম! আপনার DHONG স্টোরের লাইভ ড্যাশবোর্ড</div>
   </div>
-  <div class="admin">● Admin Panel</div>
+  <div class="admin">● Live Admin Panel</div>
 </header>
 
 <section class="page active" id="dashboard">
   <div class="grid">
-    <div class="card"><div class="stat-label">মোট অর্ডার</div><div class="stat" id="totalOrders">১২৮</div><div class="change">সব অর্ডার</div></div>
-    <div class="card"><div class="stat-label">নতুন অর্ডার</div><div class="stat">১৮</div><div class="change">যাচাই করা বাকি</div></div>
-    <div class="card"><div class="stat-label">ডেলিভারি সম্পন্ন</div><div class="stat">৯৪</div><div class="change">সম্পন্ন অর্ডার</div></div>
-    <div class="card"><div class="stat-label">মোট বিক্রি</div><div class="stat">৳ ৭৮,৫০০</div><div class="change">ডেমো হিসাব</div></div>
+    <div class="card"><div class="stat-label">মোট লাইভ অর্ডার</div><div class="stat" id="totalOrdersCount">০</div><div class="change">ডাটাবেজ থেকে প্রাপ্ত</div></div>
+    <div class="card"><div class="stat-label">নতুন অর্ডার</div><div class="stat" id="newOrdersCount">০</div><div class="change">pending স্ট্যাটাস</div></div>
+    <div class="card"><div class="stat-label">ডেলিভারি সম্পন্ন</div><div class="stat">০</div><div class="change">সম্পন্ন অর্ডার</div></div>
+    <div class="card"><div class="stat-label">মোট বিক্রি</div><div class="stat" id="totalSalesAmount">৳ ০</div><div class="change">লাইভ হিসাব</div></div>
   </div>
   <div class="two">
     <div class="card">
-      <h3 class="section-title">সাম্প্রতিক অর্ডার</h3>
-      <div class="table-wrap"><table><thead><tr><th>অর্ডার</th><th>কাস্টমার</th><th>টাকা</th><th>স্ট্যাটাস</th></tr></thead>
+      <h3 class="section-title">সাম্প্রতিক লাইভ অর্ডার</h3>
+      <div class="table-wrap"><table><thead><tr><th>অর্ডার ID</th><th>কাস্টমার</th><th>টাকা</th><th>স্ট্যাটাস</th></tr></thead>
       <tbody id="recentOrders">
-      <tr><td>#DH-1028</td><td>রহিম</td><td>৳ ১,৫০০</td><td><span class="pill pending">নতুন</span></td></tr>
-      <tr><td>#DH-1027</td><td>করিম</td><td>৳ ২,২০০</td><td><span class="pill">ডেলিভারি</span></td></tr>
-      <tr><td>#DH-1026</td><td>সুমাইয়া</td><td>৳ ৯৫০</td><td><span class="pill neutral">প্রসেসিং</span></td></tr>
+      <tr><td colspan="4" class="empty">লোড হচ্ছে...</td></tr>
       </tbody></table></div>
     </div>
     <div class="card">
       <h3 class="section-title">স্টোরের অবস্থা</h3>
-      <p class="muted">অর্ডার প্রসেসিং</p><div class="bar"><span style="width:68%"></span></div>
-      <p class="muted">ডেলিভারি সম্পন্ন</p><div class="bar"><span style="width:82%"></span></div>
-      <p class="muted">অ্যাড ক্যাম্পেইন</p><div class="bar"><span style="width:15%"></span></div>
-      <p class="note">এগুলো নমুনা ডেটা। লাইভ ডেটাবেস এখনো সংযুক্ত নয়।</p>
+      <p class="muted">অর্ডার প্রসেসিং</p><div class="bar"><span style="width:100%"></span></div>
+      <p class="note">আপনার ক্লাউডফ্লেয়ার D1 ডাটাবেজের সাথে সফলভাবে সংযুক্ত।</p>
     </div>
   </div>
 </section>
 
 <section class="page" id="orders">
   <div class="card">
-    <h3 class="section-title">অর্ডার ম্যানেজমেন্ট</h3>
+    <h3 class="section-title">অর্ডার ম্যানেজমেন্ট (লাইভ ডেটা)</h3>
     <div class="toolbar">
-      <input id="orderSearch" placeholder="অর্ডার বা কাস্টমার খুঁজুন..." oninput="filterOrders()">
-      <select id="statusFilter" onchange="filterOrders()"><option value="">সব স্ট্যাটাস</option><option>নতুন</option><option>প্রসেসিং</option><option>কুরিয়ারে পাঠানো</option><option>ডেলিভারি সম্পন্ন</option><option>বাতিল</option></select>
+      <input id="orderSearch" placeholder="নাম বা ফোন দিয়ে খুঁজুন..." oninput="filterOrders()">
+      <button class="btn primary" onclick="fetchLiveOrders()">🔄 রিফ্রেশ করুন</button>
     </div>
-    <div class="table-wrap"><table><thead><tr><th>অর্ডার ID</th><th>কাস্টমার</th><th>ফোন</th><th>মোট</th><th>স্ট্যাটাস</th><th>পরিবর্তন</th></tr></thead>
+    <div class="table-wrap"><table><thead><tr><th>ID</th><th>কাস্টমার নাম</th><th>ফোন</th><th>ঠিকানা</th><th>পণ্যের বিবরণ</th><th>মোট</th><th>স্ট্যাটাস</th><th>তারিখ</th></tr></thead>
     <tbody id="orderRows">
-      <tr><td>#DH-1028</td><td>রহিম</td><td>01XXXXXXXXX</td><td>৳ 1500</td><td><span class="pill pending">নতুন</span></td><td><select onchange="changeStatus(this)"><option>নতুন</option><option>প্রসেসিং</option><option>কুরিয়ারে পাঠানো</option><option>ডেলিভারি সম্পন্ন</option><option>বাতিল</option></select></td></tr>
-      <tr><td>#DH-1027</td><td>করিম</td><td>01XXXXXXXXX</td><td>৳ 2200</td><td><span class="pill">ডেলিভারি সম্পন্ন</span></td><td><select onchange="changeStatus(this)"><option>নতুন</option><option>প্রসেসিং</option><option>কুরিয়ারে পাঠানো</option><option selected>ডেলিভারি সম্পন্ন</option><option>বাতিল</option></select></td></tr>
-      <tr><td>#DH-1026</td><td>সুমাইয়া</td><td>01XXXXXXXXX</td><td>৳ 950</td><td><span class="pill neutral">প্রসেসিং</span></td><td><select onchange="changeStatus(this)"><option>নতুন</option><option selected>প্রসেসিং</option><option>কুরিয়ারে পাঠানো</option><option>ডেলিভারি সম্পন্ন</option><option>বাতিল</option></select></td></tr>
+      <tr><td colspan="8" class="empty">অর্ডার লোড হচ্ছে...</td></tr>
     </tbody></table></div>
-    <p class="note">স্ট্যাটাস পরিবর্তনটি শুধু এই পেজে দেখা যাবে; এখনো সার্ভারে সেভ হয় না।</p>
   </div>
 </section>
 
@@ -135,83 +124,53 @@ label{display:block;font-size:13px;font-weight:650;margin:12px 0 6px}
   <div class="card">
     <h3 class="section-title">পণ্য ম্যানেজমেন্ট</h3>
     <div class="toolbar"><input id="productName" placeholder="পণ্যের নাম"><input id="productPrice" type="number" placeholder="দাম (৳)"><button class="btn primary" onclick="addProduct()">+ পণ্য যোগ করুন</button></div>
-    <div class="table-wrap"><table><thead><tr><th>পণ্যের নাম</th><th>দাম</th><th>অবস্থা</th></tr></thead><tbody id="productRows"><tr><td>DHONG Premium Item</td><td>৳ ১,৫০০</td><td><span class="pill">সক্রিয় (ডেমো)</span></td></tr></tbody></table></div>
+    <div class="table-wrap"><table><thead><tr><th>পণ্যের নাম</th><th>দাম</th><th>অবস্থা</th></tr></thead><tbody id="productRows"><tr><td>DHONG Premium Item</td><td>৳ ১,৫০০</td><td><span class="pill">সক্রিয়</span></td></tr></tbody></table></div>
   </div>
 </section>
 
 <section class="page" id="courier">
   <div class="grid">
-    <div class="card"><h3 class="section-title">Pathao Courier</h3><span class="pill pending">সংযুক্ত নয়</span><p class="note">Merchant API তথ্য যোগ করার পর ইন্টিগ্রেশন করতে হবে।</p><button class="btn secondary" onclick="courierInfo()">সেটআপের অবস্থা</button></div>
-    <div class="card"><h3 class="section-title">Steadfast Courier</h3><span class="pill pending">সংযুক্ত নয়</span><p class="note">Merchant API তথ্য যোগ করার পর ইন্টিগ্রেশন করতে হবে।</p><button class="btn secondary" onclick="courierInfo()">সেটআপের অবস্থা</button></div>
+    <div class="card"><h3 class="section-title">Pathao Courier</h3><span class="pill pending">সংযুক্ত নয়</span><p class="note">API তথ্য যুক্ত করতে হবে।</p><button class="btn secondary" onclick="courierInfo()">সেটআপের অবস্থা</button></div>
+    <div class="card"><h3 class="section-title">Steadfast Courier</h3><span class="pill pending">সংযুক্ত নয়</span><p class="note">API তথ্য যুক্ত করতে হবে।</p><button class="btn secondary" onclick="courierInfo()">সেটআপের অবস্থা</button></div>
   </div>
-  <div class="card"><h3 class="section-title">কুরিয়ার পাঠানোর ধাপ</h3><p>১. অর্ডার যাচাই করুন</p><p>২. ঠিকানা ও ফোন নিশ্চিত করুন</p><p>৩. কুরিয়ার নির্বাচন করুন</p><p>৪. API সংযুক্ত হলে বুকিং ও ট্র্যাকিং চালু হবে</p></div>
 </section>
 
 <section class="page" id="ads">
   <div class="grid">
-    <div class="card"><div class="stat-label">দৈনিক বাজেট</div><div class="stat">৳ ০</div><div class="muted">এখনো সেট করা হয়নি</div></div>
-    <div class="card"><div class="stat-label">অনুমোদনের অপেক্ষায়</div><div class="stat" id="pendingAds">০</div><div class="muted">প্রস্তাবিত ক্যাম্পেইন</div></div>
-    <div class="card"><div class="stat-label">চালু ক্যাম্পেইন</div><div class="stat">০</div><div class="muted">Meta সংযুক্ত নয়</div></div>
-    <div class="card"><div class="stat-label">Ad Spend</div><div class="stat">৳ ০</div><div class="muted">লাইভ ডেটা নেই</div></div>
-  </div>
-  <div class="two">
-    <div class="card">
-      <h3 class="section-title">ক্যাম্পেইন প্রস্তাব তৈরি</h3>
-      <label>ক্যাম্পেইনের নাম</label><input class="field" id="campaignName" placeholder="যেমন: DHONG Eid Sale">
-      <label>দৈনিক বাজেট (৳)</label><input class="field" id="campaignBudget" type="number" min="0" placeholder="যেমন: 500">
-      <label>লক্ষ্য</label><select class="field" id="campaignGoal"><option>Sales</option><option>Messages</option><option>Traffic</option></select>
-      <button class="btn primary" style="margin-top:15px" onclick="proposeCampaign()">অনুমোদনের জন্য জমা দিন</button>
-      <p class="note">এটি কেবল প্রস্তাব সংরক্ষণের ডেমো। অনুমোদন দিলেও Meta-তে বিজ্ঞাপন চালু হবে না।</p>
-    </div>
-    <div class="card"><h3 class="section-title">ক্যাম্পেইন তালিকা</h3><div id="campaignList" class="note">এখনো কোনো প্রস্তাব নেই।</div></div>
+    <div class="card"><div class="stat-label">দৈনিক বাজেট</div><div class="stat">৳ ০</div></div>
+    <div class="card"><div class="stat-label">অনুমোদনের অপেক্ষায়</div><div class="stat" id="pendingAds">০</div></div>
+    <div class="card"><div class="stat-label">চালু ক্যাম্পেইন</div><div class="stat">০</div></div>
+    <div class="card"><div class="stat-label">Ad Spend</div><div class="stat">৳ ০</div></div>
   </div>
 </section>
 
 <section class="page" id="profit">
   <div class="grid">
-    <div class="card"><div class="stat-label">ডেলিভারি সম্পন্ন বিক্রি</div><div class="stat">৳ ০</div><p class="note">ডেটাবেস সংযুক্ত হলে হিসাব হবে</p></div>
+    <div class="card"><div class="stat-label">মোট বিক্রি</div><div class="stat" id="profitTotalSales">৳ ০</div></div>
     <div class="card"><div class="stat-label">পণ্যের খরচ</div><div class="stat">৳ ০</div></div>
     <div class="card"><div class="stat-label">কুরিয়ার খরচ</div><div class="stat">৳ ০</div></div>
     <div class="card"><div class="stat-label">বিজ্ঞাপন খরচ</div><div class="stat">৳ ০</div></div>
   </div>
-  <div class="card"><h3 class="section-title">প্রকৃত লাভের হিসাব</h3><div class="big-number">৳ ০</div><p class="note">প্রকৃত লাভ = ডেলিভারি সম্পন্ন অর্ডারের আদায় − পণ্যের খরচ − কুরিয়ার খরচ − বিজ্ঞাপন খরচ − প্রযোজ্য অন্যান্য খরচ। এটি এখন শুধু ডেমো; বাস্তব হিসাবের জন্য যাচাইকৃত অর্ডার ও খরচের তথ্য লাগবে।</p></div>
+  <div class="card"><h3 class="section-title">প্রকৃত লাভের হিসাব</h3><div class="big-number" id="netProfit">৳ ০</div></div>
 </section>
 
 <section class="page" id="api">
   <div class="card">
     <h3 class="section-title">API Settings</h3>
-    <p class="note">API key পরে যোগ করবেন। নিরাপত্তার জন্য এই ডেমো ফর্মে আসল key লিখবেন না। এখানে কোনো credential সংরক্ষণ বা পরীক্ষা হয় না।</p>
-  </div>
-  <div class="two">
-    <div class="card">
-      <h3 class="section-title">Pathao</h3>
-      <label>সংযোগের অবস্থা</label><input class="field" value="সংযুক্ত নয়" readonly>
-      <label>API তথ্য</label><input class="field" placeholder="পরে নিরাপদ backend-এ যোগ হবে" disabled>
-      <p class="note">API credentials Cloudflare backend-এ সুরক্ষিতভাবে রাখতে হবে।</p>
-    </div>
-    <div class="card">
-      <h3 class="section-title">Steadfast</h3>
-      <label>সংযোগের অবস্থা</label><input class="field" value="সংযুক্ত নয়" readonly>
-      <label>API তথ্য</label><input class="field" placeholder="পরে নিরাপদ backend-এ যোগ হবে" disabled>
-      <p class="note">এখনো কোনো বাস্তব API কল করা হয় না।</p>
-    </div>
-    <div class="card">
-      <h3 class="section-title">Meta Marketing API</h3>
-      <label>সংযোগের অবস্থা</label><input class="field" value="সংযুক্ত নয়" readonly>
-      <label>Pixel / CAPI</label><input class="field" placeholder="পরে সেটআপ হবে" disabled>
-      <p class="note">প্রকৃত অনুমতি ও নিরাপদ সার্ভার-সাইড সংযোগ লাগবে।</p>
-    </div>
-    <div class="card">
-      <h3 class="section-title">নিরাপত্তা</h3>
-      <p>✓ Admin login backend-এ করতে হবে</p><p>✓ API key frontend-এ রাখা যাবে না</p><p>✓ Campaign অনুমোদন ছাড়া চালু হবে না</p><p>✓ পরিবর্তনের audit log রাখা উচিত</p>
-    </div>
+    <p class="note">আপনার ক্লাউডফ্লেয়ার ওয়ার্কার এপিআই লিংক নিচে সংযুক্ত রয়েছে:</p>
+    <input class="field" value="https://dhong-api.mdsizansarker579.workers.dev/api/admin/orders" readonly>
   </div>
 </section>
-<footer class="muted" style="padding:15px 2px">DHONG Admin Panel · UI Prototype · Live service connected নয়</footer>
+<footer class="muted" style="padding:15px 2px">DHONG Admin Panel · Live Database Connected</footer>
 </main>
 </div>
 
 <script>
+// ক্লাউডফ্লেয়ার ওয়ার্কারের লাইভ API URL
+const API_URL = "https://dhong-api.mdsizansarker579.workers.dev/api/admin/orders";
+let allOrders = [];
+
+// পেজ লোড হলে বা নেভিগেশন পরিবর্তন হলে ডেটা ফেচ করা
 document.querySelectorAll(".nav button").forEach(button=>{
   button.addEventListener("click",()=>{
     document.querySelectorAll(".nav button").forEach(b=>b.classList.remove("active"));
@@ -219,66 +178,122 @@ document.querySelectorAll(".nav button").forEach(button=>{
     button.classList.add("active");
     document.getElementById(button.dataset.page).classList.add("active");
     document.getElementById("pageTitle").textContent=button.textContent.replace(/^[^\w\u0980-\u09FF]+/,"").trim();
+    
+    if(button.dataset.page === "orders" || button.dataset.page === "dashboard") {
+      fetchLiveOrders();
+    }
   });
 });
-function changeStatus(select){
-  const cell=select.closest("tr").cells[4];
-  const value=select.value;
-  const cls=value==="নতুন"?"pill pending":value==="ডেলিভারি সম্পন্ন"?"pill":value==="বাতিল"?"pill neutral":"pill pending";
-  cell.innerHTML='<span class="'+cls+'">'+value+'</span>';
+
+async function fetchLiveOrders() {
+  try {
+    const response = await fetch(API_URL);
+    const data = await response.json();
+    
+    if(data.success && data.orders) {
+      allOrders = data.orders;
+      updateDashboardStats();
+      renderOrdersTable(allOrders);
+      renderRecentOrders(allOrders);
+    }
+  } catch (err) {
+    console.error("Could not fetch orders:", err);
+  }
 }
-function filterOrders(){
-  const search=document.getElementById("orderSearch").value.toLowerCase();
-  const status=document.getElementById("statusFilter").value;
-  document.querySelectorAll("#orderRows tr").forEach(row=>{
-    const text=row.innerText.toLowerCase();
-    const rowStatus=row.cells[4].innerText.trim();
-    row.style.display=text.includes(search)&&(!status||rowStatus===status)?"":"none";
+
+function updateDashboardStats() {
+  const totalOrders = allOrders.length;
+  const newOrders = allOrders.filter(o => o.status === 'pending').length;
+  const totalSales = allOrders.reduce((sum, o) => sum + Number(o.total || 0), 0);
+
+  document.getElementById("totalOrdersCount").textContent = totalOrders;
+  document.getElementById("newOrdersCount").textContent = newOrders;
+  document.getElementById("totalSalesAmount").textContent = "৳ " + totalSales.toLocaleString();
+  document.getElementById("profitTotalSales").textContent = "৳ " + totalSales.toLocaleString();
+  document.getElementById("netProfit").textContent = "৳ " + totalSales.toLocaleString();
+}
+
+function renderOrdersTable(orders) {
+  const tbody = document.getElementById("orderRows");
+  tbody.innerHTML = "";
+
+  if(orders.length === 0) {
+    tbody.innerHTML = "<tr><td colspan='8' class='empty'>কোনো অর্ডার পাওয়া যায়নি।</td></tr>";
+    return;
+  }
+
+  orders.forEach(order => {
+    let itemsText = "";
+    try {
+      const items = JSON.parse(order.items_json);
+      itemsText = items.map(i => `${i.name || 'Item'} (x${i.quantity || 1})`).join(", ");
+    } catch {
+      itemsText = order.items_json;
+    }
+
+    const row = document.createElement("tr");
+    row.innerHTML = `
+      <td>#DH-${order.id}</td>
+      <td><strong>${order.customer_name}</strong></td>
+      <td>${order.phone}</td>
+      <td>${order.address}</td>
+      <td>${itemsText}</td>
+      <td>৳ ${order.total}</td>
+      <td><span class="pill ${order.status === 'pending' ? 'pending' : ''}">${order.status}</span></td>
+      <td>${new Date(order.created_at).toLocaleString()}</td>
+    `;
+    tbody.appendChild(row);
   });
 }
+
+function renderRecentOrders(orders) {
+  const tbody = document.getElementById("recentOrders");
+  tbody.innerHTML = "";
+
+  const recent = orders.slice(0, 5);
+  if(recent.length === 0) {
+    tbody.innerHTML = "<tr><td colspan='4' class='empty'>কোনো অর্ডার নেই।</td></tr>";
+    return;
+  }
+
+  recent.forEach(order => {
+    const row = document.createElement("tr");
+    row.innerHTML = `
+      <td>#DH-${order.id}</td>
+      <td>${order.customer_name}</td>
+      <td>৳ ${order.total}</td>
+      <td><span class="pill ${order.status === 'pending' ? 'pending' : ''}">${order.status}</span></td>
+    `;
+    tbody.appendChild(row);
+  });
+}
+
+function filterOrders(){
+  const search = document.getElementById("orderSearch").value.toLowerCase();
+  const filtered = allOrders.filter(o => 
+    o.customer_name.toLowerCase().includes(search) || 
+    o.phone.toLowerCase().includes(search)
+  );
+  renderOrdersTable(filtered);
+}
+
 function addProduct(){
-  const name=document.getElementById("productName").value.trim();
-  const price=Number(document.getElementById("productPrice").value);
-  if(!name||price<=0){alert("পণ্যের নাম ও সঠিক দাম লিখুন।");return}
-  const row=document.createElement("tr");
-  [name,"৳ "+price.toLocaleString("en-BD"),"ডেমো"].forEach(value=>{
-    const cell=document.createElement("td");cell.textContent=value;row.appendChild(cell);
+  const name = document.getElementById("productName").value.trim();
+  const price = Number(document.getElementById("productPrice").value);
+  if(!name || price <= 0){ alert("পণ্যের নাম ও সঠিক দাম লিখুন।"); return; }
+  const row = document.createElement("tr");
+  [name, "৳ " + price.toLocaleString(), "সক্রিয়"].forEach(value => {
+    const cell = document.createElement("td"); cell.textContent = value; row.appendChild(cell);
   });
   document.getElementById("productRows").appendChild(row);
-  document.getElementById("productName").value="";
-  document.getElementById("productPrice").value="";
+  document.getElementById("productName").value = "";
+  document.getElementById("productPrice").value = "";
 }
-let campaigns=[];
-function proposeCampaign(){
-  const name=document.getElementById("campaignName").value.trim();
-  const budget=Number(document.getElementById("campaignBudget").value);
-  const goal=document.getElementById("campaignGoal").value;
-  if(!name||budget<=0){alert("ক্যাম্পেইনের নাম ও বাজেট লিখুন।");return}
-  campaigns.push({name,budget,goal,status:"অনুমোদনের অপেক্ষায়"});
-  document.getElementById("pendingAds").textContent=campaigns.filter(c=>c.status==="অনুমোদনের অপেক্ষায়").length;
-  renderCampaigns();
-  document.getElementById("campaignName").value="";
-  document.getElementById("campaignBudget").value="";
-}
-function renderCampaigns(){
-  const list=document.getElementById("campaignList");
-  list.innerHTML="";
-  campaigns.forEach((c,i)=>{
-    const box=document.createElement("div");
-    box.className="card";
-    const title=document.createElement("strong");title.textContent=c.name;
-    const details=document.createElement("p");details.textContent="৳ "+c.budget+" / দিন · "+c.goal;
-    const status=document.createElement("p");status.className="note";status.textContent=c.status;
-    box.append(title,details,status);
-    if(c.status==="অনুমোদনের অপেক্ষায়"){
-      const approve=document.createElement("button");approve.className="btn secondary";approve.textContent="ডেমো অনুমোদন";
-      approve.onclick=()=>{c.status="ডেমোতে অনুমোদিত — বিজ্ঞাপন চালু নয়";renderCampaigns();};
-      box.appendChild(approve);
-    }
-    list.appendChild(box);
-  });
-}
-function courierInfo(){alert("Pathao ও Steadfast এখনো সংযুক্ত নয়। API credentials ও backend integration পরে করতে হবে।")}
+
+function courierInfo(){ alert("Pathao ও Steadfast কুরিয়ার API ইন্টিগ্রেশন শীঘ্রই যুক্ত করা হবে।"); }
+
+// পেজ ওপেন হওয়ার সাথে সাথেই লাইভ অর্ডার ফেচ করবে
+window.onload = fetchLiveOrders;
 </script>
 </body>
 </html>
