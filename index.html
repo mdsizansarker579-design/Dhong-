@@ -63,11 +63,11 @@ footer{background:var(--top-bg);color:white;padding:20px;line-height:1.6;font-si
 .trust-item{display:flex;align-items:center;gap:4px;background:#f8f9fa;padding:5px 8px;border-radius:6px}
 
 .slider-container{position:relative;width:100%;height:320px;background:#f0f2f5;overflow:hidden;border-radius:12px;display:flex;align-items:center;justify-content:center}
-.slider-track{display:flex;transition:transform 0.3s ease-in-out;height:100%;width:100%}
-.slider-item{min-width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:#f0f2f5}
+.slider-track{display:flex;transition:transform 0.3s ease-in-out;height:100%;width:100%;will-change:transform}
+.slider-item{flex:0 0 100%;min-width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:#f0f2f5}
 .slider-item img{width:100%;height:100%;object-fit:contain}
 .item-counter{position:absolute;bottom:10px;left:10px;background:rgba(0,0,0,0.6);color:white;padding:3px 8px;border-radius:12px;font-size:11px;z-index:3}
-.color-thumbs{display:flex;gap:8px;margin:12px 0;overflow-x:auto;padding-bottom:5px}
+.color-thumbs{display:flex;gap:8px;margin:12px 0;overflow-x:auto;padding-bottom:5px;scroll-behavior:smooth}
 .color-thumb{width:55px;height:55px;border-radius:8px;border:2px solid #ddd;cursor:pointer;object-fit:cover;flex-shrink:0}
 .color-thumb.active{border-color:var(--primary-color);transform:scale(1.05)}
 
@@ -226,14 +226,12 @@ footer{background:var(--top-bg);color:white;padding:20px;line-height:1.6;font-si
 
   let products = [];
   let currentSelectedImg = "";
-  let currentDetailId = null;
-  let currentDetailImages = [];
-  const imgCache = {};
-  const imgLoading = {};
   let isTimerExpired = false;
   let timerInterval = null;
   let hasOpenedPopup = false;
   let category = "সব", selectedProduct = null;
+  let sliderIndex = 0;
+  let currentDetailImages = [];
 
   let settings = {
     siteName: "ঢং DHONG",
@@ -246,7 +244,7 @@ footer{background:var(--top-bg);color:white;padding:20px;line-height:1.6;font-si
     freeThreshold: "3000",
     topBannerText: "🎉 ঢং-এ স্বাগতম | প্রথম অর্ডারে ১০% ছাড় ও ক্যাশ অন ডেলিভারি",
     heroTitleText: "আপনার স্টাইল, আপনারই গল্প।",
-    heroSubtextText: "১০০% প্রিমিয়াম কোয়ালিটি নিশ্চিতকরণে ক্যাশ অন ডেলিভারিতে অর্ডার করুন।",
+    heroSubtextText: "১০০% প্রিমিয়াম কোয়ালিটি নিশ্চিতকরণে অর্ডার করুন।",
     timerStatus: "show",
     timerHours: "24",
     timerText: "⏳ অফার শেষ হতে বাকি:",
@@ -271,9 +269,8 @@ footer{background:var(--top-bg);color:white;padding:20px;line-height:1.6;font-si
   let showAllProducts = false;
 
   // ---------- ক্যাশ: আগের ভিজিটের পণ্য সাথে সাথে দেখাবে ----------
-  try { localStorage.removeItem("dhong_products_cache"); } catch (e) {}
   try {
-    const cached = JSON.parse(localStorage.getItem("dhong_products_cache_v2") || "[]");
+    const cached = JSON.parse(localStorage.getItem("dhong_products_cache") || "[]");
     if (Array.isArray(cached) && cached.length) {
       products = cached.filter(Boolean);
       renderProducts();
@@ -284,15 +281,15 @@ footer{background:var(--top-bg);color:white;padding:20px;line-height:1.6;font-si
     }
   } catch (e) { console.error("cache error", e); }
 
-  // ---------- পণ্য লোড ----------
+  // ---------- পণ্য লোড (_key সহ) ----------
   db.ref('dhong_products').on('value', snapshot => {
     const list = [];
     snapshot.forEach(child => {
       const v = child.val();
-      if (v && typeof v === 'object') { v._key = child.key; list.push(v); }
+      if (v) { v._key = child.key; list.push(v); }
     });
     products = list;
-    try { localStorage.setItem("dhong_products_cache_v2", JSON.stringify(products)); } catch (e) {}
+    try { localStorage.setItem("dhong_products_cache", JSON.stringify(products)); } catch (e) {}
 
     try { renderProducts(); } catch (err) { console.error("renderProducts error:", err); }
 
@@ -314,7 +311,6 @@ footer{background:var(--top-bg);color:white;padding:20px;line-height:1.6;font-si
     }
   }, err => console.error("Firebase settings read error:", err));
 
-// অর্ডারে রাখার জন্য ছোট থাম্বনেইল বানায়
 function makeThumb(src){
   return new Promise(resolve => {
     if (!src) return resolve("");
@@ -331,34 +327,6 @@ function makeThumb(src){
     img.onerror = () => resolve("");
     img.src = src;
   });
-}
-
-// ---------- ছবি: প্রথমে থাম্বনেইল, খুললে বড় ছবি আনে ----------
-function productImages(p){
-  if (imgCache[p.id]) return imgCache[p.id];
-  const arr = [];
-  if (p.img) arr.push(p.img);
-  Object.values(p.colors || {}).forEach(u => { if (u && !arr.includes(u)) arr.push(u); });
-  return arr;
-}
-
-function fetchFullImages(p){
-  if (!p.hasFull || imgCache[p.id] || imgLoading[p.id]) return;
-  imgLoading[p.id] = true;
-  const fallback = productImages(p);
-  db.ref('dhong_images/' + p.id).once('value').then(snap => {
-    const v = snap.val();
-    const arr = [];
-    if (v) {
-      if (v.main) arr.push(v.main);
-      Object.values(v.colors || {}).forEach(u => { if (u && !arr.includes(u)) arr.push(u); });
-    }
-    imgCache[p.id] = arr.length ? arr : fallback;
-    imgLoading[p.id] = false;
-    if (String(currentDetailId) === String(p.id) && document.getElementById("detailModal").classList.contains("show")) {
-      showProductDetail(p.id, true);
-    }
-  }).catch(err => { console.error("image load error:", err); imgLoading[p.id] = false; });
 }
 
 function applySettings() {
@@ -424,7 +392,7 @@ function renderProducts(){
  }
 
  const bar = (singleProductId && !showAllProducts)
-   ? `<div style="grid-column:1/-1;text-align:center"><button class="primary" onclick="showAll()">সব পণ্য দেখুন</button></div>`
+   ? `<div style="grid-column:1/-1;text-align:center;margin-bottom:12px;"><button class="primary" onclick="showAll()">সব পণ্য দেখুন</button></div>`
    : "";
 
  document.getElementById("grid").innerHTML = bar + list.map(p=>{
@@ -462,36 +430,35 @@ function getYoutubeEmbed(url) {
   return (match && match[2].length === 11) ? `https://www.youtube.com/embed/${match[2]}` : null;
 }
 
-function showProductDetail(id, isRefresh){
+function showProductDetail(id){
   const p = products.find(prod => String(prod.id) === String(id));
   if(!p) return;
-  currentDetailId = String(p.id);
-  if (!isRefresh) fetchFullImages(p);
-
-  const modalEl = document.querySelector("#detailModal .modal");
-  const savedScroll = isRefresh && modalEl ? modalEl.scrollTop : 0;
-
   const videoEmbed = getYoutubeEmbed(p.video);
   document.getElementById("supportButtons").style.display = "none";
 
   let activePrice = (isTimerExpired && p.oldPrice) ? p.oldPrice : p.price;
   let displayOldPrice = (!isTimerExpired && p.oldPrice && p.oldPrice > p.price) ? p.oldPrice : "";
 
-  const allImages = productImages(p);
-  currentDetailImages = allImages;
-  currentSelectedImg = allImages[0] || p.img || "";
+  currentDetailImages = [];
+  if(p.img) currentDetailImages.push(p.img);
+  if(p.colors && p.colors.length > 0) {
+    p.colors.forEach(imgUrl => { if(!currentDetailImages.includes(imgUrl)) currentDetailImages.push(imgUrl); });
+  }
+
+  currentSelectedImg = currentDetailImages[0] || p.img || "";
+  sliderIndex = 0;
 
   let sliderHtml = "";
-  if(allImages.length > 0) {
-    let slides = allImages.map(img => `<div class="slider-item"><img src="${img}"></div>`).join("");
-    let thumbs = allImages.map((img, idx) => `<img src="${img}" class="color-thumb ${idx===0?'active':''}" onclick="slideImage(${idx}, this)">`).join("");
+  if(currentDetailImages.length > 0) {
+    let slides = currentDetailImages.map((img) => `<div class="slider-item"><img src="${img}"></div>`).join("");
+    let thumbs = currentDetailImages.map((img, idx) => `<img src="${img}" class="color-thumb ${idx===0?'active':''}" onclick="slideImage(${idx}, this)">`).join("");
 
     sliderHtml = `
       <div class="slider-container" id="sliderContainer">
-        <div class="slider-track" id="sliderTrack" style="width:${allImages.length * 100}%">
+        <div class="slider-track" id="sliderTrack" style="width:${currentDetailImages.length * 100}%">
           ${slides}
         </div>
-        <div class="item-counter" id="itemCounter">Item 1/${allImages.length} | Design Selected</div>
+        <div class="item-counter" id="itemCounter">Item 1/${currentDetailImages.length} | Design Selected</div>
       </div>
       <div class="color-thumbs">${thumbs}</div>
     `;
@@ -543,44 +510,43 @@ function showProductDetail(id, isRefresh){
     </div>
   `;
   document.getElementById("detailModal").classList.add("show");
-  if (modalEl) modalEl.scrollTop = savedScroll;
-  initTouchSlider(allImages);
+  initTouchSlider(currentDetailImages);
 }
 
 function slideImage(index, el) {
+  sliderIndex = index;
   currentSelectedImg = currentDetailImages[index] || currentSelectedImg;
   const track = document.getElementById("sliderTrack");
   const counter = document.getElementById("itemCounter");
   if(track) {
-    const total = track.children.length;
-    track.style.transform = `translateX(-${index * 100 / total}%)`;
-    if(counter) counter.textContent = `Item ${index + 1}/${total} | Design Selected`;
+    track.style.transform = `translateX(-${index * 100}%)`;
+    if(counter) counter.textContent = `Item ${index + 1}/${track.children.length} | Design Selected`;
   }
   document.querySelectorAll(".color-thumb").forEach(t => t.classList.remove("active"));
   if(el) el.classList.add("active");
 }
 
 function initTouchSlider(allImages) {
+  sliderIndex = 0;
   const container = document.getElementById("sliderContainer");
   if(!container || allImages.length <= 1) return;
   let startX = 0;
-  let currentIndex = 0;
 
-  container.addEventListener("touchstart", e => { startX = e.touches[0].clientX; });
+  container.addEventListener("touchstart", e => { startX = e.touches[0].clientX; }, {passive:true});
 
   container.addEventListener("touchend", e => {
-    let endX = e.changedTouches[0].clientX;
-    let diff = startX - endX;
+    const diff = startX - e.changedTouches[0].clientX;
     if(Math.abs(diff) > 50) {
-      if(diff > 0 && currentIndex < allImages.length - 1) currentIndex++;
-      else if(diff < 0 && currentIndex > 0) currentIndex--;
+      let next = sliderIndex;
+      if(diff > 0 && sliderIndex < allImages.length - 1) next++;
+      else if(diff < 0 && sliderIndex > 0) next--;
       const thumbs = document.querySelectorAll(".color-thumb");
-      slideImage(currentIndex, thumbs[currentIndex]);
+      slideImage(next, thumbs[next]);
+      if(thumbs[next]) thumbs[next].scrollIntoView({behavior:"smooth", inline:"center", block:"nearest"});
     }
   });
 }
 
-// কমেন্ট: শুধু কমেন্ট অংশ আপডেট হয়
 function addComment(e, prodId){
   e.preventDefault();
   const name = document.getElementById("cName").value;
@@ -596,10 +562,9 @@ function addComment(e, prodId){
 
   if(!p.comments) p.comments = [];
   p.comments.push({name, text});
-  showProductDetail(prodId, true);
+  showProductDetail(prodId);
 }
 
-// WhatsApp অর্ডার: অর্ডার নম্বর তৈরি করে মেসেজে পাঠায়
 async function waOrder(prodId){
   const p = products.find(x => String(x.id) === String(prodId));
   if(!p) return;
@@ -739,7 +704,6 @@ document.getElementById("orderForm").addEventListener("submit", async function(e
  closeModal("orderModal");
 });
 
-// ট্র্যাক: শুধু ওই অর্ডার নম্বরটাই খোঁজে
 document.getElementById("trackForm").addEventListener("submit", function(e){
  e.preventDefault();
  const orderId = e.target.orderId.value.replace(/[^0-9]/g, '');
