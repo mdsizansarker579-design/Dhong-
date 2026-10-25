@@ -167,7 +167,7 @@ th{color:var(--muted);font-weight:600}
 
 <section class="page" id="api">
   <div class="card">
-    <h3 class="section-title">ওয়েবসাইট ও নোটিফিকেশন সেটিংস</h3>
+    <h3 class="section-title">ওয়েবসাইট ও নোটিফিকেশন সেটিংস</h3>
     <form id="settingsForm">
       <div class="field-group">অর্ডার নোটিফিকেশন জিমেইল (Email) <input type="email" id="setAdminEmail" placeholder="yourname@gmail.com"></div>
       <div class="field-group">ওয়েবসাইটের নাম <input id="setSiteName" placeholder="ঢং DHONG"></div>
@@ -177,7 +177,15 @@ th{color:var(--muted);font-weight:600}
       <div class="field-group">ফ্রি ডেলিভারি থ্রেশহোল্ড (ন্যূনতম কেনাকাটা ৳) <input type="number" id="setThreshold" placeholder="3000"></div>
       <div class="field-group">WhatsApp নম্বর <input id="setWhatsapp" placeholder="88017..."></div>
       <div class="field-group">কাস্টমার সার্ভিস ফোন নম্বর (Call Now) <input id="setPhone" placeholder="017..."></div>
-      <button class="btn primary" type="submit">সেটিংস সেভ করুন</button>
+
+      <hr style="margin:15px 0;border:0;border-top:1px dashed #ccc">
+      <h3 class="section-title" style="color:var(--accent)">📢 ব্যানার ও অফার টেক্সট সেটিংস</h3>
+      <div class="field-group">ওপরের অফার নোটিফিকেশন বার টেক্সট <input id="setTopBanner" placeholder="🎉 ঢং-এ স্বাগতম | প্রথম অর্ডারে ১০% ছাড়"></div>
+      <div class="field-group">ব্যানার মেইন টাইটেল/শিরোনাম <input id="setHeroTitle" placeholder="আপনার স্টাইল, আপনারই গল্প।"></div>
+      <div class="field-group">ব্যানার সাবটাইটেল/বিবরণ <input id="setHeroSubtext" placeholder="১০০% প্রিমিয়াম কোয়ালিটি..."></div>
+      <div class="field-group">ব্যানার বাটন টেক্সট <input id="setHeroBtn" placeholder="পণ্য দেখুন ↓"></div>
+
+      <button class="btn primary" type="submit" style="margin-top:10px">সেটিংস সেভ করুন</button>
     </form>
   </div>
 </section>
@@ -236,7 +244,6 @@ function loadAdminData() {
   let estimatedProfit = totalSales * 0.35;
   document.getElementById("netProfitAmount").textContent = "৳ " + Math.round(estimatedProfit).toLocaleString();
 
-  // অর্ডার সার্চ ফিল্টার লজিক
   const searchQ = (document.getElementById("orderSearch")?.value || "").toLowerCase();
   const filteredOrders = orders.filter(o => 
     o.customer_name.toLowerCase().includes(searchQ) || 
@@ -304,6 +311,11 @@ function loadAdminData() {
   document.getElementById("setThreshold").value = settings.freeThreshold || "3000";
   document.getElementById("setWhatsapp").value = settings.whatsapp || "";
   document.getElementById("setPhone").value = settings.phone || "";
+
+  document.getElementById("setTopBanner").value = settings.topBannerText || "🎉 ঢং-এ স্বাগতম | প্রথম অর্ডারে ১০% ছাড় ও ক্যাশ অন ডেলিভারি";
+  document.getElementById("setHeroTitle").value = settings.heroTitleText || "আপনার স্টাইল, আপনারই গল্প।";
+  document.getElementById("setHeroSubtext").value = settings.heroSubtextText || "১০০% প্রিমিয়াম কোয়ালিটি নিশ্চিতকরণে ক্যাশ অন ডেলিভারিতে অর্ডার করুন।";
+  document.getElementById("setHeroBtn").value = settings.heroBtnLabel || "পণ্য দেখুন ↓";
 }
 
 function updateOrderStatus(orderId, newStatus){
@@ -416,13 +428,17 @@ document.getElementById("settingsForm").addEventListener("submit", function(e){
     outsiderFee: document.getElementById("setOutsider").value,
     freeThreshold: document.getElementById("setThreshold").value,
     whatsapp: document.getElementById("setWhatsapp").value,
-    phone: document.getElementById("setPhone").value
+    phone: document.getElementById("setPhone").value,
+    topBannerText: document.getElementById("setTopBanner").value,
+    heroTitleText: document.getElementById("setHeroTitle").value,
+    heroSubtextText: document.getElementById("setHeroSubtext").value,
+    heroBtnLabel: document.getElementById("setHeroBtn").value
   };
   localStorage.setItem("dhong_settings", JSON.stringify(settings));
-  alert("✅ সেটিংস সফলভাবে সেভ হয়েছে!");
+  alert("✅ ব্যানার ও সেটিংস সফলভাবে সেভ হয়েছে!");
 });
 
 window.onload = loadAdminData;
 </script>
 </body>
-</html
+</html>
