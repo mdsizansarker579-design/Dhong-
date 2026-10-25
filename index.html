@@ -225,63 +225,42 @@ footer{background:var(--top-bg);color:white;padding:20px;line-height:1.6;font-si
   let currentSelectedImg = "";
   let isTimerExpired = false;
   let timerInterval = null;
-  let hasCheckedParam = false;
+  let hasOpenedPopup = false;
 
-  let settings = {
-    siteName: "ঢং DHONG",
-    themeColor: "#e85d75",
-    dhakaFee: "60",
-    outsiderFee: "120",
-    whatsapp: "8801700000000",
-    phone: "01700000000",
-    adminEmail: "",
-    freeThreshold: "3000",
-    topBannerText: "🎉 ঢং-এ স্বাগতম | প্রথম অর্ডারে ১০% ছাড় ও ক্যাশ অন ডেলিভারি",
-    heroTitleText: "আপনার স্টাইল, আপনারই গল্প।",
-    heroSubtextText: "১০০% প্রিমিয়াম কোয়ালিটি নিশ্চিতকরণে ক্যাশ অন ডেলিভারিতে অর্ডার করুন।",
-    timerStatus: "show",
-    timerHours: "24",
-    timerText: "⏳ অফার শেষ হতে বাকি:",
-    heroPadding: "14px",
-    heroBg: "linear-gradient(120deg,#242b49,#a23b5d,#ee9a8c)",
-    btnTrackText: "📦 ট্র্যাক",
-    btnViewProductsText: "পণ্য দেখুন ↓",
-    btnBuyNowText: "অর্ডার করুন",
-    btnDetailOrderText: "সরাসরি ফর্ম পূরণ করে অর্ডার করুন",
-    btnWaOrderText: "💬 WhatsApp-এ এই পণ্যটি অর্ডার করুন",
-    btnConfirmOrderText: "অর্ডার নিশ্চিত করুন",
-    btnWaChatText: "💬 WhatsApp চ্যাট",
-    btnCallNowText: "📞 Call Now"
-  };
+  // URL থেকে সরাসরি প্রডাক্ট আইডি বের করার ফাংশন (পেজ লোডের আগেই কাজ করবে)
+  function getUrlParameter(name) {
+    name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
+    var regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
+    var results = regex.exec(location.search);
+    if(!results) {
+      // যদি কুয়েরি স্ট্রিং সরাসরি না পায়, পুরো লিংকের ভেতর থেকে চেক করবে
+      let url = window.location.href;
+      let idx = url.indexOf("product=");
+      if(idx !== -1) {
+        let val = url.substring(idx + 8).split("&")[0].split("#")[0];
+        return val;
+      }
+      return null;
+    }
+    return decodeURIComponent(results[1].replace(/\+/g, ' '));
+  }
 
   db.ref('dhong_products').on('value', snapshot => {
     let data = snapshot.val();
     products = data ? (Array.isArray(data) ? data : Object.values(data)) : [];
     renderProducts();
 
-    // শক্তিশালী URL পার্সার যা ফায়ারবেস ডাটা আসার সাথে সাথে পপআপ ওপেন করবে
-    if(!hasCheckedParam && products.length > 0) {
-      hasCheckedParam = true;
-      
-      let targetId = null;
-      const fullUrl = window.location.href;
-      
-      if(fullUrl.includes("product=")) {
-        try {
-          const parts = fullUrl.split("product=");
-          if(parts.length > 1) {
-            targetId = parts[1].split("&")[0].split("#")[0];
-          }
-        } catch(e) {}
-      }
-
-      if(targetId) {
-        setTimeout(() => {
-          const found = products.find(p => String(p.id) === String(targetId));
-          if(found) {
+    // ডাটা আসার সাথে সাথেই চেক করবে লিংকে কোনো প্রডাক্ট আইডি আছে কি না
+    if (!hasOpenedPopup && products.length > 0) {
+      let targetProductId = getUrlParameter('product');
+      if (targetProductId) {
+        let found = products.find(p => String(p.id) === String(targetProductId));
+        if (found) {
+          hasOpenedPopup = true;
+          setTimeout(() => {
             showProductDetail(found.id);
-          }
-        }, 400);
+          }, 100);
+        }
       }
     }
   });
@@ -671,7 +650,7 @@ function startTimer() {
         let m = String(Math.floor((timeLeft % 3600) / 60)).padStart(2, '0');
         let s = String(timeLeft % 60).padStart(2, '0');
         let tText = settings.timerText || "⏳ অফার শেষ হতে বাকি:";
-        timerEl.textContent = `${tText} `${h}:${m}:${s}`;
+        timerEl.textContent = `${tText} ${h}:${m}:${s}`;
       } else {
         isTimerExpired = true;
         timerEl.textContent = "⏳ অফার শেষ!";
