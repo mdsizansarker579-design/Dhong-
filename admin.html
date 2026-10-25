@@ -97,7 +97,7 @@ th{color:var(--muted);font-weight:600}
   <div class="card">
     <h3 class="section-title">অর্ডার ম্যানেজমেন্ট</h3>
     <input type="text" id="orderSearch" placeholder="🔍 কাস্টমার নাম বা ফোন নম্বর দিয়ে খুঁজুন..." oninput="loadAdminData()" style="margin-bottom:12px">
-    <div class="table-wrap"><table><thead><tr><th>ID</th><th>কাস্টমার</th><th>ফোন</th><th>ঠিকানা</th><th>পণ্যের বিবরণ</th><th>মোট</th><th>স্ট্যাটাস</th><th>তারিখ</th><th>অ্যাকশন</th></tr></thead>
+    <div class="table-wrap"><table><thead><tr><th>ID</th><th>কাস্টমার</th><th>ফোন</th><th>ঠিকানা</th><th>অর্ডারকৃত পণ্য ও ডিজাইন</th><th>মোট</th><th>স্ট্যাটাস</th><th>তারিখ</th><th>অ্যাকশন</th></tr></thead>
     <tbody id="orderRows"><tr><td colspan="9" class="empty">কোনো অর্ডার নেই।</td></tr></tbody></table></div>
   </div>
 </section>
@@ -138,7 +138,7 @@ th{color:var(--muted);font-weight:600}
       </div>
       
       <div class="field-group" style="background:#f9f9f9;padding:10px;border-radius:8px;border:1px solid #ddd">
-        🎨 কালার ভ্যারিয়েন্টের ছবি আপলোড (অটো-রিসাইজ):
+        🎨 কালার ও ডিজাইন ভ্যারিয়েন্টের ছবি আপলোড (অটো-রিসাইজ):
         <input type="file" id="pColorFiles" accept="image/*" multiple onchange="convertColorImages(this)">
         <div style="margin-top:6px;font-size:11px;color:#666">অথবা লিংকসমূহ (কমা দিয়ে):</div>
         <input id="pColors" placeholder="https://img1..., https://img2...">
@@ -366,7 +366,15 @@ function loadAdminData() {
     let itemsText = "";
     try {
       const items = JSON.parse(order.items_json);
-      itemsText = items.map(i => `<b>${i.name}</b><br>রং: ${i.color}, সাইজ: ${i.size}, পিস: ${i.quantity}`).join("<br>");
+      itemsText = items.map(i => `
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;background:#f9f9f9;padding:4px;border-radius:6px">
+          ${i.img ? `<img src="${i.img}" style="width:45px;height:45px;object-fit:cover;border-radius:4px;border:1px solid #ddd;flex-shrink:0">` : ''}
+          <div>
+            <b>${i.name}</b><br>
+            <small style="color:#555">রং/ডিজাইন: ${i.color} | সাইজ: ${i.size} | পিস: ${i.quantity}</small>
+          </div>
+        </div>
+      `).join("");
     } catch { itemsText = order.items_json; }
 
     return `<tr>
@@ -536,7 +544,7 @@ document.getElementById("settingsForm").addEventListener("submit", function(e){
   const newSettings = {
     adminEmail: document.getElementById("setAdminEmail").value,
     siteName: document.getElementById("setSiteName").value,
-    themeColor: document.getElementById("setThemeColor").value,
+    themeColor: document.getElementById("setThemeColor0").value || document.getElementById("setThemeColor").value,
     dhakaFee: document.getElementById("setDhaka").value,
     outsiderFee: document.getElementById("setOutsider").value,
     freeThreshold: document.getElementById("setThreshold").value,
