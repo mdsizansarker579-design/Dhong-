@@ -111,7 +111,6 @@ th{color:var(--muted);font-weight:600}
 
       <div class="field-group">পণ্যের নাম <input id="pName" required placeholder="কুর্তি বা ব্যাগ"></div>
       
-      <!-- ডায়নামিক ক্যাটাগরি ইনপুট বক্স -->
       <div class="field-group">ক্যাটাগরি (নিজের ইচ্ছামতো নাম লিখুন বা সিলেক্ট করুন) 
         <input id="pCat" list="categoryList" required placeholder="যেমন: পোশাক, ব্যাগ, জুতো, কসমেটিক্স">
         <datalist id="categoryList">
@@ -304,7 +303,9 @@ function loadAdminData() {
 
   let products = JSON.parse(localStorage.getItem("dhong_products")) || [];
   document.getElementById("productList").innerHTML = products.map((p, idx) => {
-    let shareLink = window.location.origin + window.location.pathname.replace("admin.html", "index.html") + "?product=" + p.id;
+    let path = window.location.pathname;
+    let baseDir = path.substring(0, path.lastIndexOf('/') + 1);
+    let shareLink = window.location.origin + baseDir + "index.html?product=" + p.id;
     return `
       <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #eee;flex-wrap:wrap;gap:8px">
         <div>
