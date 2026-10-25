@@ -94,7 +94,6 @@ footer{background:var(--top-bg);color:white;padding:20px;line-height:1.6;font-si
 
 <main id="products">
   <h2 style="font-size:18px;margin:10px 0">জনপ্রিয় পণ্য</h2>
-  <!-- ডায়নামিক ক্যাটাগরি বাটন কন্টেইনার -->
   <div class="categories" id="categoryContainer"></div>
   
   <div class="grid" id="grid"></div>
@@ -262,7 +261,6 @@ function renderSupport(){
 let category="সব", selectedProduct=null;
 function money(n){ return "৳"+Number(n).toLocaleString("en-US"); }
 
-// ডায়নামিক ক্যাটাগরি বাটন রেন্ডার ফাংশন
 function renderCategories(){
   let cats = ["সব", ...new Set(products.map(p => p.cat).filter(Boolean))];
   const catBox = document.getElementById("categoryContainer");
@@ -520,11 +518,6 @@ document.getElementById("orderForm").addEventListener("submit", function(e){
    allProducts[pIndex] = selectedProduct;
    localStorage.setItem("dhong_products", JSON.stringify(allProducts));
    products = allProducts;
- }
-
- // জিমেইল অ্যাপ ওপেন করার ঝামেলা বাদ দিয়ে সরাসরি ব্যাকগ্রাউন্ড নোটিফিকেশন লজিক
- if(settings.adminEmail) {
-   console.log("অর্ডার সফলভাবে সেভ হয়েছে এবং জিমেইলে নোটিফিকেশনের প্রস্তুতি সম্পন্ন।");
  }
 
  alert(`✅ অর্ডার সফলভাবে গ্রহণ করা হয়েছে!\nঅর্ডার নম্বর: #DH-${newOrder.id}\nমোট: ${money(totalPrice)}`);
