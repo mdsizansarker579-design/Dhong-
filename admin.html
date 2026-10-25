@@ -179,13 +179,25 @@ th{color:var(--muted);font-weight:600}
       <div class="field-group">কাস্টমার সার্ভিস ফোন নম্বর (Call Now) <input id="setPhone" placeholder="017..."></div>
 
       <hr style="margin:15px 0;border:0;border-top:1px dashed #ccc">
-      <h3 class="section-title" style="color:var(--accent)">📢 ব্যানার ও অফার টেক্সট সেটিংস</h3>
-      <div class="field-group">ওপরের অফার নোটিফিকেশন বার টেক্সট <input id="setTopBanner" placeholder="🎉 ঢং-এ স্বাগতম | প্রথম অর্ডারে ১০% ছাড়"></div>
-      <div class="field-group">ব্যানার মেইন টাইটেল/শিরোনাম <input id="setHeroTitle" placeholder="আপনার স্টাইল, আপনারই গল্প।"></div>
-      <div class="field-group">ব্যানার সাবটাইটেল/বিবরণ <input id="setHeroSubtext" placeholder="১০০% প্রিমিয়াম কোয়ালিটি..."></div>
-      <div class="field-group">ব্যানার বাটন টেক্সট <input id="setHeroBtn" placeholder="পণ্য দেখুন ↓"></div>
+      <h3 class="section-title" style="color:var(--accent)">📢 ব্যানার ও ডিজাইন সেটিংস</h3>
+      <div class="field-group">ওপরের অফার নোটিফিকেশন বার টেক্সট <input id="setTopBanner" placeholder="🎉 ঢং-এ স্বাগতম..."></div>
+      <div class="field-group">ব্যানার মেইন টাইটেল/শিরোনাম <input id="setHeroTitle" placeholder="আপনার স্টাইল..."></div>
+      <div class="field-group">ব্যানার সাবটাইটেল/বিবরণ <input id="setHeroSubtext" placeholder="১০০% প্রিমিয়াম..."></div>
+      <div class="field-group">ব্যানার সাইজ / প্যাডিং <input id="setHeroPadding" placeholder="14px"></div>
+      <div class="field-group">ব্যানার ব্যাকগ্রাউন্ড কালার/গ্রেডিয়েন্ট <input id="setHeroBg" placeholder="linear-gradient(...)"></div>
 
-      <button class="btn primary" type="submit" style="margin-top:10px">সেটিংস সেভ করুন</button>
+      <hr style="margin:15px 0;border:0;border-top:1px dashed #ccc">
+      <h3 class="section-title" style="color:var(--accent)">🎛️ অ্যাকশন বাটন টেক্সট এডিট</h3>
+      <div class="field-group">অর্ডার ট্র্যাক বাটন টেক্সট <input id="btnTrack" placeholder="📦 অর্ডার ট্র্যাক"></div>
+      <div class="field-group">পণ্য দেখুন বাটন টেক্সট <input id="btnViewProducts" placeholder="পণ্য দেখুন ↓"></div>
+      <div class="field-group">প্রোডাক্ট কার্ডের 'অর্ডার করুন' বাটন টেক্সট <input id="btnBuyNow" placeholder="অর্ডার করুন"></div>
+      <div class="field-group">বিস্তারিত পপআপের 'সরাসরি অর্ডার' বাটন টেক্সট <input id="btnDetailOrder" placeholder="সরাসরি ফর্ম পূরণ করে অর্ডার করুন"></div>
+      <div class="field-group">WhatsApp অর্ডার বাটন টেক্সট <input id="btnWaOrder" placeholder="💬 WhatsApp-এ এই পণ্যটি অর্ডার করুন"></div>
+      <div class="field-group">অর্ডার ফর্মের 'নিশ্চিত করুন' বাটন টেক্সট <input id="btnConfirmOrder" placeholder="অর্ডার নিশ্চিত করুন"></div>
+      <div class="field-group">ফ্লোটিং WhatsApp চ্যাট বাটন টেক্সট <input id="btnWaChat" placeholder="💬 WhatsApp চ্যাট"></div>
+      <div class="field-group">ফ্লোটিং Call Now বাটন টেক্সট <input id="btnCallNow" placeholder="📞 Call Now"></div>
+
+      <button class="btn primary" type="submit" style="margin-top:15px">সেটিংস সেভ করুন</button>
     </form>
   </div>
 </section>
@@ -315,7 +327,17 @@ function loadAdminData() {
   document.getElementById("setTopBanner").value = settings.topBannerText || "🎉 ঢং-এ স্বাগতম | প্রথম অর্ডারে ১০% ছাড় ও ক্যাশ অন ডেলিভারি";
   document.getElementById("setHeroTitle").value = settings.heroTitleText || "আপনার স্টাইল, আপনারই গল্প।";
   document.getElementById("setHeroSubtext").value = settings.heroSubtextText || "১০০% প্রিমিয়াম কোয়ালিটি নিশ্চিতকরণে ক্যাশ অন ডেলিভারিতে অর্ডার করুন।";
-  document.getElementById("setHeroBtn").value = settings.heroBtnLabel || "পণ্য দেখুন ↓";
+  document.getElementById("setHeroPadding").value = settings.heroPadding || "14px";
+  document.getElementById("setHeroBg").value = settings.heroBg || "linear-gradient(120deg,#242b49,#a23b5d,#ee9a8c)";
+
+  document.getElementById("btnTrack").value = settings.btnTrackText || "📦 অর্ডার ট্র্যাক";
+  document.getElementById("btnViewProducts").value = settings.btnViewProductsText || "পণ্য দেখুন ↓";
+  document.getElementById("btnBuyNow").value = settings.btnBuyNowText || "অর্ডার করুন";
+  document.getElementById("btnDetailOrder").value = settings.btnDetailOrderText || "সরাসরি ফর্ম পূরণ করে অর্ডার করুন";
+  document.getElementById("btnWaOrder").value = settings.btnWaOrderText || "💬 WhatsApp-এ এই পণ্যটি অর্ডার করুন";
+  document.getElementById("btnConfirmOrder").value = settings.btnConfirmOrderText || "অর্ডার নিশ্চিত করুন";
+  document.getElementById("btnWaChat").value = settings.btnWaChatText || "💬 WhatsApp চ্যাট";
+  document.getElementById("btnCallNow").value = settings.btnCallNowText || "📞 Call Now";
 }
 
 function updateOrderStatus(orderId, newStatus){
@@ -345,7 +367,6 @@ document.getElementById("productForm").addEventListener("submit", function(e){
   let editIdx = document.getElementById("editIndex").value;
   
   let finalImg = uploadedMainBase64 || document.getElementById("pImg").value;
-  
   let colorsInput = document.getElementById("pColors").value;
   let colorsArray = colorsInput ? colorsInput.split(',').map(s => s.trim()).filter(Boolean) : [];
   if(uploadedColorsBase64.length > 0) {
@@ -432,10 +453,19 @@ document.getElementById("settingsForm").addEventListener("submit", function(e){
     topBannerText: document.getElementById("setTopBanner").value,
     heroTitleText: document.getElementById("setHeroTitle").value,
     heroSubtextText: document.getElementById("setHeroSubtext").value,
-    heroBtnLabel: document.getElementById("setHeroBtn").value
+    heroPadding: document.getElementById("setHeroPadding").value,
+    heroBg: document.getElementById("setHeroBg").value,
+    btnTrackText: document.getElementById("btnTrack").value,
+    btnViewProductsText: document.getElementById("btnViewProducts").value,
+    btnBuyNowText: document.getElementById("btnBuyNow").value,
+    btnDetailOrderText: document.getElementById("btnDetailOrder").value,
+    btnWaOrderText: document.getElementById("btnWaOrder").value,
+    btnConfirmOrderText: document.getElementById("btnConfirmOrder").value,
+    btnWaChatText: document.getElementById("btnWaChat").value,
+    btnCallNowText: document.getElementById("btnCallNow").value
   };
   localStorage.setItem("dhong_settings", JSON.stringify(settings));
-  alert("✅ ব্যানার ও সেটিংস সফলভাবে সেভ হয়েছে!");
+  alert("✅ সমস্ত সেটিংস ও বাটন টেক্সট সফলভাবে সেভ হয়েছে!");
 });
 
 window.onload = loadAdminData;
