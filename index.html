@@ -225,7 +225,7 @@ footer{background:var(--top-bg);color:white;padding:20px;line-height:1.6;font-si
   let currentSelectedImg = "";
   let isTimerExpired = false;
   let timerInterval = null;
-  let hasOpenedParamProduct = false; // একবার ওপেন হলে বারবার যেন রিলোড না হয়
+  let hasCheckedParam = false;
 
   let settings = {
     siteName: "ঢং DHONG",
@@ -258,17 +258,25 @@ footer{background:var(--top-bg);color:white;padding:20px;line-height:1.6;font-si
     let data = snapshot.val();
     products = data ? (Array.isArray(data) ? data : Object.values(data)) : [];
     renderProducts();
-    
-    // ডাটা লোড হওয়ার সাথে সাথেই লিংকের প্রডাক্ট আইডি চেক করে পপআপ ওপেন করবে
-    if(!hasOpenedParamProduct) {
-      const params = new URLSearchParams(window.location.search);
-      const prodParam = params.get("product");
-      if(prodParam) {
-        const found = products.find(p => String(p.id) === String(prodParam));
-        if(found) {
-          hasOpenedParamProduct = true;
-          showProductDetail(found.id);
-        }
+
+    if(!hasCheckedParam && products.length > 0) {
+      hasCheckedParam = true;
+      const urlParams = new URLSearchParams(window.location.search);
+      let prodId = urlParams.get("product");
+      
+      if(!prodId && window.location.href.includes("product=")) {
+        try {
+          prodId = window.location.href.split("product=")[1].split("&")[0];
+        } catch(e) {}
+      }
+
+      if(prodId) {
+        setTimeout(() => {
+          const found = products.find(p => String(p.id) === String(prodId));
+          if(found) {
+            showProductDetail(found.id);
+          }
+        }, 300);
       }
     }
   });
@@ -633,20 +641,34 @@ function startTimer() {
   if(timerInterval) clearInterval(timerInterval);
   
   let hours = Number(settings.timerHours) || 24;
-  let time = hours * 3600;
+  let totalSeconds = hours * 3600;
+
+  // লোকালস্টোরেজ থেকে শেষ লক্ষ্য বা শুরুর সময় চেক করা
+  let savedEndTime = localStorage.getItem("dhong_timer_end");
+  let savedHoursSetting = localStorage.getItem("dhong_timer_hours_setting");
+
+  let now = Math.floor(Date.now() / 1000);
+
+  // যদি এডমিন প্যানেল থেকে ঘণ্টার হিসাব পরিবর্তন করা হয় অথবা প্রথমবার ওপেন হয়
+  if(!savedEndTime || savedHoursSetting !== String(hours)) {
+    savedEndTime = now + totalSeconds;
+    localStorage.setItem("dhong_timer_end", savedEndTime);
+    localStorage.setItem("dhong_timer_hours_setting", hours);
+  }
 
   timerInterval = setInterval(() => {
-    let h = String(Math.floor(time / 3600)).padStart(2, '0');
-    let m = String(Math.floor((time % 3600) / 60)).padStart(2, '0');
-    let s = String(time % 60).padStart(2, '0');
-    let tText = settings.timerText || "⏳ অফার শেষ হতে বাকি:";
-    
+    let currentTime = Math.floor(Date.now() / 1000);
+    let timeLeft = Number(savedEndTime) - currentTime;
+
     const timerEl = document.getElementById("countdownTimer");
     if(timerEl) {
-      if(time > 0) {
+      if(timeLeft > 0) {
         isTimerExpired = false;
+        let h = String(Math.floor(timeLeft / 3600)).padStart(2, '0');
+        let m = String(Math.floor((timeLeft % 3600) / 60)).padStart(2, '0');
+        let s = String(timeLeft % 60).padStart(2, '0');
+        let tText = settings.timerText || "⏳ অফার শেষ হতে বাকি:";
         timerEl.textContent = `${tText} ${h}:${m}:${s}`;
-        time--;
       } else {
         isTimerExpired = true;
         timerEl.textContent = "⏳ অফার শেষ!";
