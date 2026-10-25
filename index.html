@@ -16,7 +16,7 @@ header{background:white;padding:12px;display:flex;align-items:center;gap:10px;fl
 .search{flex:1;min-width:160px;padding:9px;border:1px solid #ddd;border-radius:8px}
 button{border:0;border-radius:8px;padding:9px 13px}
 .primary{background:var(--primary-color);color:white;font-weight:bold}
-.hero{margin:10px auto;max-width:1100px;padding:16px 14px;border-radius:14px;background:linear-gradient(120deg,#242b49,#a23b5d,#ee9a8c);color:white}
+.hero{margin:10px auto;max-width:1100px;border-radius:14px;color:white}
 .hero h1{font-size:20px;margin:0 0 6px 0;line-height:1.3}
 .hero p{font-size:12px;line-height:1.4;margin:0 0 8px 0;opacity:0.9}
 .timer-box{background:rgba(0,0,0,0.25);padding:6px 10px;border-radius:8px;display:inline-block;margin:6px 0;font-size:12px;font-weight:bold}
@@ -26,8 +26,8 @@ main{max-width:1100px;margin:15px auto;padding:0 12px}
 .grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
 .product{background:white;border:1px solid #e5e7eb;border-radius:12px;overflow:hidden;cursor:pointer;transition:0.2s;position:relative}
 .product:hover{transform:translateY(-3px);box-shadow:0 4px 12px rgba(0,0,0,0.08)}
-.art{height:160px;display:grid;place-items:center;background:#f0f2f5;position:relative;overflow:hidden}
-.art img{width:100%;height:100%;object-fit:cover}
+.art{height:160px;display:grid;place-items:center;background:#f9f9f9;position:relative;overflow:hidden}
+.art img{width:100%;height:100%;object-fit:contain;padding:4px}
 .badge-row{position:absolute;top:8px;left:8px;right:8px;display:flex;justify-content:space-between;align-items:center;font-size:11px;z-index:2}
 .stock-badge{background:#e8f7ef;color:#16754e;padding:3px 6px;border-radius:4px;font-weight:bold}
 .stock-badge.out{background:#fde8e8;color:#c53030}
@@ -58,12 +58,12 @@ footer{background:var(--top-bg);color:white;padding:20px;line-height:1.6;font-si
 .trust-icons{display:flex;gap:8px;justify-content:center;margin:12px 0;font-size:11px;color:#555}
 .trust-item{display:flex;align-items:center;gap:4px;background:#f8f9fa;padding:5px 8px;border-radius:6px}
 
-/* নতুন ইমেজ স্লাইডার স্টাইল */
-.slider-container{position:relative;width:100%;max-height:300px;overflow:hidden;border-radius:12px;background:#000}
-.slider-track{display:flex;transition:transform 0.3s ease-in-out;height:280px}
+/* স্লাইডার ছবি সঠিক সাইজ ও ফিট রাখার জন্য */
+.slider-container{position:relative;width:100%;height:280px;overflow:hidden;border-radius:12px;background:#f9f9f9;display:grid;place-items:center}
+.slider-track{display:flex;transition:transform 0.3s ease-in-out;height:100%;width:100%}
 .slider-item{min-width:100%;height:100%;display:grid;place-items:center}
-.slider-item img{width:100%;height:100%;object-fit:cover}
-.item-counter{position:absolute;bottom:10px;left:10px;background:rgba(0,0,0,0.6);color:white;padding:3px 8px;border-radius:12px;font-size:11px}
+.slider-item img{max-width:100%;max-height:100%;object-fit:contain}
+.item-counter{position:absolute;bottom:10px;left:10px;background:rgba(0,0,0,0.6);color:white;padding:3px 8px;border-radius:12px;font-size:11px;z-index:3}
 .color-thumbs{display:flex;gap:8px;margin:12px 0;overflow-x:auto;padding-bottom:5px}
 .color-thumb{width:55px;height:55px;border-radius:8px;border:2px solid #ddd;cursor:pointer;object-fit:cover;flex-shrink:0}
 .color-thumb.active{border-color:var(--primary-color);transform:scale(1.05)}
@@ -80,10 +80,10 @@ footer{background:var(--top-bg);color:white;padding:20px;line-height:1.6;font-si
 <header>
   <div class="logo" id="logoText">DHONG DHONG</div>
   <input class="search" id="search" placeholder="পণ্য খুঁজুন..." oninput="renderProducts()">
-  <button onclick="openTrack()" class="primary">📦 ট্র্যাক</button>
+  <button onclick="openTrack()" class="primary" id="btnTrackEl">📦 ট্র্যাক</button>
 </header>
 
-<section class="hero">
+<section class="hero" id="heroBox">
   <h1 id="heroTitle">আপনার স্টাইল, আপনারই গল্প।</h1>
   <p id="heroSubtext">১০০% প্রিমিয়াম কোয়ালিটি নিশ্চিতকরণে ক্যাশ অন ডেলিভারিতে অর্ডার করুন।</p>
   <div class="timer-box" id="countdownTimer">⏳ অফার শেষ হতে বাকি: --:--:--</div>
@@ -112,7 +112,7 @@ footer{background:var(--top-bg);color:white;padding:20px;line-height:1.6;font-si
 <footer>
   <b id="footerLogo">DHONG | ঢং</b><br>
   আপনার পছন্দের পণ্য সহজে ও নিরাপদে অর্ডার করুন।<br>
-  <button onclick="openTrack()" style="margin-top:8px;font-size:12px">আমার অর্ডার ট্র্যাক করুন</button>
+  <button onclick="openTrack()" style="margin-top:8px;font-size:12px" id="footerTrackBtn">আমার অর্ডার ট্র্যাক করুন</button>
 </footer>
 
 <div class="float-support" id="supportButtons"></div>
@@ -195,7 +195,7 @@ footer{background:var(--top-bg);color:white;padding:20px;line-height:1.6;font-si
       <label class="field">অর্ডার নম্বর
         <input name="orderId" required placeholder="যেমন: 1, 2, 3...">
       </label>
-      <button class="primary" type="submit">স্ট্যাটাস দেখুন</button>
+      <button class="primary" type="submit" id="trackSearchBtn">স্ট্যাটাস দেখুন</button>
     </form>
     <p id="trackResult"></p>
   </div>
@@ -214,7 +214,16 @@ let settings = JSON.parse(localStorage.getItem("dhong_settings")) || {
   topBannerText: "🎉 ঢং-এ স্বাগতম | প্রথম অর্ডারে ১০% ছাড় ও ক্যাশ অন ডেলিভারি",
   heroTitleText: "আপনার স্টাইল, আপনারই গল্প।",
   heroSubtextText: "১০০% প্রিমিয়াম কোয়ালিটি নিশ্চিতকরণে ক্যাশ অন ডেলিভারিতে অর্ডার করুন।",
-  heroBtnLabel: "পণ্য দেখুন ↓"
+  heroPadding: "14px",
+  heroBg: "linear-gradient(120deg,#242b49,#a23b5d,#ee9a8c)",
+  btnTrackText: "📦 ট্র্যাক",
+  btnViewProductsText: "পণ্য দেখুন ↓",
+  btnBuyNowText: "অর্ডার করুন",
+  btnDetailOrderText: "সরাসরি ফর্ম পূরণ করে অর্ডার করুন",
+  btnWaOrderText: "💬 WhatsApp-এ এই পণ্যটি অর্ডার করুন",
+  btnConfirmOrderText: "অর্ডার নিশ্চিত করুন",
+  btnWaChatText: "💬 WhatsApp চ্যাট",
+  btnCallNowText: "📞 Call Now"
 };
 
 document.documentElement.style.setProperty('--primary-color', settings.themeColor);
@@ -225,7 +234,14 @@ document.getElementById("siteTitle").textContent = settings.siteName + " | Custo
 document.getElementById("topBanner").textContent = settings.topBannerText || "🎉 ঢং-এ স্বাগতম | প্রথম অর্ডারে ১০% ছাড়";
 document.getElementById("heroTitle").textContent = settings.heroTitleText || "আপনার স্টাইল, আপনারই গল্প।";
 document.getElementById("heroSubtext").textContent = settings.heroSubtextText || "১০০% প্রিমিয়াম কোয়ালিটি নিশ্চিতকরণে অর্ডার করুন।";
-document.getElementById("heroBtnText").textContent = settings.heroBtnLabel || "পণ্য দেখুন ↓";
+document.getElementById("heroBtnText").textContent = settings.btnViewProductsText || "পণ্য দেখুন ↓";
+document.getElementById("btnTrackEl").textContent = settings.btnTrackText || "📦 ট্র্যাক";
+document.getElementById("footerTrackBtn").textContent = settings.btnTrackText ? "আমার " + settings.btnTrackText : "আমার অর্ডার ট্র্যাক করুন";
+document.getElementById("submitBtn").textContent = settings.btnConfirmOrderText || "অর্ডার নিশ্চিত করুন";
+
+const heroEl = document.getElementById("heroBox");
+heroEl.style.padding = settings.heroPadding || "14px";
+heroEl.style.background = settings.heroBg || "linear-gradient(120deg,#242b49,#a23b5d,#ee9a8c)";
 
 document.getElementById("deliveryFee").innerHTML = `
   <option value="${settings.dhakaFee}">ঢাকা ভেতরে (৳${settings.dhakaFee})</option>
@@ -233,15 +249,15 @@ document.getElementById("deliveryFee").innerHTML = `
 `;
 
 let products = JSON.parse(localStorage.getItem("dhong_products")) || [
- {id:1,name:"এলিগ্যান্ট কটন কুর্তি",cat:"পোশাক",price:1250,oldPrice:1500,stock:10,rating:4.8,sales:142,quality:"১০০% সুতি কটন",img:"",video:"",colors:[],desc:"আরামদায়ক প্রিমিয়াম কটন কাপড়ের তৈরি আকর্ষণীয় কুর্তি।",comments:[]},
- {id:2,name:"প্রিমিয়াম ক্রসব্যাগ",cat:"ব্যাগ",price:950,oldPrice:1200,stock:5,rating:4.9,sales:89,quality:"হাই গ্রেড ওয়াটারপ্রুফ চামড়া",img:"",video:"",colors:[],desc:"স্টাইলিশ ও টেকসই চামড়ার ক্রসব্যাগ।",comments:[]}
+ {id:1,name:"এলিগ্যান্ট কটন কুর্তি",cat:"পোশাক",price:1250,oldPrice:1500,stock:10,rating:4.8,sales:142,quality:"১০০% সুতি কটন",img:"",video:"",colors:[],desc:"আরামদায়ক প্রিমিয়াম কটন কাপড়ের তৈরি আকর্ষণীয় কুর্তি."},
+ {id:2,name:"প্রিমিয়াম ক্রসব্যাগ",cat:"ব্যাগ",price:950,oldPrice:1200,stock:5,rating:4.9,sales:89,quality:"হাই গ্রেড ওয়াটারপ্রুফ চামড়া",img:"",video:"",colors:[],desc:"স্টাইলিশ ও টেকসই চামড়ার ক্রসব্যাগ."}
 ];
 
 function renderSupport(){
   const box = document.getElementById("supportButtons");
   let html = "";
-  if(settings.whatsapp) html += `<a href="https://wa.me/${settings.whatsapp}" target="_blank" class="support-btn">💬 WhatsApp চ্যাট</a>`;
-  if(settings.phone) html += `<a href="tel:${settings.phone}" class="support-btn call">📞 Call Now</a>`;
+  if(settings.whatsapp) html += `<a href="https://wa.me/${settings.whatsapp}" target="_blank" class="support-btn">${settings.btnWaChatText || "💬 WhatsApp চ্যাট"}</a>`;
+  if(settings.phone) html += `<a href="tel:${settings.phone}" class="support-btn call">${settings.btnCallNowText || "📞 Call Now"}</a>`;
   box.innerHTML = html;
 }
 
@@ -267,7 +283,7 @@ function renderProducts(){
      ${p.oldPrice ? `<div class="old-price">${money(p.oldPrice)}</div>` : ''}
     </div>
     <div class="sales-badge">🔥 <b>${p.sales || 0}+</b> পিস বিক্রি হয়েছে</div>
-    <button class="buy" ${p.stock <= 0 ? 'disabled' : ''} onclick="event.stopPropagation(); openOrder(${p.id})">${p.stock <= 0 ? 'স্টক শেষ' : 'অর্ডার করুন'}</button>
+    <button class="buy" ${p.stock <= 0 ? 'disabled' : ''} onclick="event.stopPropagation(); openOrder(${p.id})">${p.stock <= 0 ? 'স্টক শেষ' : (settings.btnBuyNowText || 'অর্ডার করুন')}</button>
    </div>
   </article>
  `).join("");
@@ -288,13 +304,11 @@ function showProductDetail(id){
   const videoEmbed = getYoutubeEmbed(p.video);
   document.getElementById("supportButtons").style.display = "none";
 
-  // সব ছবি একত্র করা (প্রধান ছবি + কালার ভ্যারিয়েন্ট ছবিগুলো)
   let allImages = [];
   if(p.img) allImages.push(p.img);
   if(p.colors && p.colors.length > 0) {
     p.colors.forEach(imgUrl => { if(!allImages.includes(imgUrl)) allImages.push(imgUrl); });
   }
-  if(allImages.length === 0) allImages = [];
 
   let sliderHtml = "";
   if(allImages.length > 0) {
@@ -344,9 +358,9 @@ function showProductDetail(id){
         </div>
       ` : ''}
       
-      <button class="primary" ${p.stock <= 0 ? 'disabled' : ''} onclick="closeModal('detailModal'); openOrder(${p.id})">${p.stock <= 0 ? 'স্টক শেষ' : 'সরাসরি ফর্ম পূরণ করে অর্ডার করুন'}</button>
+      <button class="primary" ${p.stock <= 0 ? 'disabled' : ''} onclick="closeModal('detailModal'); openOrder(${p.id})">${p.stock <= 0 ? 'স্টক শেষ' : (settings.btnDetailOrderText || 'সরাসরি ফর্ম পূরণ করে অর্ডার করুন')}</button>
       
-      ${settings.whatsapp ? `<a href="https://wa.me/${settings.whatsapp}?text=${waOrderText}" target="_blank" class="support-btn wa-order">💬 WhatsApp-এ এই পণ্যটি অর্ডার করুন</a>` : ''}
+      ${settings.whatsapp ? `<a href="https://wa.me/${settings.whatsapp}?text=${waOrderText}" target="_blank" class="support-btn wa-order">${settings.btnWaOrderText || "💬 WhatsApp-এ এই পণ্যটি অর্ডার করুন"}</a>` : ''}
 
       <div class="comments-sec">
         <b>💬 কাস্টমার রিভিউ ও কমেন্ট</b>
@@ -363,7 +377,6 @@ function showProductDetail(id){
   initTouchSlider(allImages.length);
 }
 
-// টাচ ও স্লাইড করার লজিক (Swipe Slider)
 function slideImage(index, el) {
   const track = document.getElementById("sliderTrack");
   const counter = document.getElementById("itemCounter");
