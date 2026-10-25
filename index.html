@@ -1,20 +1,21 @@
-<!doctype html>
+!doctype html>
 <html lang="bn">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>DHONG | Customer Panel</title>
+<title id="siteTitle">DHONG | Customer Panel</title>
 <style>
+:root{--primary-color:#e85d75;--top-bg:#17243a;}
 *{box-sizing:border-box}
 body{margin:0;font-family:Arial,sans-serif;background:#f7f8fb;color:#182230}
 button,input,select,textarea{font:inherit}
 button{cursor:pointer}
-.top{background:#17243a;color:white;text-align:center;padding:10px}
+.top{background:var(--top-bg);color:white;text-align:center;padding:10px}
 header{background:white;padding:14px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
-.logo{font-size:23px;font-weight:bold;color:#c83d58}
+.logo{font-size:23px;font-weight:bold;color:var(--primary-color)}
 .search{flex:1;min-width:180px;padding:11px;border:1px solid #ddd;border-radius:10px}
 button{border:0;border-radius:9px;padding:11px 15px}
-.primary{background:#e85d75;color:white;font-weight:bold}
+.primary{background:var(--primary-color);color:white;font-weight:bold}
 .hero{margin:16px auto;max-width:1100px;padding:30px 22px;border-radius:18px;background:linear-gradient(120deg,#242b49,#a23b5d,#ee9a8c);color:white}
 .hero h1{font-size:34px}
 .hero p{line-height:1.7}
@@ -22,44 +23,57 @@ main{max-width:1100px;margin:25px auto;padding:0 14px}
 .categories{display:flex;gap:8px;overflow:auto;margin:15px 0}
 .categories button{background:white;border:1px solid #ddd;white-space:nowrap}
 .grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
-.product{background:white;border:1px solid #e5e7eb;border-radius:13px;overflow:hidden}
+.product{background:white;border:1px solid #e5e7eb;border-radius:13px;overflow:hidden;cursor:pointer;transition:0.2s}
+.product:hover{transform:translateY(-3px);box-shadow:0 4px 12px rgba(0,0,0,0.08)}
 .art{height:160px;display:grid;place-items:center;background:#f0f2f5}
 .art img{width:100%;height:100%;object-fit:cover}
 .info{padding:12px}
-.info h3{font-size:14px;min-height:35px}
-.price{font-size:17px;font-weight:bold}
-.buy{width:100%;margin-top:12px;background:#e85d75;color:white;font-weight:bold}
+.info h3{font-size:14px;min-height:35px;margin:5px 0}
+.price-box{display:flex;gap:8px;align-items:center;margin-top:4px}
+.price{font-size:17px;font-weight:bold;color:var(--primary-color)}
+.old-price{font-size:13px;text-decoration:line-through;color:#888}
+.buy{width:100%;margin-top:12px;background:var(--primary-color);color:white;font-weight:bold}
+.badge-row{display:flex;justify-content:space-between;align-items:center;font-size:11px}
+.stock-badge{background:#e8f7ef;color:#16754e;padding:3px 6px;border-radius:4px;font-weight:bold}
+.rating-badge{color:#ff9800;font-weight:bold}
+.sales-badge{color:#666;font-size:11px;margin-top:4px}
 .benefits{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:25px 0}
-.benefit{background:white;border:1px solid #eee;padding:15px;border-radius:12px}
-footer{background:#17243a;color:white;padding:25px;line-height:1.8}
+.benefit{background:white;border:1px solid #eee;padding:15px;border-radius:12px;text-align:center}
+footer{background:var(--top-bg);color:white;padding:25px;line-height:1.8}
 .modalbg{display:none;position:fixed;inset:0;background:#0009;align-items:center;justify-content:center;padding:14px;z-index:10}
 .modalbg.show{display:flex}
-.modal{background:white;border-radius:15px;padding:20px;width:100%;max-width:500px;max-height:90vh;overflow:auto}
+.modal{background:white;border-radius:15px;padding:20px;width:100%;max-width:580px;max-height:90vh;overflow:auto}
 .modal h2{margin-top:0}
 .field{display:block;margin:12px 0;font-size:13px;font-weight:bold}
 .field input,.field select,.field textarea{display:block;width:100%;padding:11px;margin-top:6px;border:1px solid #ddd;border-radius:8px}
 .modal .primary{width:100%;margin-top:10px}
-.close{float:right;background:#eee}
+.close{float:right;background:#eee;padding:5px 10px;font-weight:bold}
 .float-support{position:fixed;bottom:20px;right:20px;display:flex;flex-direction:column;gap:10px;z-index:99}
 .support-btn{background:#25d366;color:white;padding:12px 16px;border-radius:30px;font-weight:bold;text-decoration:none;box-shadow:0 4px 10px rgba(0,0,0,0.2);display:flex;align-items:center;gap:8px;font-size:14px}
 .support-btn.call{background:#007bff}
+.trust-icons{display:flex;gap:10px;justify-content:center;margin:15px 0;font-size:12px;color:#555}
+.trust-item{display:flex;align-items:center;gap:4px;background:#f8f9fa;padding:6px 10px;border-radius:6px}
+.video-container{position:relative;padding-bottom:56.25%;height:0;overflow:hidden;border-radius:10px;margin:12px 0}
+.video-container iframe{position:absolute;top:0;left:0;width:100%;height:100%;border:0}
+.comments-sec{margin-top:15px;text-align:left;border-top:1px solid #eee;padding-top:15px}
+.comment-item{background:#f9f9f9;padding:8px 12px;border-radius:8px;margin:6px 0;font-size:13px}
 @media(max-width:700px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.art{height:135px}.hero h1{font-size:27px}.benefits{grid-template-columns:1fr}header{padding:10px}.search{order:3;flex-basis:100%}}
 </style>
 </head>
 <body>
 
-<div class="top">🎉 ঢং-এ স্বাগতম | ক্যাশ অন ডেলিভারি</div>
+<div class="top" id="topBanner">🎉 ঢং-এ স্বাগতম | ক্যাশ অন ডেলিভারি</div>
 
 <header>
-  <div class="logo">ঢং DHONG</div>
+  <div class="logo" id="logoText">ঢং DHONG</div>
   <input class="search" id="search" placeholder="পণ্য খুঁজুন..." oninput="renderProducts()">
-  <button onclick="openTrack()">📦 অর্ডার ট্র্যাক</button>
+  <button onclick="openTrack()" class="primary">📦 অর্ডার ট্র্যাক</button>
 </header>
 
 <section class="hero">
   <h1>আপনার স্টাইল, আপনারই গল্প।</h1>
-  <p>পছন্দের পণ্য বেছে নিন এবং অ্যাকাউন্ট ছাড়াই সরাসরি অর্ডার করুন।</p>
-  <button onclick="document.getElementById('products').scrollIntoView({behavior:'smooth'})">পণ্য দেখুন ↓</button>
+  <p id="heroSubtext">১০০% প্রিমিয়াম কোয়ালিটি নিশ্চিতকরণে ক্যাশ অন ডেলিভারিতে অর্ডার করুন।</p>
+  <button onclick="document.getElementById('products').scrollIntoView({behavior:'smooth'})" class="primary" style="background:white;color:#182230">পণ্য দেখুন ↓</button>
 </section>
 
 <main id="products">
@@ -73,28 +87,31 @@ footer{background:#17243a;color:white;padding:25px;line-height:1.8}
   <div class="grid" id="grid"></div>
 
   <div class="benefits">
-    <div class="benefit">🚚 <b>সারা বাংলাদেশে ডেলিভারি</b></div>
-    <div class="benefit">💵 <b>ক্যাশ অন ডেলিভারি</b></div>
-    <div class="benefit">🔒 <b>অ্যাকাউন্ট ছাড়াই অর্ডার</b></div>
+    <div class="benefit">🚚 <b>সারা বাংলাদেশে দ্রুত ডেলিভারি</b></div>
+    <div class="benefit">💵 <b>পণ্য দেখে ক্যাশ অন ডেলিভারি</b></div>
+    <div class="benefit">🛡️ <b>১০০% কোয়ালিটি গ্যারান্টি</b></div>
   </div>
 </main>
 
 <footer>
-  <b>DHONG | ঢং</b><br>
-  আপনার পছন্দের পণ্য সহজে অর্ডার করুন।<br>
-  <button onclick="openTrack()">আমার অর্ডার ট্র্যাক করুন</button>
+  <b id="footerLogo">DHONG | ঢং</b><br>
+  আপনার পছন্দের পণ্য সহজে ও নিরাপদে অর্ডার করুন।<br>
+  <button onclick="openTrack()" style="margin-top:10px">আমার অর্ডার ট্র্যাক করুন</button>
 </footer>
 
-<!-- কাস্টমার সার্ভিস ফ্লোটিং বাটন -->
-<div class="float-support" id="supportButtons">
-  <!-- ডায়নামিকালি যুক্ত হবে -->
+<div class="float-support" id="supportButtons"></div>
+
+<div class="modalbg" id="detailModal">
+  <div class="modal">
+    <button class="close" onclick="closeModal('detailModal')">✕</button>
+    <div id="detailContent"></div>
+  </div>
 </div>
 
-<!-- অর্ডার মডাল -->
 <div class="modalbg" id="orderModal">
   <div class="modal">
     <button class="close" onclick="closeModal('orderModal')">✕</button>
-    <h2>অর্ডার করুন</h2>
+    <h2>অর্ডার ফর্ম</h2>
     <form id="orderForm">
       <input type="hidden" name="productId" id="productId">
 
@@ -107,7 +124,7 @@ footer{background:#17243a;color:white;padding:25px;line-height:1.8}
       </label>
 
       <label class="field">কালার / রং
-        <select name="color" id="productColor" required>
+        <select name="color" id="productColor">
           <option value="Standard">স্ট্যান্ডার্ড</option>
           <option value="Black">কালো (Black)</option>
           <option value="White">সাদা (White)</option>
@@ -117,7 +134,7 @@ footer{background:#17243a;color:white;padding:25px;line-height:1.8}
       </label>
 
       <label class="field">সাইজ / ভ্যারিয়েন্ট
-        <select name="size" id="productSize" required>
+        <select name="size" id="productSize">
           <option value="Free Size">Free Size</option>
           <option value="M">M</option>
           <option value="L">L</option>
@@ -128,24 +145,24 @@ footer{background:#17243a;color:white;padding:25px;line-height:1.8}
 
       <label class="field">পরিমাণ
         <select name="quantity" id="quantity" onchange="updateTotal()">
-          <option value="1">১টি</option>
-          <option value="2">২টি</option>
-          <option value="3">৩টি</option>
-          <option value="4">৪টি</option>
-          <option value="5">৫টি</option>
+          <option value="1">১টি</option><option value="2">২টি</option><option value="3">৩টি</option><option value="4">৪টি</option><option value="5">৫টি</option>
         </select>
       </label>
 
       <label class="field">ডেলিভারি এলাকা (চার্জ)
         <select name="deliveryFee" id="deliveryFee" onchange="updateTotal()" required>
-          <option value="60">ঢাকা ভেতরে (৳৬০)</option>
-          <option value="120">ঢাকা বাইরে / সারা দেশ (৳১২০)</option>
         </select>
       </label>
 
       <label class="field">সম্পূর্ণ ঠিকানা
         <textarea name="address" required rows="3" placeholder="বাসা, রোড, এলাকা, থানা"></textarea>
       </label>
+
+      <div class="trust-icons">
+        <div class="trust-item">🛡️ ১০০% অরিজিনাল</div>
+        <div class="trust-item">⚡ ফার্স্ট ডেলিভারি</div>
+        <div class="trust-item">💵 পে অন ডেলিভারি</div>
+      </div>
 
       <p><b id="summary">মোট: ৳০</b></p>
       <button class="primary" type="submit" id="submitBtn">অর্ডার নিশ্চিত করুন</button>
@@ -168,48 +185,60 @@ footer{background:#17243a;color:white;padding:25px;line-height:1.8}
 </div>
 
 <script>
-// ডিফল্ট পণ্য তালিকা (যদি অ্যাডমিন প্যানেল থেকে এডিট করা না হয়)
-let products = JSON.parse(localStorage.getItem("dhong_products")) || [
- {id:1,name:"এলিগ্যান্ট কটন কুর্তি",cat:"পোশাক",price:1250,img:""},
- {id:2,name:"প্রিমিয়াম ক্রসব্যাগ",cat:"ব্যাগ",price:950,img:""},
- {id:3,name:"সফট কালার থ্রি-পিস",cat:"পোশাক",price:1850,img:""},
- {id:4,name:"ক্লাসিক হ্যান্ডব্যাগ",cat:"ব্যাগ",price:1450,img:""}
-];
-
 let settings = JSON.parse(localStorage.getItem("dhong_settings")) || {
+  siteName: "ঢং DHONG",
+  themeColor: "#e85d75",
+  dhakaFee: "60",
+  outsiderFee: "120",
   whatsapp: "8801700000000",
   phone: "01700000000",
-  sheetUrl: ""
+  adminEmail: ""
 };
 
-// কাস্টমার সার্ভিস বাটন লোড
+document.documentElement.style.setProperty('--primary-color', settings.themeColor);
+document.getElementById("logoText").textContent = settings.siteName;
+document.getElementById("footerLogo").textContent = settings.siteName;
+document.getElementById("siteTitle").textContent = settings.siteName + " | Customer Panel";
+
+document.getElementById("deliveryFee").innerHTML = `
+  <option value="${settings.dhakaFee}">ঢাকা ভেতরে (৳${settings.dhakaFee})</option>
+  <option value="${settings.outsiderFee}">ঢাকা বাইরে / সারা দেশ (৳${settings.outsiderFee})</option>
+`;
+
+let products = JSON.parse(localStorage.getItem("dhong_products")) || [
+ {id:1,name:"এলিগ্যান্ট কটন কুর্তি",cat:"পোশাক",price:1250,oldPrice:1500,stock:10,rating:4.8,sales:142,quality:"১০০% সুতি কটন",img:"",video:"",desc:"আরামদায়ক প্রিমিয়াম কটন কাপড়ের তৈরি আকর্ষণীয় কুর্তি।",comments:[{name:"সুমাইয়া",text:"খুব সুন্দর কাপড়, ধন্যবাদ!"}]},
+ {id:2,name:"প্রিমিয়াম ক্রসব্যাগ",cat:"ব্যাগ",price:950,oldPrice:1200,stock:5,rating:4.9,sales:89,quality:"হাই গ্রেড ওয়াটারপ্রুফ চামড়া",img:"",video:"",desc:"স্টাইলিশ ও টেকসই চামড়ার ক্রসব্যাগ।",comments:[]}
+];
+
 function renderSupport(){
   const box = document.getElementById("supportButtons");
   let html = "";
-  if(settings.whatsapp) {
-    html += `<a href="https://wa.me/${settings.whatsapp}" target="_blank" class="support-btn">💬 WhatsApp চ্যাট</a>`;
-  }
-  if(settings.phone) {
-    html += `<a href="tel:${settings.phone}" class="support-btn call">📞 কল করুন</a>`;
-  }
+  if(settings.whatsapp) html += `<a href="https://wa.me/${settings.whatsapp}" target="_blank" class="support-btn">💬 WhatsApp চ্যাট</a>`;
+  if(settings.phone) html += `<a href="tel:${settings.phone}" class="support-btn call">📞 Call Now</a>`;
   box.innerHTML = html;
 }
 
 let category="সব", selectedProduct=null;
-
 function money(n){ return "৳"+Number(n).toLocaleString("en-US"); }
 
 function renderProducts(){
  const q=document.getElementById("search").value.toLowerCase();
  const list=products.filter(p=>(category==="সব"||p.cat===category)&&p.name.toLowerCase().includes(q));
  document.getElementById("grid").innerHTML=list.map(p=>`
-  <article class="product">
+  <article class="product" onclick="showProductDetail(${p.id})">
    <div class="art">${p.img ? `<img src="${p.img}" alt="${p.name}">` : `<div style="font-size:30px">🛍️</div>`}</div>
    <div class="info">
-    <small>${p.cat}</small>
+    <div class="badge-row">
+      <span class="stock-badge">স্টক: ${p.stock ?? 'উপলভ্য'}</span>
+      <span class="rating-badge">★ ${p.rating || '5.0'}</span>
+    </div>
     <h3>${p.name}</h3>
-    <div class="price">${money(p.price)}</div>
-    <button class="buy" onclick="openOrder(${p.id})">অর্ডার করুন</button>
+    <div class="price-box">
+     <div class="price">${money(p.price)}</div>
+     ${p.oldPrice ? `<div class="old-price">${money(p.oldPrice)}</div>` : ''}
+    </div>
+    <div class="sales-badge">🔥 <b>${p.sales || 0}+</b> পিস বিক্রি হয়েছে</div>
+    <button class="buy" onclick="event.stopPropagation(); openOrder(${p.id})">অর্ডার করুন</button>
    </div>
   </article>
  `).join("");
@@ -217,11 +246,84 @@ function renderProducts(){
 
 function setCategory(c){ category=c; renderProducts(); }
 
+function getYoutubeEmbed(url) {
+  if (!url) return "";
+  const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+  const match = url.match(regExp);
+  return (match && match[2].length === 11) ? `https://www.youtube.com/embed/${match[2]}` : null;
+}
+
+function showProductDetail(id){
+  const p = products.find(prod => prod.id === id);
+  if(!p) return;
+  const videoEmbed = getYoutubeEmbed(p.video);
+  
+  const commentsList = (p.comments || []).map(c=>`
+    <div class="comment-item"><b>${c.name}:</b> ${c.text}</div>
+  `).join("") || "<small style='color:#888'>এখনো কোনো রিভিউ নেই। প্রথম মন্তব্যটি আপনার হোক!</small>";
+
+  document.getElementById("detailContent").innerHTML = `
+    <div style="text-align:center">
+      ${p.img ? `<img src="${p.img}" style="max-height:220px;max-width:100%;object-fit:cover;border-radius:10px">` : `<div style="font-size:50px;padding:10px">🛍️</div>`}
+      <h2 style="margin:8px 0">${p.name}</h2>
+      <div style="display:flex;justify-content:center;gap:12px;font-size:13px;color:#555">
+        <span><b>রেটিং:</b> ⭐ ${p.rating || '5.0'}</span>
+        <span><b>বিক্রি:</b> ${p.sales || 0}+ পিস</span>
+        <span><b>স্টক:</b> ${p.stock ?? 0}</span>
+      </div>
+      <div style="display:flex;justify-content:center;gap:10px;align-items:center;margin:8px 0">
+        <h3 style="color:${settings.themeColor};margin:0">${money(p.price)}</h3>
+        ${p.oldPrice ? `<span style="text-decoration:line-through;color:#888">${money(p.oldPrice)}</span>` : ''}
+      </div>
+      ${p.quality ? `<p style="font-size:13px;color:#16754e;background:#e8f7ef;padding:6px;border-radius:6px;margin:5px 0"><b>পণ্যের মান:</b> ${p.quality}</p>` : ''}
+      <p style="text-align:left;background:#f9f9f9;padding:10px;border-radius:8px;font-size:13px">${p.desc || 'কোনো বিবরণ দেওয়া হয়নি।'}</p>
+
+      ${videoEmbed ? `
+        <div style="text-align:left;margin-top:10px"><b>📹 ভিডিও রিভিউ:</b></div>
+        <div class="video-container">
+          <iframe src="${videoEmbed}" allowfullscreen></iframe>
+        </div>
+      ` : ''}
+      
+      <div class="trust-icons">
+        <div class="trust-item">🛡️ কোয়ালিটি চেকড</div>
+        <div class="trust-item">📦 ইন-স্টক</div>
+      </div>
+
+      <button class="primary" onclick="closeModal('detailModal'); openOrder(${p.id})">এই পণ্যটি সরাসরি অর্ডার করুন</button>
+
+      <div class="comments-sec">
+        <b>💬 কাস্টমার রিভিউ ও কমেন্ট</b>
+        <div id="commentBox">${commentsList}</div>
+        <form onsubmit="addComment(event, ${p.id})" style="margin-top:10px">
+          <input id="cName" placeholder="আপনার নাম" required style="font-size:12px;padding:6px;margin-bottom:4px">
+          <textarea id="cText" placeholder="আপনার অনুভূতি বা মতামত লিখুন..." required rows="2" style="font-size:12px;padding:6px"></textarea>
+          <button class="primary" type="submit" style="font-size:12px;padding:6px 12px;margin-top:4px">মতামত দিন</button>
+        </form>
+      </div>
+    </div>
+  `;
+  document.getElementById("detailModal").classList.add("show");
+}
+
+function addComment(e, prodId){
+  e.preventDefault();
+  const name = document.getElementById("cName").value;
+  const text = document.getElementById("cText").value;
+  
+  let p = products.find(prod => prod.id === prodId);
+  if(p){
+    if(!p.comments) p.comments = [];
+    p.comments.push({name, text});
+    localStorage.setItem("dhong_products", JSON.stringify(products));
+    showProductDetail(prodId);
+  }
+}
+
 function openOrder(id){
  selectedProduct=products.find(p=>p.id===id);
  document.getElementById("productId").value=id;
  document.getElementById("quantity").value="1";
- document.getElementById("deliveryFee").value="60";
  updateTotal();
  document.getElementById("orderModal").classList.add("show");
 }
@@ -263,10 +365,15 @@ document.getElementById("orderForm").addEventListener("submit", function(e){
    created_at: new Date().toISOString()
  };
 
- // লোকাল স্টোরেজে অর্ডার সেভ (যাতে অ্যাডমিন প্যানেলে ইনস্ট্যান্ট দেখা যায়)
  let orders = JSON.parse(localStorage.getItem("dhong_orders")) || [];
  orders.unshift(newOrder);
  localStorage.setItem("dhong_orders", JSON.stringify(orders));
+
+ if(settings.adminEmail) {
+   const mailSubject = encodeURIComponent(`নতুন অর্ডার #${newOrder.id} - ${settings.siteName}`);
+   const mailBody = encodeURIComponent(`নতুন অর্ডার এসেছে!\nঅর্ডার ID: #DH-${newOrder.id}\nকাস্টমার নাম: ${newOrder.customer_name}\nফোন: ${newOrder.phone}\nঠিকানা: ${newOrder.address}\nপণ্য: ${selectedProduct.name} (রং: ${formData.get("color")}, সাইজ: ${formData.get("size")})\nমোট টাকা: ${totalPrice}`);
+   window.open(`mailto:${settings.adminEmail}?subject=${mailSubject}&body=${mailBody}`, '_blank');
+ }
 
  alert(`✅ অর্ডার সফলভাবে গ্রহণ করা হয়েছে!\nঅর্ডার নম্বর: #DH-${newOrder.id}\nমোট: ${money(totalPrice)}`);
  e.target.reset();
@@ -277,7 +384,6 @@ document.getElementById("trackForm").addEventListener("submit", function(e){
  e.preventDefault();
  const orderId = e.target.orderId.value.replace(/[^0-9]/g, '');
  const resultEl = document.getElementById("trackResult");
- 
  let orders = JSON.parse(localStorage.getItem("dhong_orders")) || [];
  const order = orders.find(o => String(o.id) === orderId);
 
