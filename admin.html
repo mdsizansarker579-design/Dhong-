@@ -110,11 +110,17 @@ th{color:var(--muted);font-weight:600}
       </div>
 
       <div class="field-group">পণ্যের নাম <input id="pName" required placeholder="কুর্তি বা ব্যাগ"></div>
-      <div class="field-group">ক্যাটাগরি 
-        <select id="pCat">
-          <option>পোশাক</option><option>ব্যাগ</option><option>অ্যাক্সেসরিজ</option>
-        </select>
+      
+      <!-- ডায়নামিক ক্যাটাগরি ইনপুট বক্স -->
+      <div class="field-group">ক্যাটাগরি (নিজের ইচ্ছামতো নাম লিখুন বা সিলেক্ট করুন) 
+        <input id="pCat" list="categoryList" required placeholder="যেমন: পোশাক, ব্যাগ, জুতো, কসমেটিক্স">
+        <datalist id="categoryList">
+          <option value="পোশাক">
+          <option value="ব্যাগ">
+          <option value="অ্যাক্সেসরিজ">
+        </datalist>
       </div>
+
       <div class="field-group">বর্তমান মূল্য (৳) <input type="number" id="pPrice" required placeholder="১২৫০"></div>
       <div class="field-group">পূর্বের মূল্য / ডিসকাউন্ট (৳) <input type="number" id="pOldPrice" placeholder="১৫০০"></div>
       <div class="field-group">স্টক পরিমাণ <input type="number" id="pStock" required placeholder="১০"></div>
@@ -183,12 +189,13 @@ th{color:var(--muted);font-weight:600}
       <div class="field-group">ওপরের অফার নোটিফিকেশন বার টেক্সট <input id="setTopBanner" placeholder="🎉 ঢং-এ স্বাগতম..."></div>
       <div class="field-group">ব্যানার মেইন টাইটেল/শিরোনাম <input id="setHeroTitle" placeholder="আপনার স্টাইল..."></div>
       <div class="field-group">ব্যানার সাবটাইটেল/বিবরণ <input id="setHeroSubtext" placeholder="১০০% প্রিমিয়াম..."></div>
+      <div class="field-group">ব্যানার কাউন্টডাউন টেক্সট <input id="setTimerText" placeholder="⏳ অফার শেষ হতে বাকি:"></div>
       <div class="field-group">ব্যানার সাইজ / প্যাডিং <input id="setHeroPadding" placeholder="14px"></div>
       <div class="field-group">ব্যানার ব্যাকগ্রাউন্ড কালার/গ্রেডিয়েন্ট <input id="setHeroBg" placeholder="linear-gradient(...)"></div>
 
       <hr style="margin:15px 0;border:0;border-top:1px dashed #ccc">
       <h3 class="section-title" style="color:var(--accent)">🎛️ অ্যাকশন বাটন টেক্সট এডিট</h3>
-      <div class="field-group">অর্ডার ট্র্যাক বাটন টেক্সট <input id="btnTrack" placeholder="📦 অর্ডার ট্র্যাক"></div>
+      <div class="field-group">অর্ডার ট্র্যাক বাটন টেক্সট <input id="btnTrack" placeholder="📦 ট্র্যাক"></div>
       <div class="field-group">পণ্য দেখুন বাটন টেক্সট <input id="btnViewProducts" placeholder="পণ্য দেখুন ↓"></div>
       <div class="field-group">প্রোডাক্ট কার্ডের 'অর্ডার করুন' বাটন টেক্সট <input id="btnBuyNow" placeholder="অর্ডার করুন"></div>
       <div class="field-group">বিস্তারিত পপআপের 'সরাসরি অর্ডার' বাটন টেক্সট <input id="btnDetailOrder" placeholder="সরাসরি ফর্ম পূরণ করে অর্ডার করুন"></div>
@@ -282,7 +289,7 @@ function loadAdminData() {
         <select onchange="updateOrderStatus('${order.id}', this.value)" style="padding:4px;font-size:11px;border-radius:6px">
           <option ${order.status==='Pending'?'selected':''}>Pending</option>
           <option ${order.status==='Processing'?'selected':''}>Processing</option>
-          <option ${order.status==='Completed'?'selected':''}>Completed</option>
+          <option ${order.status==='Delivered'?'selected':''}>Delivered</option>
           <option ${order.status==='Cancelled'?'selected':''}>Cancelled</option>
         </select>
       </td>
@@ -327,10 +334,11 @@ function loadAdminData() {
   document.getElementById("setTopBanner").value = settings.topBannerText || "🎉 ঢং-এ স্বাগতম | প্রথম অর্ডারে ১০% ছাড় ও ক্যাশ অন ডেলিভারি";
   document.getElementById("setHeroTitle").value = settings.heroTitleText || "আপনার স্টাইল, আপনারই গল্প।";
   document.getElementById("setHeroSubtext").value = settings.heroSubtextText || "১০০% প্রিমিয়াম কোয়ালিটি নিশ্চিতকরণে ক্যাশ অন ডেলিভারিতে অর্ডার করুন।";
+  document.getElementById("setTimerText").value = settings.timerText || "⏳ অফার শেষ হতে বাকি:";
   document.getElementById("setHeroPadding").value = settings.heroPadding || "14px";
   document.getElementById("setHeroBg").value = settings.heroBg || "linear-gradient(120deg,#242b49,#a23b5d,#ee9a8c)";
 
-  document.getElementById("btnTrack").value = settings.btnTrackText || "📦 অর্ডার ট্র্যাক";
+  document.getElementById("btnTrack").value = settings.btnTrackText || "📦 ট্র্যাক";
   document.getElementById("btnViewProducts").value = settings.btnViewProductsText || "পণ্য দেখুন ↓";
   document.getElementById("btnBuyNow").value = settings.btnBuyNowText || "অর্ডার করুন";
   document.getElementById("btnDetailOrder").value = settings.btnDetailOrderText || "সরাসরি ফর্ম পূরণ করে অর্ডার করুন";
@@ -376,7 +384,7 @@ document.getElementById("productForm").addEventListener("submit", function(e){
   const productData = {
     id: editIdx !== "" ? products[editIdx].id : Date.now(),
     name: document.getElementById("pName").value,
-    cat: document.getElementById("pCat").value,
+    cat: document.getElementById("pCat").value.trim(),
     price: Number(document.getElementById("pPrice").value),
     oldPrice: Number(document.getElementById("pOldPrice").value) || 0,
     stock: Number(document.getElementById("pStock").value),
@@ -453,6 +461,7 @@ document.getElementById("settingsForm").addEventListener("submit", function(e){
     topBannerText: document.getElementById("setTopBanner").value,
     heroTitleText: document.getElementById("setHeroTitle").value,
     heroSubtextText: document.getElementById("setHeroSubtext").value,
+    timerText: document.getElementById("setTimerText").value,
     heroPadding: document.getElementById("setHeroPadding").value,
     heroBg: document.getElementById("setHeroBg").value,
     btnTrackText: document.getElementById("btnTrack").value,
@@ -465,7 +474,7 @@ document.getElementById("settingsForm").addEventListener("submit", function(e){
     btnCallNowText: document.getElementById("btnCallNow").value
   };
   localStorage.setItem("dhong_settings", JSON.stringify(settings));
-  alert("✅ সমস্ত সেটিংস ও বাটন টেক্সট সফলভাবে সেভ হয়েছে!");
+  alert("✅ সমস্ত সেটিংস সফলভাবে সেভ হয়েছে!");
 });
 
 window.onload = loadAdminData;
