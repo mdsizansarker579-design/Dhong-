@@ -259,24 +259,29 @@ footer{background:var(--top-bg);color:white;padding:20px;line-height:1.6;font-si
     products = data ? (Array.isArray(data) ? data : Object.values(data)) : [];
     renderProducts();
 
+    // শক্তিশালী URL পার্সার যা ফায়ারবেস ডাটা আসার সাথে সাথে পপআপ ওপেন করবে
     if(!hasCheckedParam && products.length > 0) {
       hasCheckedParam = true;
-      const urlParams = new URLSearchParams(window.location.search);
-      let prodId = urlParams.get("product");
       
-      if(!prodId && window.location.href.includes("product=")) {
+      let targetId = null;
+      const fullUrl = window.location.href;
+      
+      if(fullUrl.includes("product=")) {
         try {
-          prodId = window.location.href.split("product=")[1].split("&")[0];
+          const parts = fullUrl.split("product=");
+          if(parts.length > 1) {
+            targetId = parts[1].split("&")[0].split("#")[0];
+          }
         } catch(e) {}
       }
 
-      if(prodId) {
+      if(targetId) {
         setTimeout(() => {
-          const found = products.find(p => String(p.id) === String(prodId));
+          const found = products.find(p => String(p.id) === String(targetId));
           if(found) {
             showProductDetail(found.id);
           }
-        }, 200);
+        }, 400);
       }
     }
   });
@@ -666,7 +671,7 @@ function startTimer() {
         let m = String(Math.floor((timeLeft % 3600) / 60)).padStart(2, '0');
         let s = String(timeLeft % 60).padStart(2, '0');
         let tText = settings.timerText || "⏳ অফার শেষ হতে বাকি:";
-        timerEl.textContent = `${tText} ${h}:${m}:${s}`;
+        timerEl.textContent = `${tText} `${h}:${m}:${s}`;
       } else {
         isTimerExpired = true;
         timerEl.textContent = "⏳ অফার শেষ!";
