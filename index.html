@@ -71,14 +71,18 @@ footer{background:var(--top-bg);color:white;padding:20px;line-height:1.6;font-si
 .color-thumb{width:55px;height:55px;border-radius:8px;border:2px solid #ddd;cursor:pointer;object-fit:cover;flex-shrink:0}
 .color-thumb.active{border-color:var(--primary-color);transform:scale(1.05)}
 
+.video-container{position:relative;padding-bottom:56.25%;height:0;margin:8px 0}
+.video-container iframe{position:absolute;inset:0;width:100%;height:100%;border:0;border-radius:8px}
+
 .comments-sec{margin-top:12px;text-align:left;border-top:1px solid #eee;padding-top:12px}
 .comment-item{background:#f9f9f9;padding:6px 10px;border-radius:6px;margin:4px 0;font-size:12px}
+.comments-sec input,.comments-sec textarea{display:block;width:100%;border:1px solid #ddd;border-radius:8px}
 @media(max-width:700px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.art{height:135px}.hero h1{font-size:18px}.benefits{grid-template-columns:1fr}header{padding:10px}.search{order:3;flex-basis:100%}}
 </style>
 </head>
 <body>
 
-<div class="top" id="topBanner">🎉 ঢং-এ স্বাগতম | প্রথম অর্ডারে ১০% ছাড় ও ক্যাশ অন ডেলিভারি</div>
+<div class="top" id="topBanner">🎉 ঢং-এ স্বাগতম | প্রথম অর্ডারে ১০% ছাড় ও ক্যাশ অন ডেলিভারি</div>
 
 <header>
   <div class="logo" id="logoText">DHONG DHONG</div>
@@ -88,7 +92,7 @@ footer{background:var(--top-bg);color:white;padding:20px;line-height:1.6;font-si
 
 <section class="hero" id="heroBox">
   <h1 id="heroTitle">আপনার স্টাইল, আপনারই গল্প।</h1>
-  <p id="heroSubtext">১০০% প্রিমিয়াম কোয়ালিটি নিশ্চিতকরণে ক্যাশ অন ডেলিভারিতে অর্ডার করুন।</p>
+  <p id="heroSubtext">১০০% প্রিমিয়াম কোয়ালিটি নিশ্চিতকরণে ক্যাশ অন ডেলিভারিতে অর্ডার করুন।</p>
   <div class="timer-box" id="countdownTimer">⏳ অফার শেষ হতে বাকি: --:--:--</div>
   <div>
     <button onclick="document.getElementById('products').scrollIntoView({behavior:'smooth'})" class="primary" id="heroBtnText" style="background:white;color:#182230;padding:6px 12px;font-size:12px">পণ্য দেখুন ↓</button>
@@ -96,9 +100,9 @@ footer{background:var(--top-bg);color:white;padding:20px;line-height:1.6;font-si
 </section>
 
 <main id="products">
-  <h2 style="font-size:18px;margin:10px 0">জনপ্রিয় পণ্য</h2>
+  <h2 style="font-size:18px;margin:10px 0">জনপ্রিয় পণ্য</h2>
   <div class="categories" id="categoryContainer"></div>
-  
+
   <div class="grid" id="grid"></div>
 
   <div class="benefits">
@@ -226,51 +230,7 @@ footer{background:var(--top-bg);color:white;padding:20px;line-height:1.6;font-si
   let isTimerExpired = false;
   let timerInterval = null;
   let hasOpenedPopup = false;
-
-  function getUrlParameter(name) {
-    let url = window.location.href;
-    let idx = url.indexOf("product=");
-    if(idx !== -1) {
-      let val = url.substring(idx + 8).split("&")[0].split("#")[0];
-      return val;
-    }
-    return null;
-  }
-
-  // পেজ লোড হওয়ার সাথে সাথেই ব্যাকগ্রাউন্ড থেকে ডেটা নিয়ে এসে প্রোডাক্ট পপআপ ওপেন করবে
-  db.ref('dhong_products').on('value', snapshot => {
-    let data = snapshot.val();
-    products = data ? (Array.isArray(data) ? data : Object.values(data)) : [];
-    
-    // প্রথমে সম্পূর্ণ পেজের প্রোডাক্ট রেন্ডার করে দেব, যাতে পেজ কখনো ফাঁকা না থাকে
-    renderProducts();
-
-    // এরপর চেক করবে লিংকে নির্দিষ্ট কোনো প্রোডাক্ট আইডি আছে কি না, থাকলে পপআপ ওপেন করবে
-    if (!hasOpenedPopup && products.length > 0) {
-      let targetProductId = getUrlParameter('product');
-      if (targetProductId) {
-        let found = products.find(p => String(p.id) === String(targetProductId));
-        if (found) {
-          hasOpenedPopup = true;
-          showProductDetail(found.id);
-        }
-      }
-    }
-  });
-
-  db.ref('dhong_orders').on('value', snapshot => {
-    let data = snapshot.val();
-    orders = data ? (Array.isArray(data) ? data : Object.values(data)) : [];
-  });
-
-  db.ref('dhong_settings').on('value', snapshot => {
-    let data = snapshot.val();
-    if(data) {
-      settings = { ...settings, ...data };
-      applySettings();
-      startTimer();
-    }
-  });
+  let category = "সব", selectedProduct = null;
 
   let settings = {
     siteName: "ঢং DHONG",
@@ -281,9 +241,9 @@ footer{background:var(--top-bg);color:white;padding:20px;line-height:1.6;font-si
     phone: "01700000000",
     adminEmail: "",
     freeThreshold: "3000",
-    topBannerText: "🎉 ঢং-এ স্বাগতম | প্রথম অর্ডারে ১০% ছাড় ও ক্যাশ অন ডেলিভারি",
+    topBannerText: "🎉 ঢং-এ স্বাগতম | প্রথম অর্ডারে ১০% ছাড় ও ক্যাশ অন ডেলিভারি",
     heroTitleText: "আপনার স্টাইল, আপনারই গল্প।",
-    heroSubtextText: "১০০% প্রিমিয়াম কোয়ালিটি নিশ্চিতকরণে ক্যাশ অন ডেলিভারিতে অর্ডার করুন।",
+    heroSubtextText: "১০০% প্রিমিয়াম কোয়ালিটি নিশ্চিতকরণে ক্যাশ অন ডেলিভারিতে অর্ডার করুন।",
     timerStatus: "show",
     timerHours: "24",
     timerText: "⏳ অফার শেষ হতে বাকি:",
@@ -299,15 +259,54 @@ footer{background:var(--top-bg);color:white;padding:20px;line-height:1.6;font-si
     btnCallNowText: "📞 Call Now"
   };
 
+  // লিংক থেকে ?product=ID বা #product=ID পড়ে
+  function getUrlParameter(name) {
+    const m = window.location.href.match(new RegExp('[?&#]' + name + '=([^&#]*)'));
+    return m ? decodeURIComponent(m[1]) : null;
+  }
+
+  // সিঙ্গেল পণ্যের লিংক হলে শুধু ওই পণ্য দেখাবে
+  let singleProductId = getUrlParameter('product');
+  let showAllProducts = false;
+
+  db.ref('dhong_products').on('value', snapshot => {
+    let data = snapshot.val();
+    products = (data ? (Array.isArray(data) ? data : Object.values(data)) : []).filter(Boolean);
+
+    try { renderProducts(); } catch (err) { console.error("renderProducts error:", err); }
+
+    if (!hasOpenedPopup && singleProductId) {
+      const found = products.find(p => String(p.id) === String(singleProductId));
+      if (found) {
+        hasOpenedPopup = true;
+        try { showProductDetail(found.id); } catch (err) { console.error("showProductDetail error:", err); }
+      }
+    }
+  }, err => console.error("Firebase products read error:", err));
+
+  db.ref('dhong_orders').on('value', snapshot => {
+    let data = snapshot.val();
+    orders = (data ? (Array.isArray(data) ? data : Object.values(data)) : []).filter(Boolean);
+  }, err => console.error("Firebase orders read error:", err));
+
+  db.ref('dhong_settings').on('value', snapshot => {
+    let data = snapshot.val();
+    if (data) {
+      settings = { ...settings, ...data };
+      applySettings();
+      startTimer();
+    }
+  }, err => console.error("Firebase settings read error:", err));
+
 function applySettings() {
   document.documentElement.style.setProperty('--primary-color', settings.themeColor);
   document.getElementById("logoText").textContent = settings.siteName;
   document.getElementById("footerLogo").textContent = settings.siteName;
   document.getElementById("siteTitle").textContent = settings.siteName + " | Customer Panel";
 
-  document.getElementById("topBanner").textContent = settings.topBannerText || "🎉 ঢং-এ স্বাগতম | প্রথম অর্ডারে ১০% ছাড়";
+  document.getElementById("topBanner").textContent = settings.topBannerText || "🎉 ঢং-এ স্বাগতম | প্রথম অর্ডারে ১০% ছাড়";
   document.getElementById("heroTitle").textContent = settings.heroTitleText || "আপনার স্টাইল, আপনারই গল্প।";
-  document.getElementById("heroSubtext").textContent = settings.heroSubtextText || "১০০% প্রিমিয়াম কোয়ালিটি নিশ্চিতকরণে অর্ডার করুন।";
+  document.getElementById("heroSubtext").textContent = settings.heroSubtextText || "১০০% প্রিমিয়াম কোয়ালিটি নিশ্চিতকরণে অর্ডার করুন।";
   document.getElementById("heroBtnText").textContent = settings.btnViewProductsText || "পণ্য দেখুন ↓";
   document.getElementById("btnTrackEl").textContent = settings.btnTrackText || "📦 ট্র্যাক";
   document.getElementById("footerTrackBtn").textContent = settings.btnTrackText ? "আমার " + settings.btnTrackText : "আমার অর্ডার ট্র্যাক করুন";
@@ -318,7 +317,7 @@ function applySettings() {
   heroEl.style.background = settings.heroBg || "linear-gradient(120deg,#242b49,#a23b5d,#ee9a8c)";
 
   const timerEl = document.getElementById("countdownTimer");
-  if(settings.timerStatus === "hide") {
+  if (settings.timerStatus === "hide") {
     timerEl.style.display = "none";
   } else {
     timerEl.style.display = "inline-block";
@@ -339,28 +338,44 @@ function renderSupport(){
   box.innerHTML = html;
 }
 
-let category="সব", selectedProduct=null;
 function money(n){ return "৳"+Number(n).toLocaleString("en-US"); }
 
 function renderCategories(){
-  let cats = ["সব", ...new Set(products.map(p => p.cat).filter(Boolean))];
   const catBox = document.getElementById("categoryContainer");
+  // সিঙ্গেল পণ্য মোডে ক্যাটাগরি বাটন লুকানো থাকবে
+  if (singleProductId && !showAllProducts) { catBox.innerHTML = ""; return; }
+  let cats = ["সব", ...new Set(products.map(p => p.cat).filter(Boolean))];
   catBox.innerHTML = cats.map(c => `
     <button class="${category === c ? 'active-cat' : ''}" onclick="setCategory('${c}')">${c === 'সব' ? 'সব পণ্য' : c}</button>
   `).join("");
 }
 
+function showAll(){
+  showAllProducts = true;
+  renderProducts();
+}
+
 function renderProducts(){
  renderCategories();
  const q=document.getElementById("search").value.toLowerCase();
- const list=products.filter(p=>(category==="সব"||p.cat===category)&&p.name.toLowerCase().includes(q));
- 
- document.getElementById("grid").innerHTML=list.map(p=>{
+
+ let list = products.filter(p => (category==="সব"||p.cat===category) && String(p.name||"").toLowerCase().includes(q));
+
+ // শুধু একটি পণ্যের লিংক হলে ওই পণ্যই দেখাবে
+ if (singleProductId && !showAllProducts) {
+   list = products.filter(p => String(p.id) === String(singleProductId));
+ }
+
+ const bar = (singleProductId && !showAllProducts)
+   ? `<div style="grid-column:1/-1;text-align:center"><button class="primary" onclick="showAll()">সব পণ্য দেখুন</button></div>`
+   : "";
+
+ document.getElementById("grid").innerHTML = bar + list.map(p=>{
   let activePrice = (isTimerExpired && p.oldPrice) ? p.oldPrice : p.price;
   let displayOldPrice = (!isTimerExpired && p.oldPrice && p.oldPrice > p.price) ? p.oldPrice : "";
 
   return `
-  <article class="product" onclick="showProductDetail(${p.id})">
+  <article class="product" onclick="showProductDetail('${p.id}')">
    <div class="art">
     <div class="badge-row">
       <span class="stock-badge ${p.stock <= 0 ? 'out' : ''}">${p.stock <= 0 ? 'Stock Out' : 'স্টক: ' + p.stock}</span>
@@ -374,8 +389,8 @@ function renderProducts(){
      <div class="price">${money(activePrice)}</div>
      ${displayOldPrice ? `<div class="old-price">${money(displayOldPrice)}</div>` : ''}
     </div>
-    <div class="sales-badge">🔥 <b>${p.sales || 0}+</b> পিস বিক্রি হয়েছে</div>
-    <button class="buy" ${p.stock <= 0 ? 'disabled' : ''} onclick="event.stopPropagation(); openOrder(${p.id})">${p.stock <= 0 ? 'স্টক শেষ' : (settings.btnBuyNowText || 'অর্ডার করুন')}</button>
+    <div class="sales-badge">🔥 <b>${p.sales || 0}+</b> পিস বিক্রি হয়েছে</div>
+    <button class="buy" ${p.stock <= 0 ? 'disabled' : ''} onclick="event.stopPropagation(); currentSelectedImg=''; openOrder('${p.id}')">${p.stock <= 0 ? 'স্টক শেষ' : (settings.btnBuyNowText || 'অর্ডার করুন')}</button>
    </div>
   </article>
  `}).join("");
@@ -411,7 +426,7 @@ function showProductDetail(id){
   if(allImages.length > 0) {
     let slides = allImages.map((img, idx) => `<div class="slider-item"><img src="${img}"></div>`).join("");
     let thumbs = allImages.map((img, idx) => `<img src="${img}" class="color-thumb ${idx===0?'active':''}" onclick="slideImage(${idx}, '${img}', this)">`).join("");
-    
+
     sliderHtml = `
       <div class="slider-container" id="sliderContainer">
         <div class="slider-track" id="sliderTrack" style="width:${allImages.length * 100}%">
@@ -446,7 +461,7 @@ function showProductDetail(id){
         ${displayOldPrice ? `<span style="text-decoration:line-through;color:#888;font-size:12px">${money(displayOldPrice)}</span>` : ''}
       </div>
       ${p.quality ? `<p style="font-size:12px;color:#16754e;background:#e8f7ef;padding:6px;border-radius:6px;margin:5px 0"><b>পণ্যের মান:</b> ${p.quality}</p>` : ''}
-      <p style="text-align:left;background:#f9f9f9;padding:8px;border-radius:8px;font-size:12px">${p.desc || 'কোনো বিবরণ দেওয়া হয়নি।'}</p>
+      <p style="text-align:left;background:#f9f9f9;padding:8px;border-radius:8px;font-size:12px">${p.desc || 'কোনো বিবরণ দেওয়া হয়নি।'}</p>
 
       ${videoEmbed ? `
         <div style="text-align:left;margin-top:8px;font-size:12px"><b>📹 ভিডিও রিভিউ:</b></div>
@@ -454,15 +469,15 @@ function showProductDetail(id){
           <iframe src="${videoEmbed}" allowfullscreen></iframe>
         </div>
       ` : ''}
-      
-      <button class="primary" ${p.stock <= 0 ? 'disabled' : ''} onclick="closeModal('detailModal'); openOrder(${p.id})">${p.stock <= 0 ? 'স্টক শেষ' : (settings.btnDetailOrderText || 'সরাসরি ফর্ম পূরণ করে অর্ডার করুন')}</button>
-      
+
+      <button class="primary" ${p.stock <= 0 ? 'disabled' : ''} onclick="closeModal('detailModal'); openOrder('${p.id}')">${p.stock <= 0 ? 'স্টক শেষ' : (settings.btnDetailOrderText || 'সরাসরি ফর্ম পূরণ করে অর্ডার করুন')}</button>
+
       ${settings.whatsapp ? `<a href="https://wa.me/${settings.whatsapp}?text=${waOrderText}" target="_blank" class="support-btn wa-order">${settings.btnWaOrderText || "💬 WhatsApp-এ এই পণ্যটি অর্ডার করুন"}</a>` : ''}
 
       <div class="comments-sec">
         <b>💬 কাস্টমার রিভিউ ও কমেন্ট</b>
         <div id="commentBox">${commentsList}</div>
-        <form onsubmit="addComment(event, ${p.id})" style="margin-top:8px">
+        <form onsubmit="addComment(event, '${p.id}')" style="margin-top:8px">
           <input id="cName" placeholder="আপনার নাম" required style="font-size:12px;padding:6px;margin-bottom:4px">
           <textarea id="cText" placeholder="আপনার মতামত লিখুন..." required rows="2" style="font-size:12px;padding:6px"></textarea>
           <button class="primary" type="submit" style="font-size:11px;padding:6px 10px;margin-top:4px">মতামত দিন</button>
@@ -479,9 +494,9 @@ function slideImage(index, imgUrl, el) {
   const track = document.getElementById("sliderTrack");
   const counter = document.getElementById("itemCounter");
   if(track) {
-    track.style.transform = `translateX(-${index * 100}%)`;
+    track.style.transform = `translateX(-${index * 100 / track.children.length}%)`;
     const total = track.children.length;
-    counter.textContent = `Item ${index + 1}/${total} | Design Selected`;
+    if(counter) counter.textContent = `Item ${index + 1}/${total} | Design Selected`;
   }
   document.querySelectorAll(".color-thumb").forEach(t => t.classList.remove("active"));
   if(el) el.classList.add("active");
@@ -522,6 +537,7 @@ function addComment(e, prodId){
 
 function openOrder(id){
  selectedProduct = products.find(p => String(p.id) === String(id));
+ if(!selectedProduct) return;
  document.getElementById("productId").value = id;
  document.getElementById("quantity").value = "1";
 
@@ -545,13 +561,13 @@ function updateTotal(){
  if(selectedProduct){
   const qty=Number(document.getElementById("quantity").value);
   let delivery=Number(document.getElementById("deliveryFee").value);
-  
+
   let activeUnitPrice = (isTimerExpired && selectedProduct.oldPrice) ? selectedProduct.oldPrice : selectedProduct.price;
   const subtotal = activeUnitPrice * qty;
-  
+
   let isFirstOrder = !localStorage.getItem("dhong_ordered_before");
-  let discount = isFirstOrder ? subtotal * 0.1 : 0; 
-  
+  let discount = isFirstOrder ? subtotal * 0.1 : 0;
+
   if(settings.freeThreshold && subtotal >= Number(settings.freeThreshold)){
     delivery = 0;
   }
@@ -569,8 +585,8 @@ function updateTotal(){
 
 function openTrack(){ document.getElementById("trackModal").classList.add("show"); }
 
-function closeModal(id){ 
-  document.getElementById(id).classList.remove("show"); 
+function closeModal(id){
+  document.getElementById(id).classList.remove("show");
   document.getElementById("supportButtons").style.display = "flex";
 }
 
@@ -579,10 +595,10 @@ document.getElementById("orderForm").addEventListener("submit", function(e){
  const formData = new FormData(e.target);
  const qty = Number(formData.get("quantity"));
  let delivery = Number(formData.get("deliveryFee"));
- 
+
  let activeUnitPrice = (isTimerExpired && selectedProduct.oldPrice) ? selectedProduct.oldPrice : selectedProduct.price;
  const subtotal = activeUnitPrice * qty;
- 
+
  let isFirstOrder = !localStorage.getItem("dhong_ordered_before");
  let discount = isFirstOrder ? subtotal * 0.1 : 0;
  if(settings.freeThreshold && subtotal >= Number(settings.freeThreshold)){
@@ -622,7 +638,7 @@ document.getElementById("orderForm").addEventListener("submit", function(e){
    db.ref('dhong_products').set(products);
  }
 
- alert(`✅ অর্ডার সফলভাবে গ্রহণ করা হয়েছে!\nঅর্ডার নম্বর: #DH-${newOrder.id}\nমোট: ঠিক আছে`);
+ alert(`✅ অর্ডার সফলভাবে গ্রহণ করা হয়েছে!\nঅর্ডার নম্বর: #DH-${newOrder.id}\nমোট: ${money(totalPrice)}`);
  e.target.reset();
  closeModal("orderModal");
  renderProducts();
@@ -637,13 +653,13 @@ document.getElementById("trackForm").addEventListener("submit", function(e){
  if(order) {
    resultEl.innerHTML = `<br><b>অর্ডার নম্বর:</b> #DH-${order.id}<br><b>নাম:</b> ${order.customer_name}<br><b>স্ট্যাটাস:</b> <span style="color:green;font-weight:bold">${order.status}</span>`;
  } else {
-   resultEl.textContent = "কোনো অর্ডার পাওয়া যায়নি।";
+   resultEl.textContent = "কোনো অর্ডার পাওয়া যায়নি।";
  }
 });
 
 function startTimer() {
   if(timerInterval) clearInterval(timerInterval);
-  
+
   let hours = Number(settings.timerHours) || 24;
   let totalSeconds = hours * 3600;
 
