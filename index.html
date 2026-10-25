@@ -23,13 +23,11 @@ main{max-width:1100px;margin:25px auto;padding:0 14px}
 .categories button{background:white;border:1px solid #ddd;white-space:nowrap}
 .grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
 .product{background:white;border:1px solid #e5e7eb;border-radius:13px;overflow:hidden}
-.art{height:160px;display:grid;place-items:center;background:linear-gradient(135deg,#f8dfe4,#e4e9f7)}
-.shape{width:90px;height:110px;border-radius:25px 25px 10px 10px;background:linear-gradient(135deg,#a04c67,#e99aa8)}
-.product:nth-child(even) .shape{background:linear-gradient(135deg,#303d67,#7785b6)}
+.art{height:160px;display:grid;place-items:center;background:#f0f2f5}
+.art img{width:100%;height:100%;object-fit:cover}
 .info{padding:12px}
 .info h3{font-size:14px;min-height:35px}
 .price{font-size:17px;font-weight:bold}
-.old{font-size:12px;text-decoration:line-through;color:#888}
 .buy{width:100%;margin-top:12px;background:#e85d75;color:white;font-weight:bold}
 .benefits{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:25px 0}
 .benefit{background:white;border:1px solid #eee;padding:15px;border-radius:12px}
@@ -42,7 +40,9 @@ footer{background:#17243a;color:white;padding:25px;line-height:1.8}
 .field input,.field select,.field textarea{display:block;width:100%;padding:11px;margin-top:6px;border:1px solid #ddd;border-radius:8px}
 .modal .primary{width:100%;margin-top:10px}
 .close{float:right;background:#eee}
-.note{font-size:12px;color:#666;line-height:1.6}
+.float-support{position:fixed;bottom:20px;right:20px;display:flex;flex-direction:column;gap:10px;z-index:99}
+.support-btn{background:#25d366;color:white;padding:12px 16px;border-radius:30px;font-weight:bold;text-decoration:none;box-shadow:0 4px 10px rgba(0,0,0,0.2);display:flex;align-items:center;gap:8px;font-size:14px}
+.support-btn.call{background:#007bff}
 @media(max-width:700px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.art{height:135px}.hero h1{font-size:27px}.benefits{grid-template-columns:1fr}header{padding:10px}.search{order:3;flex-basis:100%}}
 </style>
 </head>
@@ -85,6 +85,12 @@ footer{background:#17243a;color:white;padding:25px;line-height:1.8}
   <button onclick="openTrack()">আমার অর্ডার ট্র্যাক করুন</button>
 </footer>
 
+<!-- কাস্টমার সার্ভিস ফ্লোটিং বাটন -->
+<div class="float-support" id="supportButtons">
+  <!-- ডায়নামিকালি যুক্ত হবে -->
+</div>
+
+<!-- অর্ডার মডাল -->
 <div class="modalbg" id="orderModal">
   <div class="modal">
     <button class="close" onclick="closeModal('orderModal')">✕</button>
@@ -141,12 +147,6 @@ footer{background:#17243a;color:white;padding:25px;line-height:1.8}
         <textarea name="address" required rows="3" placeholder="বাসা, রোড, এলাকা, থানা"></textarea>
       </label>
 
-      <label class="field">পেমেন্ট পদ্ধতি
-        <select name="payment">
-          <option>ক্যাশ অন ডেলিভারি</option>
-        </select>
-      </label>
-
       <p><b id="summary">মোট: ৳০</b></p>
       <button class="primary" type="submit" id="submitBtn">অর্ডার নিশ্চিত করুন</button>
     </form>
@@ -159,7 +159,7 @@ footer{background:#17243a;color:white;padding:25px;line-height:1.8}
     <h2>অর্ডার ট্র্যাক করুন</h2>
     <form id="trackForm">
       <label class="field">অর্ডার নম্বর
-        <input name="orderId" required placeholder="যেমন 1, 2, 3...">
+        <input name="orderId" required placeholder="যেমন: 1, 2, 3...">
       </label>
       <button class="primary" type="submit">স্ট্যাটাস দেখুন</button>
     </form>
@@ -168,18 +168,32 @@ footer{background:#17243a;color:white;padding:25px;line-height:1.8}
 </div>
 
 <script>
-const API_URL = "https://dhong-api.mdsizansarker579.workers.dev";
-
-const products=[
- {id:1,name:"এলিগ্যান্ট কটন কুর্তি",cat:"পোশাক",price:1250},
- {id:2,name:"প্রিমিয়াম ক্রসব্যাগ",cat:"ব্যাগ",price:950},
- {id:3,name:"সফট কালার থ্রি-পিস",cat:"পোশাক",price:1850},
- {id:4,name:"ক্লাসিক হ্যান্ডব্যাগ",cat:"ব্যাগ",price:1450},
- {id:5,name:"ডেইলি ওয়্যার টপ",cat:"পোশাক",price:780},
- {id:6,name:"স্টাইলিশ ওয়ালেট",cat:"অ্যাক্সেসরিজ",price:550},
- {id:7,name:"ফ্যাশন স্কার্ফ",cat:"অ্যাক্সেসরিজ",price:420},
- {id:8,name:"মিনিমাল শোল্ডার ব্যাগ",cat:"ব্যাগ",price:1150}
+// ডিফল্ট পণ্য তালিকা (যদি অ্যাডমিন প্যানেল থেকে এডিট করা না হয়)
+let products = JSON.parse(localStorage.getItem("dhong_products")) || [
+ {id:1,name:"এলিগ্যান্ট কটন কুর্তি",cat:"পোশাক",price:1250,img:""},
+ {id:2,name:"প্রিমিয়াম ক্রসব্যাগ",cat:"ব্যাগ",price:950,img:""},
+ {id:3,name:"সফট কালার থ্রি-পিস",cat:"পোশাক",price:1850,img:""},
+ {id:4,name:"ক্লাসিক হ্যান্ডব্যাগ",cat:"ব্যাগ",price:1450,img:""}
 ];
+
+let settings = JSON.parse(localStorage.getItem("dhong_settings")) || {
+  whatsapp: "8801700000000",
+  phone: "01700000000",
+  sheetUrl: ""
+};
+
+// কাস্টমার সার্ভিস বাটন লোড
+function renderSupport(){
+  const box = document.getElementById("supportButtons");
+  let html = "";
+  if(settings.whatsapp) {
+    html += `<a href="https://wa.me/${settings.whatsapp}" target="_blank" class="support-btn">💬 WhatsApp চ্যাট</a>`;
+  }
+  if(settings.phone) {
+    html += `<a href="tel:${settings.phone}" class="support-btn call">📞 কল করুন</a>`;
+  }
+  box.innerHTML = html;
+}
 
 let category="সব", selectedProduct=null;
 
@@ -190,7 +204,7 @@ function renderProducts(){
  const list=products.filter(p=>(category==="সব"||p.cat===category)&&p.name.toLowerCase().includes(q));
  document.getElementById("grid").innerHTML=list.map(p=>`
   <article class="product">
-   <div class="art"><div class="shape"></div></div>
+   <div class="art">${p.img ? `<img src="${p.img}" alt="${p.name}">` : `<div style="font-size:30px">🛍️</div>`}</div>
    <div class="info">
     <small>${p.cat}</small>
     <h3>${p.name}</h3>
@@ -224,81 +238,58 @@ function updateTotal(){
 function openTrack(){ document.getElementById("trackModal").classList.add("show"); }
 function closeModal(id){ document.getElementById(id).classList.remove("show"); }
 
-document.getElementById("orderForm").addEventListener("submit", async function(e){
+document.getElementById("orderForm").addEventListener("submit", function(e){
  e.preventDefault();
- const submitBtn = document.getElementById("submitBtn");
- submitBtn.disabled = true;
- submitBtn.textContent = "অর্ডার প্রসেস হচ্ছে...";
-
  const formData = new FormData(e.target);
  const qty = Number(formData.get("quantity"));
  const delivery = Number(formData.get("deliveryFee"));
  const totalPrice = (selectedProduct.price * qty) + delivery;
 
- const payload = {
-   name: formData.get("name"),
+ const newOrder = {
+   id: Date.now().toString().slice(-4),
+   customer_name: formData.get("name"),
    phone: formData.get("phone"),
    address: formData.get("address"),
-   items: [{
-     id: selectedProduct.id,
+   items_json: JSON.stringify([{
      name: selectedProduct.name,
      price: selectedProduct.price,
      quantity: qty,
      color: formData.get("color"),
      size: formData.get("size"),
      deliveryFee: delivery
-   }],
-   total: totalPrice
+   }]),
+   total: totalPrice,
+   status: "pending",
+   created_at: new Date().toISOString()
  };
 
- try {
-   const res = await fetch(`${API_URL}/api/orders`, {
-     method: "POST",
-     headers: { "Content-Type": "application/json" },
-     body: JSON.stringify(payload)
-   });
+ // লোকাল স্টোরেজে অর্ডার সেভ (যাতে অ্যাডমিন প্যানেলে ইনস্ট্যান্ট দেখা যায়)
+ let orders = JSON.parse(localStorage.getItem("dhong_orders")) || [];
+ orders.unshift(newOrder);
+ localStorage.setItem("dhong_orders", JSON.stringify(orders));
 
-   const data = await res.json();
-
-   if(res.ok && data.success) {
-     alert(`✅ সফল! অর্ডার নম্বর: #DH-${data.orderId}\nমোট: ${money(totalPrice)}`);
-     e.target.reset();
-     closeModal("orderModal");
-   } else {
-     alert("❌ সমস্যা: " + (data.error || "অর্ডার জমা হয়নি"));
-   }
- } catch(err) {
-   alert("❌ নেটওয়ার্ক কানেকশন সমস্যা।");
- } finally {
-   submitBtn.disabled = false;
-   submitBtn.textContent = "অর্ডার নিশ্চিত করুন";
- }
+ alert(`✅ অর্ডার সফলভাবে গ্রহণ করা হয়েছে!\nঅর্ডার নম্বর: #DH-${newOrder.id}\nমোট: ${money(totalPrice)}`);
+ e.target.reset();
+ closeModal("orderModal");
 });
 
-document.getElementById("trackForm").addEventListener("submit", async function(e){
+document.getElementById("trackForm").addEventListener("submit", function(e){
  e.preventDefault();
  const orderId = e.target.orderId.value.replace(/[^0-9]/g, '');
  const resultEl = document.getElementById("trackResult");
- resultEl.textContent = "খোঁজ করা হচ্ছে...";
+ 
+ let orders = JSON.parse(localStorage.getItem("dhong_orders")) || [];
+ const order = orders.find(o => String(o.id) === orderId);
 
- try {
-   const res = await fetch(`${API_URL}/api/admin/orders`);
-   const data = await res.json();
-   
-   if(data.success && data.orders) {
-     const order = data.orders.find(o => String(o.id) === orderId);
-     if(order) {
-       resultEl.innerHTML = `<br><b>অর্ডার নম্বর:</b> #DH-${order.id}<br><b>নাম:</b> ${order.customer_name}<br><b>স্ট্যাটাস:</b> <span style="color:green;font-weight:bold">${order.status}</span>`;
-     } else {
-       resultEl.textContent = "কোনো অর্ডার পাওয়া যায়নি।";
-     }
-   }
- } catch(err) {
-   resultEl.textContent = "ট্র্যাকিং স্ট্যাটাস আনতে সমস্যা হয়েছে।";
+ if(order) {
+   resultEl.innerHTML = `<br><b>অর্ডার নম্বর:</b> #DH-${order.id}<br><b>নাম:</b> ${order.customer_name}<br><b>স্ট্যাটাস:</b> <span style="color:green;font-weight:bold">${order.status}</span>`;
+ } else {
+   resultEl.textContent = "কোনো অর্ডার পাওয়া যায়নি।";
  }
 });
 
 renderProducts();
+renderSupport();
 </script>
 </body>
 </html>
