@@ -225,6 +225,7 @@ footer{background:var(--top-bg);color:white;padding:20px;line-height:1.6;font-si
   let currentSelectedImg = "";
   let isTimerExpired = false;
   let timerInterval = null;
+  let hasOpenedParamProduct = false; // একবার ওপেন হলে বারবার যেন রিলোড না হয়
 
   let settings = {
     siteName: "ঢং DHONG",
@@ -257,6 +258,19 @@ footer{background:var(--top-bg);color:white;padding:20px;line-height:1.6;font-si
     let data = snapshot.val();
     products = data ? (Array.isArray(data) ? data : Object.values(data)) : [];
     renderProducts();
+    
+    // ডাটা লোড হওয়ার সাথে সাথেই লিংকের প্রডাক্ট আইডি চেক করে পপআপ ওপেন করবে
+    if(!hasOpenedParamProduct) {
+      const params = new URLSearchParams(window.location.search);
+      const prodParam = params.get("product");
+      if(prodParam) {
+        const found = products.find(p => String(p.id) === String(prodParam));
+        if(found) {
+          hasOpenedParamProduct = true;
+          showProductDetail(found.id);
+        }
+      }
+    }
   });
 
   db.ref('dhong_orders').on('value', snapshot => {
@@ -269,7 +283,7 @@ footer{background:var(--top-bg);color:white;padding:20px;line-height:1.6;font-si
     if(data) {
       settings = { ...settings, ...data };
       applySettings();
-      startTimer(); // সেটিংস বদলানোর সাথে সাথে নতুন সময় অনুযায়ী টাইমার রি-স্টার্ট হবে
+      startTimer();
     }
   });
 
@@ -365,7 +379,7 @@ function getYoutubeEmbed(url) {
 }
 
 function showProductDetail(id){
-  const p = products.find(prod => prod.id === id);
+  const p = products.find(prod => String(prod.id) === String(id));
   if(!p) return;
   const videoEmbed = getYoutubeEmbed(p.video);
   document.getElementById("supportButtons").style.display = "none";
@@ -485,7 +499,7 @@ function addComment(e, prodId){
   e.preventDefault();
   const name = document.getElementById("cName").value;
   const text = document.getElementById("cText").value;
-  let p = products.find(prod => prod.id === prodId);
+  let p = products.find(prod => String(prod.id) === String(prodId));
   if(p){
     if(!p.comments) p.comments = [];
     p.comments.push({name, text});
@@ -495,7 +509,7 @@ function addComment(e, prodId){
 }
 
 function openOrder(id){
- selectedProduct = products.find(p => p.id === id);
+ selectedProduct = products.find(p => String(p.id) === String(id));
  document.getElementById("productId").value = id;
  document.getElementById("quantity").value = "1";
 
@@ -590,7 +604,7 @@ document.getElementById("orderForm").addEventListener("submit", function(e){
  selectedProduct.stock = Math.max(0, (Number(selectedProduct.stock) || 0) - qty);
  selectedProduct.sales = (Number(selectedProduct.sales) || 0) + qty;
 
- const pIndex = products.findIndex(p => p.id === selectedProduct.id);
+ const pIndex = products.findIndex(p => String(p.id) === String(selectedProduct.id));
  if(pIndex !== -1) {
    products[pIndex] = selectedProduct;
    db.ref('dhong_products').set(products);
@@ -618,7 +632,6 @@ document.getElementById("trackForm").addEventListener("submit", function(e){
 function startTimer() {
   if(timerInterval) clearInterval(timerInterval);
   
-  // এডমিন প্যানেল থেকে দেওয়া ঘণ্টা (যেমন: ৩ বা ৬) ডায়নামিকালি রিড করবে
   let hours = Number(settings.timerHours) || 24;
   let time = hours * 3600;
 
@@ -645,14 +658,6 @@ function startTimer() {
 }
 
 window.addEventListener("DOMContentLoaded", () => {
-  const params = new URLSearchParams(window.location.search);
-  const prodParam = params.get("product");
-  if(prodParam) {
-    setTimeout(() => {
-      const found = products.find(p => p.id == prodParam);
-      if(found) showProductDetail(found.id);
-    }, 500);
-  }
   renderSupport();
 });
 </script>
