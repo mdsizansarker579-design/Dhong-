@@ -208,7 +208,6 @@ footer{background:var(--top-bg);color:white;padding:20px;line-height:1.6;font-si
 </div>
 
 <script>
-  // Firebase Configuration from your project
   const firebaseConfig = {
     apiKey: "AIzaSyBNQLZU6KiVHp6IcAh4G70Trf7ThTcuLqw",
     authDomain: "dhong-c897d.firebaseapp.com",
@@ -223,7 +222,8 @@ footer{background:var(--top-bg);color:white;padding:20px;line-height:1.6;font-si
 
   let products = [];
   let orders = [];
-  let currentSelectedImg = ""; // কাস্টমার যে ছবিটি দেখবে বা সিলেক্ট করবে তা ট্র্যাক করার জন্য
+  let currentSelectedImg = "";
+  let isTimerExpired = false; // টাইমার শেষ হয়েছে কি না তা ট্র্যাক করার জন্য
   let settings = {
     siteName: "ঢং DHONG",
     themeColor: "#e85d75",
@@ -236,6 +236,8 @@ footer{background:var(--top-bg);color:white;padding:20px;line-height:1.6;font-si
     topBannerText: "🎉 ঢং-এ স্বাগতম | প্রথম অর্ডারে ১০% ছাড় ও ক্যাশ অন ডেলিভারি",
     heroTitleText: "আপনার স্টাইল, আপনারই গল্প।",
     heroSubtextText: "১০০% প্রিমিয়াম কোয়ালিটি নিশ্চিতকরণে ক্যাশ অন ডেলিভারিতে অর্ডার করুন।",
+    timerStatus: "show",
+    timerHours: "24",
     timerText: "⏳ অফার শেষ হতে বাকি:",
     heroPadding: "14px",
     heroBg: "linear-gradient(120deg,#242b49,#a23b5d,#ee9a8c)",
@@ -249,7 +251,6 @@ footer{background:var(--top-bg);color:white;padding:20px;line-height:1.6;font-si
     btnCallNowText: "📞 Call Now"
   };
 
-  // Real-time synchronization listeners
   db.ref('dhong_products').on('value', snapshot => {
     let data = snapshot.val();
     products = data ? (Array.isArray(data) ? data : Object.values(data)) : [];
@@ -285,6 +286,13 @@ function applySettings() {
   heroEl.style.padding = settings.heroPadding || "14px";
   heroEl.style.background = settings.heroBg || "linear-gradient(120deg,#242b49,#a23b5d,#ee9a8c)";
 
+  const timerEl = document.getElementById("countdownTimer");
+  if(settings.timerStatus === "hide") {
+    timerEl.style.display = "none";
+  } else {
+    timerEl.style.display = "inline-block";
+  }
+
   document.getElementById("deliveryFee").innerHTML = `
     <option value="${settings.dhakaFee}">ঢাকা ভেতরে (৳${settings.dhakaFee})</option>
     <option value="${settings.outsiderFee}">ঢাকা বাইরে / সারা দেশ (৳${settings.outsiderFee})</option>
@@ -315,7 +323,13 @@ function renderProducts(){
  renderCategories();
  const q=document.getElementById("search").value.toLowerCase();
  const list=products.filter(p=>(category==="সব"||p.cat===category)&&p.name.toLowerCase().includes(q));
- document.getElementById("grid").innerHTML=list.map(p=>`
+ 
+ document.getElementById("grid").innerHTML=list.map(p=>{
+  // টাইমার শেষ হয়ে গেলে বর্তমান মূল্য হবে oldPrice (আগের দাম), আর অফার চলাকালীন price (অফার দাম)
+  let activePrice = (isTimerExpired && p.oldPrice) ? p.oldPrice : p.price;
+  let displayOldPrice = (!isTimerExpired && p.oldPrice && p.oldPrice > p.price) ? p.oldPrice : "";
+
+  return `
   <article class="product" onclick="showProductDetail(${p.id})">
    <div class="art">
     <div class="badge-row">
@@ -327,14 +341,14 @@ function renderProducts(){
    <div class="info">
     <h3>${p.name}</h3>
     <div class="price-box">
-     <div class="price">${money(p.price)}</div>
-     ${p.oldPrice ? `<div class="old-price">${money(p.oldPrice)}</div>` : ''}
+     <div class="price">${money(activePrice)}</div>
+     ${displayOldPrice ? `<div class="old-price">${money(displayOldPrice)}</div>` : ''}
     </div>
     <div class="sales-badge">🔥 <b>${p.sales || 0}+</b> পিস বিক্রি হয়েছে</div>
     <button class="buy" ${p.stock <= 0 ? 'disabled' : ''} onclick="event.stopPropagation(); openOrder(${p.id})">${p.stock <= 0 ? 'স্টক শেষ' : (settings.btnBuyNowText || 'অর্ডার করুন')}</button>
    </div>
   </article>
- `).join("");
+ `}).join("");
 }
 
 function setCategory(c){ category=c; renderProducts(); }
@@ -352,13 +366,15 @@ function showProductDetail(id){
   const videoEmbed = getYoutubeEmbed(p.video);
   document.getElementById("supportButtons").style.display = "none";
 
+  let activePrice = (isTimerExpired && p.oldPrice) ? p.oldPrice : p.price;
+  let displayOldPrice = (!isTimerExpired && p.oldPrice && p.oldPrice > p.price) ? p.oldPrice : "";
+
   let allImages = [];
   if(p.img) allImages.push(p.img);
   if(p.colors && p.colors.length > 0) {
     p.colors.forEach(imgUrl => { if(!allImages.includes(imgUrl)) allImages.push(imgUrl); });
   }
 
-  // ডিফলल्टভাবে প্রথম ছবিটি সিলেক্ট করা থাকবে
   currentSelectedImg = allImages[0] || p.img || "";
 
   let sliderHtml = "";
@@ -383,7 +399,7 @@ function showProductDetail(id){
     <div class="comment-item"><b>${c.name}:</b> ${c.text}</div>
   `).join("") || "<small style='color:#888'>এখনো কোনো রিভিউ নেই।</small>";
 
-  let waOrderText = encodeURIComponent(`আসসালামু আলাইকুম, আমি এই পণ্যটি অর্ডার করতে চাই:\nনাম: ${p.name}\nমূল্য: ${money(p.price)}\nলিংক: ${window.location.href}`);
+  let waOrderText = encodeURIComponent(`আসসালামু আলাইকুম, আমি এই পণ্যটি অর্ডার করতে চাই:\nনাম: ${p.name}\nমূল্য: ${money(activePrice)}\nলিংক: ${window.location.href}`);
 
   document.getElementById("detailContent").innerHTML = `
     <div style="text-align:center">
@@ -396,8 +412,8 @@ function showProductDetail(id){
         <span><b>স্টক:</b> ${p.stock ?? 0}</span>
       </div>
       <div style="display:flex;justify-content:center;gap:8px;align-items:center;margin:6px 0">
-        <h3 style="color:${settings.themeColor};margin:0">${money(p.price)}</h3>
-        ${p.oldPrice ? `<span style="text-decoration:line-through;color:#888;font-size:12px">${money(p.oldPrice)}</span>` : ''}
+        <h3 style="color:${settings.themeColor};margin:0">${money(activePrice)}</h3>
+        ${displayOldPrice ? `<span style="text-decoration:line-through;color:#888;font-size:12px">${money(displayOldPrice)}</span>` : ''}
       </div>
       ${p.quality ? `<p style="font-size:12px;color:#16754e;background:#e8f7ef;padding:6px;border-radius:6px;margin:5px 0"><b>পণ্যের মান:</b> ${p.quality}</p>` : ''}
       <p style="text-align:left;background:#f9f9f9;padding:8px;border-radius:8px;font-size:12px">${p.desc || 'কোনো বিবরণ দেওয়া হয়নি।'}</p>
@@ -429,7 +445,7 @@ function showProductDetail(id){
 }
 
 function slideImage(index, imgUrl, el) {
-  currentSelectedImg = imgUrl; // যে ছবিতে ক্লিক করবে সেটি সিলেক্ট হয়ে যাবে
+  currentSelectedImg = imgUrl;
   const track = document.getElementById("sliderTrack");
   const counter = document.getElementById("itemCounter");
   if(track) {
@@ -447,19 +463,14 @@ function initTouchSlider(allImages) {
   let startX = 0;
   let currentIndex = 0;
 
-  container.addEventListener("touchstart", e => {
-    startX = e.touches[0].clientX;
-  });
+  container.addEventListener("touchstart", e => { startX = e.touches[0].clientX; });
 
   container.addEventListener("touchend", e => {
     let endX = e.changedTouches[0].clientX;
     let diff = startX - endX;
     if(Math.abs(diff) > 50) {
-      if(diff > 0 && currentIndex < allImages.length - 1) {
-        currentIndex++;
-      } else if(diff < 0 && currentIndex > 0) {
-        currentIndex--;
-      }
+      if(diff > 0 && currentIndex < allImages.length - 1) currentIndex++;
+      else if(diff < 0 && currentIndex > 0) currentIndex--;
       const thumbs = document.querySelectorAll(".color-thumb");
       slideImage(currentIndex, allImages[currentIndex], thumbs[currentIndex]);
     }
@@ -484,12 +495,10 @@ function openOrder(id){
  document.getElementById("productId").value = id;
  document.getElementById("quantity").value = "1";
 
- // যদি কোনো নির্দিষ্ট ছবি সিলেক্ট করা না থাকে, তবে প্রোডাক্টের মূল ছবি ধরবে
  if(!currentSelectedImg) {
    currentSelectedImg = selectedProduct.img;
  }
 
- // অর্ডার মডালে নির্বাচিত ছবি প্রিভিউ দেখাবে
  const previewImgEl = document.getElementById("orderPreviewImg");
  if(currentSelectedImg) {
    previewImgEl.src = currentSelectedImg;
@@ -506,7 +515,10 @@ function updateTotal(){
  if(selectedProduct){
   const qty=Number(document.getElementById("quantity").value);
   let delivery=Number(document.getElementById("deliveryFee").value);
-  const subtotal = selectedProduct.price * qty;
+  
+  // অর্ডার করার সময়ও চেক করা হবে টাইমার শেষ হয়েছে কি না
+  let activeUnitPrice = (isTimerExpired && selectedProduct.oldPrice) ? selectedProduct.oldPrice : selectedProduct.price;
+  const subtotal = activeUnitPrice * qty;
   
   let isFirstOrder = !localStorage.getItem("dhong_ordered_before");
   let discount = isFirstOrder ? subtotal * 0.1 : 0; 
@@ -538,7 +550,9 @@ document.getElementById("orderForm").addEventListener("submit", function(e){
  const formData = new FormData(e.target);
  const qty = Number(formData.get("quantity"));
  let delivery = Number(formData.get("deliveryFee"));
- const subtotal = selectedProduct.price * qty;
+ 
+ let activeUnitPrice = (isTimerExpired && selectedProduct.oldPrice) ? selectedProduct.oldPrice : selectedProduct.price;
+ const subtotal = activeUnitPrice * qty;
  
  let isFirstOrder = !localStorage.getItem("dhong_ordered_before");
  let discount = isFirstOrder ? subtotal * 0.1 : 0;
@@ -554,11 +568,11 @@ document.getElementById("orderForm").addEventListener("submit", function(e){
    address: formData.get("address"),
    items_json: JSON.stringify([{
      name: selectedProduct.name,
-     price: selectedProduct.price,
+     price: activeUnitPrice,
      quantity: qty,
      color: formData.get("color"),
      size: formData.get("size"),
-     img: currentSelectedImg || selectedProduct.img, // কাস্টমার যে ডিজাইন/ছবি সিলেক্ট করেছে তা সেভ হয়ে যাবে
+     img: currentSelectedImg || selectedProduct.img,
      deliveryFee: delivery
    }]),
    total: totalPrice,
@@ -598,15 +612,32 @@ document.getElementById("trackForm").addEventListener("submit", function(e){
  }
 });
 
+let timerInterval = null;
 function startTimer() {
-  let time = 23 * 3600 + 45 * 60 + 30;
-  setInterval(() => {
+  if(timerInterval) clearInterval(timerInterval);
+  let hours = Number(settings.timerHours) || 24;
+  let time = hours * 3600;
+
+  timerInterval = setInterval(() => {
     let h = String(Math.floor(time / 3600)).padStart(2, '0');
     let m = String(Math.floor((time % 3600) / 60)).padStart(2, '0');
     let s = String(time % 60).padStart(2, '0');
     let tText = settings.timerText || "⏳ অফার শেষ হতে বাকি:";
-    document.getElementById("countdownTimer").textContent = `${tText} ${h}:${m}:${s}`;
-    if(time > 0) time--;
+    
+    const timerEl = document.getElementById("countdownTimer");
+    if(timerEl) {
+      if(time > 0) {
+        isTimerExpired = false;
+        timerEl.textContent = `${tText} ${h}:${m}:${s}`;
+        time--;
+      } else {
+        // টাইম শেষ হলে অফার বন্ধ হয়ে আগের দাম শো করবে
+        isTimerExpired = true;
+        timerEl.textContent = "⏳ অফার শেষ!";
+        renderProducts(); // দাম আপডেট করার জন্য পেজ রি-রেন্ডার হবে
+        clearInterval(timerInterval);
+      }
+    }
   }, 1000);
 }
 startTimer();
