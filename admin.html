@@ -123,8 +123,8 @@ th{color:var(--muted);font-weight:600}
         </datalist>
       </div>
 
-      <div class="field-group">বর্তমান মূল্য (৳) <input type="number" id="pPrice" required placeholder="১২৫০"></div>
-      <div class="field-group">পূর্বের মূল্য / ডিসকাউন্ট (৳) <input type="number" id="pOldPrice" placeholder="১৫০০"></div>
+      <div class="field-group">বর্তমান অফার মূল্য (৳) [টাইম চলাকালীন এই দামে বিক্রি হবে] <input type="number" id="pPrice" required placeholder="১২৫০"></div>
+      <div class="field-group">আগের / নিয়মিত মূল্য (৳) [টাইম শেষ হলে এই মূল্যে ফিরে যাবে] <input type="number" id="pOldPrice" placeholder="১৫০০"></div>
       <div class="field-group">স্টক পরিমাণ <input type="number" id="pStock" required placeholder="১০"></div>
       <div class="field-group">রেটিং (১ থেকে ৫, যেমন: 4.8) <input type="number" step="0.1" min="1" max="5" id="pRating" placeholder="4.8"></div>
       <div class="field-group">মোট সেলস সংখ্যা <input type="number" id="pSales" placeholder="100"></div>
@@ -190,9 +190,19 @@ th{color:var(--muted);font-weight:600}
       <div class="field-group">ওপরের অফার নোটিফিকেশন বার টেক্সট <input id="setTopBanner" placeholder="🎉 ঢং-এ স্বাগতম..."></div>
       <div class="field-group">ব্যানার মেইন টাইটেল <input id="setHeroTitle" placeholder="আপনার স্টাইল..."></div>
       <div class="field-group">ব্যানার সাবটাইটেল <input id="setHeroSubtext" placeholder="১০০% প্রিমিয়াম..."></div>
-      <div class="field-group">ব্যানার কাউন্টডাউন টেক্সট <input id="setTimerText" placeholder="⏳ অফার শেষ হতে বাকি:"></div>
       <div class="field-group">ব্যানার সাইজ / প্যাডিং <input id="setHeroPadding" placeholder="14px"></div>
       <div class="field-group">ব্যানার ব্যাকগ্রাউন্ড কালার/গ্রেডিয়েন্ট <input id="setHeroBg" placeholder="linear-gradient(...)"></div>
+
+      <hr style="margin:15px 0;border:0;border-top:1px dashed #ccc">
+      <h3 class="section-title" style="color:var(--accent)">⏳ ফ্ল্যাশ সেল ও টাইমার সেটিংস</h3>
+      <div class="field-group">টাইমার স্ট্যাটাস
+        <select id="setTimerStatus">
+          <option value="show">ফ্ল্যাশ সেল চালু রাখুন (Show Timer)</option>
+          <option value="hide">বন্ধ রাখুন (Hide Timer & Regular Price)</option>
+        </select>
+      </div>
+      <div class="field-group">অফারের সময়সীমা (ঘণ্টা) <input type="number" id="setTimerHours" placeholder="24"></div>
+      <div class="field-group">টাইমার টেক্সট <input id="setTimerText" placeholder="⏳ অফার শেষ হতে বাকি:"></div>
 
       <hr style="margin:15px 0;border:0;border-top:1px dashed #ccc">
       <h3 class="section-title" style="color:var(--accent)">🎛️ অ্যাকশন বাটন টেক্সট</h3>
@@ -205,7 +215,7 @@ th{color:var(--muted);font-weight:600}
       <div class="field-group">WhatsApp চ্যাট বাটন <input id="btnWaChat" placeholder="💬 WhatsApp চ্যাট"></div>
       <div class="field-group">Call Now বাটন <input id="btnCallNow" placeholder="📞 Call Now"></div>
 
-      <button class="btn primary" type="submit" style="margin-top:15px">সেটিংস সেভ করুন</button>
+      <button class="btn primary" type="submit" style="margin-top:15px;width:100%;padding:12px;font-size:15px">সেটিংস সেভ করুন</button>
     </form>
   </div>
 </section>
@@ -214,7 +224,6 @@ th{color:var(--muted);font-weight:600}
 </div>
 
 <script>
-  // Firebase Configuration from your project
   const firebaseConfig = {
     apiKey: "AIzaSyBNQLZU6KiVHp6IcAh4G70Trf7ThTcuLqw",
     authDomain: "dhong-c897d.firebaseapp.com",
@@ -231,7 +240,6 @@ th{color:var(--muted);font-weight:600}
   let orders = [];
   let settings = {};
 
-  // Real-time synchronization listeners
   db.ref('dhong_products').on('value', snapshot => {
     let data = snapshot.val();
     products = data ? (Array.isArray(data) ? data : Object.values(data)) : [];
@@ -261,7 +269,6 @@ function convertMainImage(fileInput) {
         const canvas = document.createElement('canvas');
         let width = img.width;
         let height = img.height;
-        
         const MAX_WIDTH = 800;
         const MAX_HEIGHT = 800;
 
@@ -408,7 +415,7 @@ function loadAdminData() {
     return `
       <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #eee;flex-wrap:wrap;gap:8px">
         <div>
-          <b>${p.name}</b> (${p.cat}) - ৳${p.price} <br>
+          <b>${p.name}</b> (${p.cat}) - অফার মূল্য: ৳${p.price} (আগের: ৳${p.oldPrice || p.price}) <br>
           <small style="color:green">স্টক: ${p.stock ?? 0} | রেটিং: ⭐${p.rating || '5.0'} | বিক্রি: ${p.sales || 0} পিস</small><br>
           <small style="color:#666;word-break:break-all">লিংক: <a href="${shareLink}" target="_blank">${shareLink}</a></small>
         </div>
@@ -433,6 +440,8 @@ function loadAdminData() {
   document.getElementById("setTopBanner").value = settings.topBannerText || "🎉 ঢং-এ স্বাগতম | প্রথম অর্ডারে ১০% ছাড় ও ক্যাশ অন ডেলিভারি";
   document.getElementById("setHeroTitle").value = settings.heroTitleText || "আপনার স্টাইল, আপনারই গল্প।";
   document.getElementById("setHeroSubtext").value = settings.heroSubtextText || "১০০% প্রিমিয়াম কোয়ালিটি নিশ্চিতকরণে ক্যাশ অন ডেলিভারিতে অর্ডার করুন।";
+  document.getElementById("setTimerStatus").value = settings.timerStatus || "show";
+  document.getElementById("setTimerHours").value = settings.timerHours || "24";
   document.getElementById("setTimerText").value = settings.timerText || "⏳ অফার শেষ হতে বাকি:";
   document.getElementById("setHeroPadding").value = settings.heroPadding || "14px";
   document.getElementById("setHeroBg").value = settings.heroBg || "linear-gradient(120deg,#242b49,#a23b5d,#ee9a8c)";
@@ -482,7 +491,7 @@ document.getElementById("productForm").addEventListener("submit", function(e){
     name: document.getElementById("pName").value,
     cat: document.getElementById("pCat").value.trim(),
     price: Number(document.getElementById("pPrice").value),
-    oldPrice: Number(document.getElementById("pOldPrice").value) || 0,
+    oldPrice: Number(document.getElementById("pOldPrice").value) || Number(document.getElementById("pPrice").value),
     stock: Number(document.getElementById("pStock").value),
     rating: document.getElementById("pRating").value || "5.0",
     sales: Number(document.getElementById("pSales").value) || 0,
@@ -517,7 +526,7 @@ function editProduct(idx) {
   document.getElementById("pName").value = p.name;
   document.getElementById("pCat").value = p.cat;
   document.getElementById("pPrice").value = p.price;
-  document.getElementById("pOldPrice").value = p.oldPrice || "";
+  document.getElementById("pOldPrice").value = p.oldPrice || p.price;
   document.getElementById("pStock").value = p.stock || 0;
   document.getElementById("pRating").value = p.rating || "5.0";
   document.getElementById("pSales").value = p.sales || 0;
@@ -544,7 +553,7 @@ document.getElementById("settingsForm").addEventListener("submit", function(e){
   const newSettings = {
     adminEmail: document.getElementById("setAdminEmail").value,
     siteName: document.getElementById("setSiteName").value,
-    themeColor: document.getElementById("setThemeColor0").value || document.getElementById("setThemeColor").value,
+    themeColor: document.getElementById("setThemeColor").value,
     dhakaFee: document.getElementById("setDhaka").value,
     outsiderFee: document.getElementById("setOutsider").value,
     freeThreshold: document.getElementById("setThreshold").value,
@@ -553,6 +562,8 @@ document.getElementById("settingsForm").addEventListener("submit", function(e){
     topBannerText: document.getElementById("setTopBanner").value,
     heroTitleText: document.getElementById("setHeroTitle").value,
     heroSubtextText: document.getElementById("setHeroSubtext").value,
+    timerStatus: document.getElementById("setTimerStatus").value,
+    timerHours: document.getElementById("setTimerHours").value,
     timerText: document.getElementById("setTimerText").value,
     heroPadding: document.getElementById("setHeroPadding").value,
     heroBg: document.getElementById("setHeroBg").value,
@@ -565,8 +576,11 @@ document.getElementById("settingsForm").addEventListener("submit", function(e){
     btnWaChatText: document.getElementById("btnWaChat").value,
     btnCallNowText: document.getElementById("btnCallNow").value
   };
+  
   db.ref('dhong_settings').set(newSettings).then(() => {
     alert("✅ সমস্ত সেটিংস সফলভাবে ক্লাউডে সেভ হয়েছে!");
+  }).catch((err) => {
+    alert("❌ সেভ হতে সমস্যা হয়েছে: " + err.message);
   });
 });
 </script>
