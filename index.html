@@ -58,11 +58,11 @@ footer{background:var(--top-bg);color:white;padding:20px;line-height:1.6;font-si
 .trust-icons{display:flex;gap:8px;justify-content:center;margin:12px 0;font-size:11px;color:#555}
 .trust-item{display:flex;align-items:center;gap:4px;background:#f8f9fa;padding:5px 8px;border-radius:6px}
 
-/* স্লাইডার ছবি সঠিক সাইজ ও ফিট রাখার জন্য */
-.slider-container{position:relative;width:100%;height:280px;overflow:hidden;border-radius:12px;background:#f9f9f9;display:grid;place-items:center}
+/* বড় পপআপ স্লাইডার ছবির সাইজ নিখুঁত রাখার জন্য ফিক্সড স্টাইল[span_1](start_span)[span_1](end_span) */
+.slider-container{position:relative;width:100%;height:320px;background:#f0f2f5;overflow:hidden;border-radius:12px;display:flex;align-items:center;justify-content:center}
 .slider-track{display:flex;transition:transform 0.3s ease-in-out;height:100%;width:100%}
-.slider-item{min-width:100%;height:100%;display:grid;place-items:center}
-.slider-item img{max-width:100%;max-height:100%;object-fit:contain}
+.slider-item{min-width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:#f0f2f5}
+.slider-item img{width:100%;height:100%;object-fit:contain}
 .item-counter{position:absolute;bottom:10px;left:10px;background:rgba(0,0,0,0.6);color:white;padding:3px 8px;border-radius:12px;font-size:11px;z-index:3}
 .color-thumbs{display:flex;gap:8px;margin:12px 0;overflow-x:auto;padding-bottom:5px}
 .color-thumb{width:55px;height:55px;border-radius:8px;border:2px solid #ddd;cursor:pointer;object-fit:cover;flex-shrink:0}
