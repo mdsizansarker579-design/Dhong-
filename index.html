@@ -129,7 +129,11 @@ footer{background:var(--top-bg);color:white;padding:20px;line-height:1.6;font-si
     <h2>অর্ডার ফর্ম</h2>
     <form id="orderForm">
       <input type="hidden" name="productId" id="productId">
-      <input type="hidden" name="selectedColor" id="selectedColorInput">
+
+      <div style="text-align:center; margin-bottom:10px;">
+        <img id="orderPreviewImg" src="" style="width:70px; height:70px; object-fit:contain; border-radius:8px; border:1px solid #ddd; background:#f9f9f9; display:none;">
+        <div style="font-size:11px; color:#666; margin-top:2px;">নির্বাচিত ডিজাইন/কালার</div>
+      </div>
 
       <label class="field">আপনার নাম
         <input name="name" required placeholder="সম্পূর্ণ নাম">
@@ -139,17 +143,20 @@ footer{background:var(--top-bg);color:white;padding:20px;line-height:1.6;font-si
         <input name="phone" required inputmode="tel" pattern="01[3-9][0-9]{8}" placeholder="01XXXXXXXXX">
       </label>
 
-      <label class="field">কালার / রং
+      <label class="field">কালার / ডিজাইন ভ্যারিয়েন্ট
         <select name="color" id="productColor">
           <option value="Standard">স্ট্যান্ডার্ড</option>
           <option value="Black">কালো (Black)</option>
           <option value="White">সাদা (White)</option>
           <option value="Red">লাল (Red)</option>
           <option value="Blue">নীল (Blue)</option>
+          <option value="Design 1">ডিজাইন ১</option>
+          <option value="Design 2">ডিজাইন ২</option>
+          <option value="Design 3">ডিজাইন ৩</option>
         </select>
       </label>
 
-      <label class="field">সাইজ / ভ্যারিয়েন্ট
+      <label class="field">সাইজ / পরিমাপ
         <select name="size" id="productSize">
           <option value="Free Size">Free Size</option>
           <option value="M">M</option>
@@ -216,6 +223,7 @@ footer{background:var(--top-bg);color:white;padding:20px;line-height:1.6;font-si
 
   let products = [];
   let orders = [];
+  let currentSelectedImg = ""; // কাস্টমার যে ছবিটি দেখবে বা সিলেক্ট করবে তা ট্র্যাক করার জন্য
   let settings = {
     siteName: "ঢং DHONG",
     themeColor: "#e85d75",
@@ -244,10 +252,7 @@ footer{background:var(--top-bg);color:white;padding:20px;line-height:1.6;font-si
   // Real-time synchronization listeners
   db.ref('dhong_products').on('value', snapshot => {
     let data = snapshot.val();
-    products = data ? (Array.isArray(data) ? data : Object.values(data)) : [
-      {id:1,name:"এলিগ্যান্ট কটন কুর্তি",cat:"পোশাক",price:1250,oldPrice:1500,stock:10,rating:4.8,sales:142,quality:"১০০% সুতি কটন",img:"",video:"",colors:[],desc:"আরামদায়ক প্রিমিয়াম কটন কাপড়ের তৈরি আকর্ষণীয় কুর্তি."},
-      {id:2,name:"প্রিমিয়াম ক্রসব্যাগ",cat:"ব্যাগ",price:950,oldPrice:1200,stock:5,rating:4.9,sales:89,quality:"হাই গ্রেড ওয়াটারপ্রুফ চামড়া",img:"",video:"",colors:[],desc:"স্টাইলিশ ও টেকসই চামড়ার ক্রসব্যাগ."}
-    ];
+    products = data ? (Array.isArray(data) ? data : Object.values(data)) : [];
     renderProducts();
   });
 
@@ -353,17 +358,20 @@ function showProductDetail(id){
     p.colors.forEach(imgUrl => { if(!allImages.includes(imgUrl)) allImages.push(imgUrl); });
   }
 
+  // ডিফলल्टভাবে প্রথম ছবিটি সিলেক্ট করা থাকবে
+  currentSelectedImg = allImages[0] || p.img || "";
+
   let sliderHtml = "";
   if(allImages.length > 0) {
     let slides = allImages.map((img, idx) => `<div class="slider-item"><img src="${img}"></div>`).join("");
-    let thumbs = allImages.map((img, idx) => `<img src="${img}" class="color-thumb ${idx===0?'active':''}" onclick="slideImage(${idx}, this)">`).join("");
+    let thumbs = allImages.map((img, idx) => `<img src="${img}" class="color-thumb ${idx===0?'active':''}" onclick="slideImage(${idx}, '${img}', this)">`).join("");
     
     sliderHtml = `
       <div class="slider-container" id="sliderContainer">
         <div class="slider-track" id="sliderTrack" style="width:${allImages.length * 100}%">
           ${slides}
         </div>
-        <div class="item-counter" id="itemCounter">Item 1/${allImages.length} | Size | Color</div>
+        <div class="item-counter" id="itemCounter">Item 1/${allImages.length} | Design Selected</div>
       </div>
       <div class="color-thumbs">${thumbs}</div>
     `;
@@ -417,24 +425,25 @@ function showProductDetail(id){
     </div>
   `;
   document.getElementById("detailModal").classList.add("show");
-  initTouchSlider(allImages.length);
+  initTouchSlider(allImages);
 }
 
-function slideImage(index, el) {
+function slideImage(index, imgUrl, el) {
+  currentSelectedImg = imgUrl; // যে ছবিতে ক্লিক করবে সেটি সিলেক্ট হয়ে যাবে
   const track = document.getElementById("sliderTrack");
   const counter = document.getElementById("itemCounter");
   if(track) {
     track.style.transform = `translateX(-${index * 100}%)`;
     const total = track.children.length;
-    counter.textContent = `Item ${index + 1}/${total} | Size | Color`;
+    counter.textContent = `Item ${index + 1}/${total} | Design Selected`;
   }
   document.querySelectorAll(".color-thumb").forEach(t => t.classList.remove("active"));
   if(el) el.classList.add("active");
 }
 
-function initTouchSlider(totalItems) {
+function initTouchSlider(allImages) {
   const container = document.getElementById("sliderContainer");
-  if(!container || totalItems <= 1) return;
+  if(!container || allImages.length <= 1) return;
   let startX = 0;
   let currentIndex = 0;
 
@@ -446,13 +455,13 @@ function initTouchSlider(totalItems) {
     let endX = e.changedTouches[0].clientX;
     let diff = startX - endX;
     if(Math.abs(diff) > 50) {
-      if(diff > 0 && currentIndex < totalItems - 1) {
+      if(diff > 0 && currentIndex < allImages.length - 1) {
         currentIndex++;
       } else if(diff < 0 && currentIndex > 0) {
         currentIndex--;
       }
       const thumbs = document.querySelectorAll(".color-thumb");
-      slideImage(currentIndex, thumbs[currentIndex]);
+      slideImage(currentIndex, allImages[currentIndex], thumbs[currentIndex]);
     }
   });
 }
@@ -471,9 +480,24 @@ function addComment(e, prodId){
 }
 
 function openOrder(id){
- selectedProduct=products.find(p=>p.id===id);
- document.getElementById("productId").value=id;
- document.getElementById("quantity").value="1";
+ selectedProduct = products.find(p => p.id === id);
+ document.getElementById("productId").value = id;
+ document.getElementById("quantity").value = "1";
+
+ // যদি কোনো নির্দিষ্ট ছবি সিলেক্ট করা না থাকে, তবে প্রোডাক্টের মূল ছবি ধরবে
+ if(!currentSelectedImg) {
+   currentSelectedImg = selectedProduct.img;
+ }
+
+ // অর্ডার মডালে নির্বাচিত ছবি প্রিভিউ দেখাবে
+ const previewImgEl = document.getElementById("orderPreviewImg");
+ if(currentSelectedImg) {
+   previewImgEl.src = currentSelectedImg;
+   previewImgEl.style.display = "inline-block";
+ } else {
+   previewImgEl.style.display = "none";
+ }
+
  updateTotal();
  document.getElementById("orderModal").classList.add("show");
 }
@@ -534,6 +558,7 @@ document.getElementById("orderForm").addEventListener("submit", function(e){
      quantity: qty,
      color: formData.get("color"),
      size: formData.get("size"),
+     img: currentSelectedImg || selectedProduct.img, // কাস্টমার যে ডিজাইন/ছবি সিলেক্ট করেছে তা সেভ হয়ে যাবে
      deliveryFee: delivery
    }]),
    total: totalPrice,
