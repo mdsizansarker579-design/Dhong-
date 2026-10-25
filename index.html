@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title id="siteTitle">DHONG | Customer Panel</title>
-<!-- Firebase App & Realtime Database CDN -->
+<link rel="preconnect" href="https://www.gstatic.com">
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
 <style>
@@ -203,7 +203,7 @@ footer{background:var(--top-bg);color:white;padding:20px;line-height:1.6;font-si
     <h2>অর্ডার ট্র্যাক করুন</h2>
     <form id="trackForm">
       <label class="field">অর্ডার নম্বর
-        <input name="orderId" required placeholder="যেমন: 1, 2, 3...">
+        <input name="orderId" required placeholder="যেমন: 1234">
       </label>
       <button class="primary" type="submit" id="trackSearchBtn">স্ট্যাটাস দেখুন</button>
     </form>
@@ -225,8 +225,11 @@ footer{background:var(--top-bg);color:white;padding:20px;line-height:1.6;font-si
   const db = firebase.database();
 
   let products = [];
-  let orders = [];
   let currentSelectedImg = "";
+  let currentDetailId = null;
+  let currentDetailImages = [];
+  const imgCache = {};
+  const imgLoading = {};
   let isTimerExpired = false;
   let timerInterval = null;
   let hasOpenedPopup = false;
@@ -259,19 +262,37 @@ footer{background:var(--top-bg);color:white;padding:20px;line-height:1.6;font-si
     btnCallNowText: "📞 Call Now"
   };
 
-  // লিংক থেকে ?product=ID বা #product=ID পড়ে
   function getUrlParameter(name) {
     const m = window.location.href.match(new RegExp('[?&#]' + name + '=([^&#]*)'));
     return m ? decodeURIComponent(m[1]) : null;
   }
 
-  // সিঙ্গেল পণ্যের লিংক হলে শুধু ওই পণ্য দেখাবে
   let singleProductId = getUrlParameter('product');
   let showAllProducts = false;
 
+  // ---------- ক্যাশ: আগের ভিজিটের পণ্য সাথে সাথে দেখাবে ----------
+  try { localStorage.removeItem("dhong_products_cache"); } catch (e) {}
+  try {
+    const cached = JSON.parse(localStorage.getItem("dhong_products_cache_v2") || "[]");
+    if (Array.isArray(cached) && cached.length) {
+      products = cached.filter(Boolean);
+      renderProducts();
+      if (singleProductId) {
+        const f = products.find(p => String(p.id) === String(singleProductId));
+        if (f) { hasOpenedPopup = true; showProductDetail(f.id); }
+      }
+    }
+  } catch (e) { console.error("cache error", e); }
+
+  // ---------- পণ্য লোড ----------
   db.ref('dhong_products').on('value', snapshot => {
-    let data = snapshot.val();
-    products = (data ? (Array.isArray(data) ? data : Object.values(data)) : []).filter(Boolean);
+    const list = [];
+    snapshot.forEach(child => {
+      const v = child.val();
+      if (v && typeof v === 'object') { v._key = child.key; list.push(v); }
+    });
+    products = list;
+    try { localStorage.setItem("dhong_products_cache_v2", JSON.stringify(products)); } catch (e) {}
 
     try { renderProducts(); } catch (err) { console.error("renderProducts error:", err); }
 
@@ -284,11 +305,6 @@ footer{background:var(--top-bg);color:white;padding:20px;line-height:1.6;font-si
     }
   }, err => console.error("Firebase products read error:", err));
 
-  db.ref('dhong_orders').on('value', snapshot => {
-    let data = snapshot.val();
-    orders = (data ? (Array.isArray(data) ? data : Object.values(data)) : []).filter(Boolean);
-  }, err => console.error("Firebase orders read error:", err));
-
   db.ref('dhong_settings').on('value', snapshot => {
     let data = snapshot.val();
     if (data) {
@@ -297,6 +313,53 @@ footer{background:var(--top-bg);color:white;padding:20px;line-height:1.6;font-si
       startTimer();
     }
   }, err => console.error("Firebase settings read error:", err));
+
+// অর্ডারে রাখার জন্য ছোট থাম্বনেইল বানায়
+function makeThumb(src){
+  return new Promise(resolve => {
+    if (!src) return resolve("");
+    if (!String(src).startsWith("data:")) return resolve(src);
+    const img = new Image();
+    img.onload = () => {
+      const s = 90, r = Math.min(s / img.width, s / img.height, 1);
+      const c = document.createElement("canvas");
+      c.width = Math.max(1, Math.round(img.width * r));
+      c.height = Math.max(1, Math.round(img.height * r));
+      c.getContext("2d").drawImage(img, 0, 0, c.width, c.height);
+      resolve(c.toDataURL("image/jpeg", 0.6));
+    };
+    img.onerror = () => resolve("");
+    img.src = src;
+  });
+}
+
+// ---------- ছবি: প্রথমে থাম্বনেইল, খুললে বড় ছবি আনে ----------
+function productImages(p){
+  if (imgCache[p.id]) return imgCache[p.id];
+  const arr = [];
+  if (p.img) arr.push(p.img);
+  Object.values(p.colors || {}).forEach(u => { if (u && !arr.includes(u)) arr.push(u); });
+  return arr;
+}
+
+function fetchFullImages(p){
+  if (!p.hasFull || imgCache[p.id] || imgLoading[p.id]) return;
+  imgLoading[p.id] = true;
+  const fallback = productImages(p);
+  db.ref('dhong_images/' + p.id).once('value').then(snap => {
+    const v = snap.val();
+    const arr = [];
+    if (v) {
+      if (v.main) arr.push(v.main);
+      Object.values(v.colors || {}).forEach(u => { if (u && !arr.includes(u)) arr.push(u); });
+    }
+    imgCache[p.id] = arr.length ? arr : fallback;
+    imgLoading[p.id] = false;
+    if (String(currentDetailId) === String(p.id) && document.getElementById("detailModal").classList.contains("show")) {
+      showProductDetail(p.id, true);
+    }
+  }).catch(err => { console.error("image load error:", err); imgLoading[p.id] = false; });
+}
 
 function applySettings() {
   document.documentElement.style.setProperty('--primary-color', settings.themeColor);
@@ -317,11 +380,7 @@ function applySettings() {
   heroEl.style.background = settings.heroBg || "linear-gradient(120deg,#242b49,#a23b5d,#ee9a8c)";
 
   const timerEl = document.getElementById("countdownTimer");
-  if (settings.timerStatus === "hide") {
-    timerEl.style.display = "none";
-  } else {
-    timerEl.style.display = "inline-block";
-  }
+  timerEl.style.display = (settings.timerStatus === "hide") ? "none" : "inline-block";
 
   document.getElementById("deliveryFee").innerHTML = `
     <option value="${settings.dhakaFee}">ঢাকা ভেতরে (৳${settings.dhakaFee})</option>
@@ -342,7 +401,6 @@ function money(n){ return "৳"+Number(n).toLocaleString("en-US"); }
 
 function renderCategories(){
   const catBox = document.getElementById("categoryContainer");
-  // সিঙ্গেল পণ্য মোডে ক্যাটাগরি বাটন লুকানো থাকবে
   if (singleProductId && !showAllProducts) { catBox.innerHTML = ""; return; }
   let cats = ["সব", ...new Set(products.map(p => p.cat).filter(Boolean))];
   catBox.innerHTML = cats.map(c => `
@@ -361,7 +419,6 @@ function renderProducts(){
 
  let list = products.filter(p => (category==="সব"||p.cat===category) && String(p.name||"").toLowerCase().includes(q));
 
- // শুধু একটি পণ্যের লিংক হলে ওই পণ্যই দেখাবে
  if (singleProductId && !showAllProducts) {
    list = products.filter(p => String(p.id) === String(singleProductId));
  }
@@ -381,7 +438,7 @@ function renderProducts(){
       <span class="stock-badge ${p.stock <= 0 ? 'out' : ''}">${p.stock <= 0 ? 'Stock Out' : 'স্টক: ' + p.stock}</span>
       <span class="rating-badge">★ ${p.rating || '5.0'}</span>
     </div>
-    ${p.img ? `<img src="${p.img}" alt="${p.name}">` : `<div style="font-size:30px">🛍️</div>`}
+    ${p.img ? `<img src="${p.img}" alt="${p.name}" loading="lazy" decoding="async">` : `<div style="font-size:30px">🛍️</div>`}
    </div>
    <div class="info">
     <h3>${p.name}</h3>
@@ -405,27 +462,29 @@ function getYoutubeEmbed(url) {
   return (match && match[2].length === 11) ? `https://www.youtube.com/embed/${match[2]}` : null;
 }
 
-function showProductDetail(id){
+function showProductDetail(id, isRefresh){
   const p = products.find(prod => String(prod.id) === String(id));
   if(!p) return;
+  currentDetailId = String(p.id);
+  if (!isRefresh) fetchFullImages(p);
+
+  const modalEl = document.querySelector("#detailModal .modal");
+  const savedScroll = isRefresh && modalEl ? modalEl.scrollTop : 0;
+
   const videoEmbed = getYoutubeEmbed(p.video);
   document.getElementById("supportButtons").style.display = "none";
 
   let activePrice = (isTimerExpired && p.oldPrice) ? p.oldPrice : p.price;
   let displayOldPrice = (!isTimerExpired && p.oldPrice && p.oldPrice > p.price) ? p.oldPrice : "";
 
-  let allImages = [];
-  if(p.img) allImages.push(p.img);
-  if(p.colors && p.colors.length > 0) {
-    p.colors.forEach(imgUrl => { if(!allImages.includes(imgUrl)) allImages.push(imgUrl); });
-  }
-
+  const allImages = productImages(p);
+  currentDetailImages = allImages;
   currentSelectedImg = allImages[0] || p.img || "";
 
   let sliderHtml = "";
   if(allImages.length > 0) {
-    let slides = allImages.map((img, idx) => `<div class="slider-item"><img src="${img}"></div>`).join("");
-    let thumbs = allImages.map((img, idx) => `<img src="${img}" class="color-thumb ${idx===0?'active':''}" onclick="slideImage(${idx}, '${img}', this)">`).join("");
+    let slides = allImages.map(img => `<div class="slider-item"><img src="${img}"></div>`).join("");
+    let thumbs = allImages.map((img, idx) => `<img src="${img}" class="color-thumb ${idx===0?'active':''}" onclick="slideImage(${idx}, this)">`).join("");
 
     sliderHtml = `
       <div class="slider-container" id="sliderContainer">
@@ -443,8 +502,6 @@ function showProductDetail(id){
   const commentsList = (p.comments || []).map(c=>`
     <div class="comment-item"><b>${c.name}:</b> ${c.text}</div>
   `).join("") || "<small style='color:#888'>এখনো কোনো রিভিউ নেই।</small>";
-
-  let waOrderText = encodeURIComponent(`আসসালামু আলাইকুম, আমি এই পণ্যটি অর্ডার করতে চাই:\nনাম: ${p.name}\nমূল্য: ${money(activePrice)}\nলিংক: ${window.location.href}`);
 
   document.getElementById("detailContent").innerHTML = `
     <div style="text-align:center">
@@ -472,7 +529,7 @@ function showProductDetail(id){
 
       <button class="primary" ${p.stock <= 0 ? 'disabled' : ''} onclick="closeModal('detailModal'); openOrder('${p.id}')">${p.stock <= 0 ? 'স্টক শেষ' : (settings.btnDetailOrderText || 'সরাসরি ফর্ম পূরণ করে অর্ডার করুন')}</button>
 
-      ${settings.whatsapp ? `<a href="https://wa.me/${settings.whatsapp}?text=${waOrderText}" target="_blank" class="support-btn wa-order">${settings.btnWaOrderText || "💬 WhatsApp-এ এই পণ্যটি অর্ডার করুন"}</a>` : ''}
+      ${settings.whatsapp ? `<button type="button" class="support-btn wa-order" style="border:0;cursor:pointer" onclick="waOrder('${p.id}')">${settings.btnWaOrderText || "💬 WhatsApp-এ এই পণ্যটি অর্ডার করুন"}</button>` : ''}
 
       <div class="comments-sec">
         <b>💬 কাস্টমার রিভিউ ও কমেন্ট</b>
@@ -486,16 +543,17 @@ function showProductDetail(id){
     </div>
   `;
   document.getElementById("detailModal").classList.add("show");
+  if (modalEl) modalEl.scrollTop = savedScroll;
   initTouchSlider(allImages);
 }
 
-function slideImage(index, imgUrl, el) {
-  currentSelectedImg = imgUrl;
+function slideImage(index, el) {
+  currentSelectedImg = currentDetailImages[index] || currentSelectedImg;
   const track = document.getElementById("sliderTrack");
   const counter = document.getElementById("itemCounter");
   if(track) {
-    track.style.transform = `translateX(-${index * 100 / track.children.length}%)`;
     const total = track.children.length;
+    track.style.transform = `translateX(-${index * 100 / total}%)`;
     if(counter) counter.textContent = `Item ${index + 1}/${total} | Design Selected`;
   }
   document.querySelectorAll(".color-thumb").forEach(t => t.classList.remove("active"));
@@ -517,22 +575,58 @@ function initTouchSlider(allImages) {
       if(diff > 0 && currentIndex < allImages.length - 1) currentIndex++;
       else if(diff < 0 && currentIndex > 0) currentIndex--;
       const thumbs = document.querySelectorAll(".color-thumb");
-      slideImage(currentIndex, allImages[currentIndex], thumbs[currentIndex]);
+      slideImage(currentIndex, thumbs[currentIndex]);
     }
   });
 }
 
+// কমেন্ট: শুধু কমেন্ট অংশ আপডেট হয়
 function addComment(e, prodId){
   e.preventDefault();
   const name = document.getElementById("cName").value;
   const text = document.getElementById("cText").value;
-  let p = products.find(prod => String(prod.id) === String(prodId));
-  if(p){
-    if(!p.comments) p.comments = [];
-    p.comments.push({name, text});
-    db.ref('dhong_products').set(products);
-    showProductDetail(prodId);
-  }
+  const p = products.find(prod => String(prod.id) === String(prodId));
+  if(!p || p._key === undefined) return;
+
+  db.ref('dhong_products/' + p._key + '/comments').transaction(c => {
+    c = Array.isArray(c) ? c : (c ? Object.values(c) : []);
+    c.push({name, text});
+    return c;
+  });
+
+  if(!p.comments) p.comments = [];
+  p.comments.push({name, text});
+  showProductDetail(prodId, true);
+}
+
+// WhatsApp অর্ডার: অর্ডার নম্বর তৈরি করে মেসেজে পাঠায়
+async function waOrder(prodId){
+  const p = products.find(x => String(x.id) === String(prodId));
+  if(!p) return;
+
+  const w = window.open('', '_blank');
+  const price = (isTimerExpired && p.oldPrice) ? p.oldPrice : p.price;
+  const orderId = Date.now().toString().slice(-4);
+  const link = window.location.origin + window.location.pathname + "?product=" + encodeURIComponent(p.id);
+  const thumb = await makeThumb(currentSelectedImg || p.img);
+
+  const newOrder = {
+    id: orderId,
+    customer_name: "WhatsApp Customer",
+    phone: "",
+    address: "",
+    items_json: JSON.stringify([{
+      name: p.name, price: price, quantity: 1, color: "", size: "", img: thumb, deliveryFee: 0
+    }]),
+    total: price,
+    status: "WhatsApp Pending",
+    created_at: new Date().toISOString()
+  };
+  db.ref('dhong_orders').push(newOrder);
+
+  const text = `আসসালামু আলাইকুম, আমি এই পণ্যটি অর্ডার করতে চাই:\nঅর্ডার নম্বর: #DH-${orderId}\nপণ্য: ${p.name}\nপণ্য আইডি: ${p.id}\nমূল্য: ${money(price)}\nলিংক: ${link}`;
+  const url = `https://wa.me/${settings.whatsapp}?text=${encodeURIComponent(text)}`;
+  if (w) w.location.href = url; else window.location.href = url;
 }
 
 function openOrder(id){
@@ -590,11 +684,14 @@ function closeModal(id){
   document.getElementById("supportButtons").style.display = "flex";
 }
 
-document.getElementById("orderForm").addEventListener("submit", function(e){
+document.getElementById("orderForm").addEventListener("submit", async function(e){
  e.preventDefault();
- const formData = new FormData(e.target);
+ const form = e.target;
+ const formData = new FormData(form);
  const qty = Number(formData.get("quantity"));
  let delivery = Number(formData.get("deliveryFee"));
+ const submitBtn = document.getElementById("submitBtn");
+ submitBtn.disabled = true;
 
  let activeUnitPrice = (isTimerExpired && selectedProduct.oldPrice) ? selectedProduct.oldPrice : selectedProduct.price;
  const subtotal = activeUnitPrice * qty;
@@ -605,6 +702,8 @@ document.getElementById("orderForm").addEventListener("submit", function(e){
    delivery = 0;
  }
  const totalPrice = (subtotal - discount) + delivery;
+
+ const thumb = await makeThumb(currentSelectedImg || selectedProduct.img);
 
  const newOrder = {
    id: Date.now().toString().slice(-4),
@@ -617,7 +716,7 @@ document.getElementById("orderForm").addEventListener("submit", function(e){
      quantity: qty,
      color: formData.get("color"),
      size: formData.get("size"),
-     img: currentSelectedImg || selectedProduct.img,
+     img: thumb,
      deliveryFee: delivery
    }]),
    total: totalPrice,
@@ -625,36 +724,40 @@ document.getElementById("orderForm").addEventListener("submit", function(e){
    created_at: new Date().toISOString()
  };
 
- orders.unshift(newOrder);
- db.ref('dhong_orders').set(orders);
+ db.ref('dhong_orders').push(newOrder).catch(err => console.error("order save error:", err));
  localStorage.setItem("dhong_ordered_before", "true");
 
- selectedProduct.stock = Math.max(0, (Number(selectedProduct.stock) || 0) - qty);
- selectedProduct.sales = (Number(selectedProduct.sales) || 0) + qty;
-
- const pIndex = products.findIndex(p => String(p.id) === String(selectedProduct.id));
- if(pIndex !== -1) {
-   products[pIndex] = selectedProduct;
-   db.ref('dhong_products').set(products);
+ if(selectedProduct._key !== undefined) {
+   const base = 'dhong_products/' + selectedProduct._key;
+   db.ref(base + '/stock').transaction(v => Math.max(0, (Number(v) || 0) - qty));
+   db.ref(base + '/sales').transaction(v => (Number(v) || 0) + qty);
  }
 
  alert(`✅ অর্ডার সফলভাবে গ্রহণ করা হয়েছে!\nঅর্ডার নম্বর: #DH-${newOrder.id}\nমোট: ${money(totalPrice)}`);
- e.target.reset();
+ form.reset();
+ submitBtn.disabled = false;
  closeModal("orderModal");
- renderProducts();
 });
 
+// ট্র্যাক: শুধু ওই অর্ডার নম্বরটাই খোঁজে
 document.getElementById("trackForm").addEventListener("submit", function(e){
  e.preventDefault();
  const orderId = e.target.orderId.value.replace(/[^0-9]/g, '');
  const resultEl = document.getElementById("trackResult");
- const order = orders.find(o => String(o.id) === orderId);
+ resultEl.textContent = "খোঁজা হচ্ছে...";
 
- if(order) {
-   resultEl.innerHTML = `<br><b>অর্ডার নম্বর:</b> #DH-${order.id}<br><b>নাম:</b> ${order.customer_name}<br><b>স্ট্যাটাস:</b> <span style="color:green;font-weight:bold">${order.status}</span>`;
- } else {
-   resultEl.textContent = "কোনো অর্ডার পাওয়া যায়নি।";
- }
+ db.ref('dhong_orders').orderByChild('id').equalTo(orderId).once('value').then(snap => {
+   let order = null;
+   snap.forEach(ch => { order = ch.val(); });
+   if(order) {
+     resultEl.innerHTML = `<br><b>অর্ডার নম্বর:</b> #DH-${order.id}<br><b>নাম:</b> ${order.customer_name}<br><b>স্ট্যাটাস:</b> <span style="color:green;font-weight:bold">${order.status}</span>`;
+   } else {
+     resultEl.textContent = "কোনো অর্ডার পাওয়া যায়নি।";
+   }
+ }).catch(err => {
+   console.error(err);
+   resultEl.textContent = "❌ সমস্যা হয়েছে, আবার চেষ্টা করুন।";
+ });
 });
 
 function startTimer() {
