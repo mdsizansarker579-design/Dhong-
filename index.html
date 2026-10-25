@@ -23,11 +23,13 @@ main{max-width:1100px;margin:25px auto;padding:0 14px}
 .categories button{background:white;border:1px solid #ddd;white-space:nowrap}
 .grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
 .product{background:white;border:1px solid #e5e7eb;border-radius:13px;overflow:hidden}
-.art{height:160px;display:grid;place-items:center;background:#f0f2f5}
-.art img{width:100%;height:100%;object-fit:cover}
+.art{height:160px;display:grid;place-items:center;background:linear-gradient(135deg,#f8dfe4,#e4e9f7)}
+.shape{width:90px;height:110px;border-radius:25px 25px 10px 10px;background:linear-gradient(135deg,#a04c67,#e99aa8)}
+.product:nth-child(even) .shape{background:linear-gradient(135deg,#303d67,#7785b6)}
 .info{padding:12px}
 .info h3{font-size:14px;min-height:35px}
 .price{font-size:17px;font-weight:bold}
+.old{font-size:12px;text-decoration:line-through;color:#888}
 .buy{width:100%;margin-top:12px;background:#e85d75;color:white;font-weight:bold}
 .benefits{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:25px 0}
 .benefit{background:white;border:1px solid #eee;padding:15px;border-radius:12px}
@@ -40,6 +42,7 @@ footer{background:#17243a;color:white;padding:25px;line-height:1.8}
 .field input,.field select,.field textarea{display:block;width:100%;padding:11px;margin-top:6px;border:1px solid #ddd;border-radius:8px}
 .modal .primary{width:100%;margin-top:10px}
 .close{float:right;background:#eee}
+.note{font-size:12px;color:#666;line-height:1.6}
 @media(max-width:700px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.art{height:135px}.hero h1{font-size:27px}.benefits{grid-template-columns:1fr}header{padding:10px}.search{order:3;flex-basis:100%}}
 </style>
 </head>
@@ -68,6 +71,12 @@ footer{background:#17243a;color:white;padding:25px;line-height:1.8}
     <button onclick="setCategory('অ্যাক্সেসরিজ')">অ্যাক্সেসরিজ</button>
   </div>
   <div class="grid" id="grid"></div>
+
+  <div class="benefits">
+    <div class="benefit">🚚 <b>সারা বাংলাদেশে ডেলিভারি</b></div>
+    <div class="benefit">💵 <b>ক্যাশ অন ডেলিভারি</b></div>
+    <div class="benefit">🔒 <b>অ্যাকাউন্ট ছাড়াই অর্ডার</b></div>
+  </div>
 </main>
 
 <footer>
@@ -76,7 +85,6 @@ footer{background:#17243a;color:white;padding:25px;line-height:1.8}
   <button onclick="openTrack()">আমার অর্ডার ট্র্যাক করুন</button>
 </footer>
 
-<!-- অর্ডার মডাল -->
 <div class="modalbg" id="orderModal">
   <div class="modal">
     <button class="close" onclick="closeModal('orderModal')">✕</button>
@@ -92,7 +100,7 @@ footer{background:#17243a;color:white;padding:25px;line-height:1.8}
         <input name="phone" required inputmode="tel" pattern="01[3-9][0-9]{8}" placeholder="01XXXXXXXXX">
       </label>
 
-      <label class="field">কালার নির্বাচন করুন
+      <label class="field">কালার / রং
         <select name="color" id="productColor" required>
           <option value="Standard">স্ট্যান্ডার্ড</option>
           <option value="Black">কালো (Black)</option>
@@ -122,14 +130,21 @@ footer{background:#17243a;color:white;padding:25px;line-height:1.8}
         </select>
       </label>
 
-      <label class="field">ডেলিভারি এলাকা (চার্জ)</label>
-      <select name="deliveryArea" id="deliveryArea" onchange="updateTotal()" required>
-        <option value="60">ঢাকা ভেতরে (৳৬০)</option>
-        <option value="120">ঢাকা বাইরে / সারা দেশ (৳১২০)</option>
-      </select>
+      <label class="field">ডেলিভারি এলাকা (চার্জ)
+        <select name="deliveryFee" id="deliveryFee" onchange="updateTotal()" required>
+          <option value="60">ঢাকা ভেতরে (৳৬০)</option>
+          <option value="120">ঢাকা বাইরে / সারা দেশ (৳১২০)</option>
+        </select>
+      </label>
 
       <label class="field">সম্পূর্ণ ঠিকানা
-        <textarea name="address" required rows="3" placeholder="বাসা, রোড, এলাকা, থানা, জেলা"></textarea>
+        <textarea name="address" required rows="3" placeholder="বাসা, রোড, এলাকা, থানা"></textarea>
+      </label>
+
+      <label class="field">পেমেন্ট পদ্ধতি
+        <select name="payment">
+          <option>ক্যাশ অন ডেলিভারি</option>
+        </select>
       </label>
 
       <p><b id="summary">মোট: ৳০</b></p>
@@ -138,14 +153,13 @@ footer{background:#17243a;color:white;padding:25px;line-height:1.8}
   </div>
 </div>
 
-<!-- ট্র্যাকিং মডাল -->
 <div class="modalbg" id="trackModal">
   <div class="modal">
     <button class="close" onclick="closeModal('trackModal')">✕</button>
     <h2>অর্ডার ট্র্যাক করুন</h2>
     <form id="trackForm">
       <label class="field">অর্ডার নম্বর
-        <input name="orderId" required placeholder="যেমন: 1, 2, 3...">
+        <input name="orderId" required placeholder="যেমন 1, 2, 3...">
       </label>
       <button class="primary" type="submit">স্ট্যাটাস দেখুন</button>
     </form>
@@ -157,10 +171,14 @@ footer{background:#17243a;color:white;padding:25px;line-height:1.8}
 const API_URL = "https://dhong-api.mdsizansarker579.workers.dev";
 
 const products=[
- {id:1,name:"এলিগ্যান্ট কটন কুর্তি",cat:"পোশাক",price:1250,img:"https://images.unsplash.com/photo-1583394838336-acd977736f90?w=300"},
- {id:2,name:"প্রিমিয়াম ক্রসব্যাগ",cat:"ব্যাগ",price:950,img:"https://images.unsplash.com/photo-1548036328-c9fa89d128fa?w=300"},
- {id:3,name:"সফট কালার থ্রি-পিস",cat:"পোশাক",price:1850,img:"https://images.unsplash.com/photo-1617627143750-d86bc21e42bb?w=300"},
- {id:4,name:"ক্লাসিক হ্যান্ডব্যাগ",cat:"ব্যাগ",price:1450,img:"https://images.unsplash.com/photo-1590874103328-eac38a683ce7?w=300"}
+ {id:1,name:"এলিগ্যান্ট কটন কুর্তি",cat:"পোশাক",price:1250},
+ {id:2,name:"প্রিমিয়াম ক্রসব্যাগ",cat:"ব্যাগ",price:950},
+ {id:3,name:"সফট কালার থ্রি-পিস",cat:"পোশাক",price:1850},
+ {id:4,name:"ক্লাসিক হ্যান্ডব্যাগ",cat:"ব্যাগ",price:1450},
+ {id:5,name:"ডেইলি ওয়্যার টপ",cat:"পোশাক",price:780},
+ {id:6,name:"স্টাইলিশ ওয়ালেট",cat:"অ্যাক্সেসরিজ",price:550},
+ {id:7,name:"ফ্যাশন স্কার্ফ",cat:"অ্যাক্সেসরিজ",price:420},
+ {id:8,name:"মিনিমাল শোল্ডার ব্যাগ",cat:"ব্যাগ",price:1150}
 ];
 
 let category="সব", selectedProduct=null;
@@ -172,7 +190,7 @@ function renderProducts(){
  const list=products.filter(p=>(category==="সব"||p.cat===category)&&p.name.toLowerCase().includes(q));
  document.getElementById("grid").innerHTML=list.map(p=>`
   <article class="product">
-   <div class="art"><img src="${p.img}" alt="${p.name}"></div>
+   <div class="art"><div class="shape"></div></div>
    <div class="info">
     <small>${p.cat}</small>
     <h3>${p.name}</h3>
@@ -189,7 +207,7 @@ function openOrder(id){
  selectedProduct=products.find(p=>p.id===id);
  document.getElementById("productId").value=id;
  document.getElementById("quantity").value="1";
- document.getElementById("deliveryArea").value="60";
+ document.getElementById("deliveryFee").value="60";
  updateTotal();
  document.getElementById("orderModal").classList.add("show");
 }
@@ -197,9 +215,9 @@ function openOrder(id){
 function updateTotal(){
  if(selectedProduct){
   const qty=Number(document.getElementById("quantity").value);
-  const deliveryFee=Number(document.getElementById("deliveryArea").value);
-  const total = (selectedProduct.price * qty) + deliveryFee;
-  document.getElementById("summary").textContent=`পণ্যের দাম: ${money(selectedProduct.price*qty)} + ডেলিভারি চার্জ: ${money(deliveryFee)} = মোট: ${money(total)}`;
+  const delivery=Number(document.getElementById("deliveryFee").value);
+  const total = (selectedProduct.price * qty) + delivery;
+  document.getElementById("summary").textContent="মোট (ডেলিভারিসহ): "+money(total);
  }
 }
 
@@ -214,24 +232,23 @@ document.getElementById("orderForm").addEventListener("submit", async function(e
 
  const formData = new FormData(e.target);
  const qty = Number(formData.get("quantity"));
- const deliveryFee = Number(formData.get("deliveryArea"));
- const productTotal = selectedProduct.price * qty;
- const grandTotal = productTotal + deliveryFee;
+ const delivery = Number(formData.get("deliveryFee"));
+ const totalPrice = (selectedProduct.price * qty) + delivery;
 
  const payload = {
    name: formData.get("name"),
    phone: formData.get("phone"),
    address: formData.get("address"),
-   items: [{ 
-     id: selectedProduct.id, 
-     name: selectedProduct.name, 
-     price: selectedProduct.price, 
+   items: [{
+     id: selectedProduct.id,
+     name: selectedProduct.name,
+     price: selectedProduct.price,
      quantity: qty,
      color: formData.get("color"),
      size: formData.get("size"),
-     deliveryFee: deliveryFee
+     deliveryFee: delivery
    }],
-   total: grandTotal
+   total: totalPrice
  };
 
  try {
@@ -244,14 +261,14 @@ document.getElementById("orderForm").addEventListener("submit", async function(e
    const data = await res.json();
 
    if(res.ok && data.success) {
-     alert(`✅ অর্ডার সফল হয়েছে!\nঅর্ডার নম্বর: #DH-${data.orderId}\nমোট (ডেলিভারি সহ): ${money(grandTotal)}`);
+     alert(`✅ সফল! অর্ডার নম্বর: #DH-${data.orderId}\nমোট: ${money(totalPrice)}`);
      e.target.reset();
      closeModal("orderModal");
    } else {
      alert("❌ সমস্যা: " + (data.error || "অর্ডার জমা হয়নি"));
    }
  } catch(err) {
-   alert("❌ নেটওয়ার্ক এরর।");
+   alert("❌ নেটওয়ার্ক কানেকশন সমস্যা।");
  } finally {
    submitBtn.disabled = false;
    submitBtn.textContent = "অর্ডার নিশ্চিত করুন";
@@ -271,13 +288,13 @@ document.getElementById("trackForm").addEventListener("submit", async function(e
    if(data.success && data.orders) {
      const order = data.orders.find(o => String(o.id) === orderId);
      if(order) {
-       resultEl.innerHTML = `<br><b>অর্ডার:</b> #DH-${order.id}<br><b>নাম:</b> ${order.customer_name}<br><b>স্ট্যাটাস:</b> <span style="color:green">${order.status}</span>`;
+       resultEl.innerHTML = `<br><b>অর্ডার নম্বর:</b> #DH-${order.id}<br><b>নাম:</b> ${order.customer_name}<br><b>স্ট্যাটাস:</b> <span style="color:green;font-weight:bold">${order.status}</span>`;
      } else {
        resultEl.textContent = "কোনো অর্ডার পাওয়া যায়নি।";
      }
    }
  } catch(err) {
-   resultEl.textContent = "স্ট্যাটাস পাওয়া যায়নি।";
+   resultEl.textContent = "ট্র্যাকিং স্ট্যাটাস আনতে সমস্যা হয়েছে।";
  }
 });
 
