@@ -3,7 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>DHONG Admin Panel</title>
+<title>DHONG Admin Panel - Firebase Connected</title>
+<!-- Firebase App & Realtime Database CDN -->
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
 <style>
 :root{--bg:#f4f6fb;--card:#fff;--text:#182230;--muted:#667085;--dark:#151b2b;--accent:#6558e8;--line:#e7eaf0;--green:#12805c}
 *{box-sizing:border-box}
@@ -56,7 +59,7 @@ th{color:var(--muted);font-weight:600}
 <body>
 <div class="layout">
 <aside class="sidebar">
-  <div class="brand">DHONG<small>ADMINISTRATION PANEL</small></div>
+  <div class="brand">DHONG<small>ADMIN PANEL</small></div>
   <nav class="nav">
     <button class="active" data-page="dashboard">▦ Dashboard</button>
     <button data-page="orders">▤ Orders</button>
@@ -72,9 +75,9 @@ th{color:var(--muted);font-weight:600}
 <header class="top">
   <div>
     <h1 id="pageTitle">Dashboard</h1>
-    <div class="muted">DHONG স্টোরের লাইভ এডমিন প্যানেল</div>
+    <div class="muted">DHONG স্টোরের লাইভ ক্লাউড এডমিন প্যানেল</div>
   </div>
-  <div class="admin">● Connected</div>
+  <div class="admin" style="background:#e8f7ef;color:#12805c">● Firebase Live</div>
 </header>
 
 <section class="page active" id="dashboard">
@@ -211,6 +214,41 @@ th{color:var(--muted);font-weight:600}
 </div>
 
 <script>
+  // Firebase Configuration from your project
+  const firebaseConfig = {
+    apiKey: "AIzaSyBNQLZU6KiVHp6IcAh4G70Trf7ThTcuLqw",
+    authDomain: "dhong-c897d.firebaseapp.com",
+    projectId: "dhong-c897d",
+    storageBucket: "dhong-c897d.firebasestorage.app",
+    messagingSenderId: "14236976798",
+    appId: "1:14236976798:web:d8ae40a5add4a70b2a1d8f",
+    measurementId: "G-J2RC81D0WB"
+  };
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.database();
+
+  let products = [];
+  let orders = [];
+  let settings = {};
+
+  // Real-time synchronization listeners
+  db.ref('dhong_products').on('value', snapshot => {
+    let data = snapshot.val();
+    products = data ? (Array.isArray(data) ? data : Object.values(data)) : [];
+    loadAdminData();
+  });
+
+  db.ref('dhong_orders').on('value', snapshot => {
+    let data = snapshot.val();
+    orders = data ? (Array.isArray(data) ? data : Object.values(data)) : [];
+    loadAdminData();
+  });
+
+  db.ref('dhong_settings').on('value', snapshot => {
+    settings = snapshot.val() || {};
+    loadAdminData();
+  });
+
 let uploadedMainBase64 = "";
 let uploadedColorsBase64 = [];
 
@@ -251,7 +289,6 @@ document.querySelectorAll(".nav button").forEach(button=>{
 });
 
 function loadAdminData() {
-  let orders = JSON.parse(localStorage.getItem("dhong_orders")) || [];
   document.getElementById("totalOrdersCount").textContent = orders.length;
   document.getElementById("newOrdersCount").textContent = orders.filter(o => o.status === 'Pending').length;
   const totalSales = orders.reduce((sum, o) => sum + Number(o.total || 0), 0);
@@ -263,9 +300,9 @@ function loadAdminData() {
 
   const searchQ = (document.getElementById("orderSearch")?.value || "").toLowerCase();
   const filteredOrders = orders.filter(o => 
-    o.customer_name.toLowerCase().includes(searchQ) || 
-    o.phone.includes(searchQ) || 
-    String(o.id).includes(searchQ)
+    (o.customer_name || "").toLowerCase().includes(searchQ) || 
+    (o.phone || "").includes(searchQ) || 
+    String(o.id || "").includes(searchQ)
   );
 
   document.getElementById("orderRows").innerHTML = filteredOrders.length === 0 ? "<tr><td colspan='9' class='empty'>কোনো অর্ডার পাওয়া যায়নি।</td></tr>" : 
@@ -291,7 +328,7 @@ function loadAdminData() {
           <option ${order.status==='Cancelled'?'selected':''}>Cancelled</option>
         </select>
       </td>
-      <td>${new Date(order.created_at).toLocaleString()}</td>
+      <td>${order.created_at ? new Date(order.created_at).toLocaleString() : ''}</td>
       <td><button class="btn" style="background:#ff4d4d;color:white;padding:5px 8px;font-size:11px" onclick="deleteOrder('${order.id}')">ডিলিট</button></td>
     </tr>`;
   }).join("");
@@ -300,7 +337,6 @@ function loadAdminData() {
     <tr><td>#DH-${o.id}</td><td>${o.customer_name}</td><td>৳ ${o.total}</td><td><span class="pill pending">${o.status}</span></td></tr>
   `).join("") || "<tr><td colspan='4' class='empty'>কোনো অর্ডার নেই।</td></tr>";
 
-  let products = JSON.parse(localStorage.getItem("dhong_products")) || [];
   document.getElementById("productList").innerHTML = products.map((p, idx) => {
     let path = window.location.pathname;
     let baseDir = path.substring(0, path.lastIndexOf('/') + 1);
@@ -321,7 +357,6 @@ function loadAdminData() {
     `;
   }).join("");
 
-  let settings = JSON.parse(localStorage.getItem("dhong_settings")) || {};
   document.getElementById("setAdminEmail").value = settings.adminEmail || "";
   document.getElementById("setSiteName").value = settings.siteName || "ঢং DHONG";
   document.getElementById("setThemeColor").value = settings.themeColor || "#e85d75";
@@ -349,29 +384,26 @@ function loadAdminData() {
 }
 
 function updateOrderStatus(orderId, newStatus){
-  let orders = JSON.parse(localStorage.getItem("dhong_orders")) || [];
   let ord = orders.find(o => String(o.id) === String(orderId));
   if(ord) {
     ord.status = newStatus;
-    localStorage.setItem("dhong_orders", JSON.stringify(orders));
-    alert("✅ অর্ডার স্ট্যাটাস আপডেট হয়েছে!");
-    loadAdminData();
+    db.ref('dhong_orders').set(orders).then(() => {
+      alert("✅ অর্ডার স্ট্যাটাস আপডেট হয়েছে!");
+    });
   }
 }
 
 function deleteOrder(orderId){
   if(confirm("আপনি কি নিশ্চিতভাবে এই অর্ডারটি ডিলিট করতে চান?")) {
-    let orders = JSON.parse(localStorage.getItem("dhong_orders")) || [];
     orders = orders.filter(o => String(o.id) !== String(orderId));
-    localStorage.setItem("dhong_orders", JSON.stringify(orders));
-    alert("✅ অর্ডার সফলভাবে মুছে ফেলা হয়েছে!");
-    loadAdminData();
+    db.ref('dhong_orders').set(orders).then(() => {
+      alert("✅ অর্ডার সফলভাবে মুছে ফেলা হয়েছে!");
+    });
   }
 }
 
 document.getElementById("productForm").addEventListener("submit", function(e){
   e.preventDefault();
-  let products = JSON.parse(localStorage.getItem("dhong_products")) || [];
   let editIdx = document.getElementById("editIndex").value;
   
   let finalImg = uploadedMainBase64 || document.getElementById("pImg").value;
@@ -406,18 +438,16 @@ document.getElementById("productForm").addEventListener("submit", function(e){
     alert("✅ নতুন পণ্য যোগ করা হয়েছে!");
   }
 
-  localStorage.setItem("dhong_products", JSON.stringify(products));
+  db.ref('dhong_products').set(products);
   e.target.reset();
   uploadedMainBase64 = "";
   uploadedColorsBase64 = [];
   document.getElementById("previewImage").style.display = "none";
   document.getElementById("editIndex").value = "";
   document.getElementById("formTitle").textContent = "পণ্য যোগ / তথ্য এডিট";
-  loadAdminData();
 });
 
 function editProduct(idx) {
-  let products = JSON.parse(localStorage.getItem("dhong_products")) || [];
   let p = products[idx];
   document.getElementById("editIndex").value = idx;
   document.getElementById("pName").value = p.name;
@@ -441,15 +471,13 @@ function editProduct(idx) {
 }
 
 function deleteProduct(id){
-  let products = JSON.parse(localStorage.getItem("dhong_products")) || [];
   products = products.filter(p => p.id !== id);
-  localStorage.setItem("dhong_products", JSON.stringify(products));
-  loadAdminData();
+  db.ref('dhong_products').set(products);
 }
 
 document.getElementById("settingsForm").addEventListener("submit", function(e){
   e.preventDefault();
-  const settings = {
+  const newSettings = {
     adminEmail: document.getElementById("setAdminEmail").value,
     siteName: document.getElementById("setSiteName").value,
     themeColor: document.getElementById("setThemeColor").value,
@@ -473,11 +501,10 @@ document.getElementById("settingsForm").addEventListener("submit", function(e){
     btnWaChatText: document.getElementById("btnWaChat").value,
     btnCallNowText: document.getElementById("btnCallNow").value
   };
-  localStorage.setItem("dhong_settings", JSON.stringify(settings));
-  alert("✅ সমস্ত সেটিংস সফলভাবে সেভ হয়েছে!");
+  db.ref('dhong_settings').set(newSettings).then(() => {
+    alert("✅ সমস্ত সেটিংস সফলভাবে ক্লাউডে সেভ হয়েছে!");
+  });
 });
-
-window.onload = loadAdminData;
 </script>
 </body>
 </html>
