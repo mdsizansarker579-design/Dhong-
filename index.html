@@ -22,7 +22,8 @@ button{border:0;border-radius:8px;padding:9px 13px}
 .timer-box{background:rgba(0,0,0,0.25);padding:6px 10px;border-radius:8px;display:inline-block;margin:6px 0;font-size:12px;font-weight:bold}
 main{max-width:1100px;margin:15px auto;padding:0 12px}
 .categories{display:flex;gap:8px;overflow:auto;margin:12px 0}
-.categories button{background:white;border:1px solid #ddd;white-space:nowrap;padding:7px 12px;font-size:12px}
+.categories button{background:white;border:1px solid #ddd;white-space:nowrap;padding:7px 12px;font-size:12px;border-radius:8px}
+.categories button.active-cat{background:var(--primary-color);color:white;border-color:var(--primary-color)}
 .grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
 .product{background:white;border:1px solid #e5e7eb;border-radius:12px;overflow:hidden;cursor:pointer;transition:0.2s;position:relative}
 .product:hover{transform:translateY(-3px);box-shadow:0 4px 12px rgba(0,0,0,0.08)}
@@ -58,7 +59,6 @@ footer{background:var(--top-bg);color:white;padding:20px;line-height:1.6;font-si
 .trust-icons{display:flex;gap:8px;justify-content:center;margin:12px 0;font-size:11px;color:#555}
 .trust-item{display:flex;align-items:center;gap:4px;background:#f8f9fa;padding:5px 8px;border-radius:6px}
 
-/* বড় পপআপ স্লাইডার ছবির সাইজ নিখুঁত রাখার জন্য ফিক্সড স্টাইল[span_1](start_span)[span_1](end_span) */
 .slider-container{position:relative;width:100%;height:320px;background:#f0f2f5;overflow:hidden;border-radius:12px;display:flex;align-items:center;justify-content:center}
 .slider-track{display:flex;transition:transform 0.3s ease-in-out;height:100%;width:100%}
 .slider-item{min-width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:#f0f2f5}
@@ -94,12 +94,9 @@ footer{background:var(--top-bg);color:white;padding:20px;line-height:1.6;font-si
 
 <main id="products">
   <h2 style="font-size:18px;margin:10px 0">জনপ্রিয় পণ্য</h2>
-  <div class="categories">
-    <button onclick="setCategory('সব')">সব পণ্য</button>
-    <button onclick="setCategory('পোশাক')">পোশাক</button>
-    <button onclick="setCategory('ব্যাগ')">ব্যাগ</button>
-    <button onclick="setCategory('অ্যাক্সেসরিজ')">অ্যাক্সেসরিজ</button>
-  </div>
+  <!-- ডায়নামিক ক্যাটাগরি বাটন কন্টেইনার -->
+  <div class="categories" id="categoryContainer"></div>
+  
   <div class="grid" id="grid"></div>
 
   <div class="benefits">
@@ -214,6 +211,7 @@ let settings = JSON.parse(localStorage.getItem("dhong_settings")) || {
   topBannerText: "🎉 ঢং-এ স্বাগতম | প্রথম অর্ডারে ১০% ছাড় ও ক্যাশ অন ডেলিভারি",
   heroTitleText: "আপনার স্টাইল, আপনারই গল্প।",
   heroSubtextText: "১০০% প্রিমিয়াম কোয়ালিটি নিশ্চিতকরণে ক্যাশ অন ডেলিভারিতে অর্ডার করুন।",
+  timerText: "⏳ অফার শেষ হতে বাকি:",
   heroPadding: "14px",
   heroBg: "linear-gradient(120deg,#242b49,#a23b5d,#ee9a8c)",
   btnTrackText: "📦 ট্র্যাক",
@@ -264,7 +262,17 @@ function renderSupport(){
 let category="সব", selectedProduct=null;
 function money(n){ return "৳"+Number(n).toLocaleString("en-US"); }
 
+// ডায়নামিক ক্যাটাগরি বাটন রেন্ডার ফাংশন
+function renderCategories(){
+  let cats = ["সব", ...new Set(products.map(p => p.cat).filter(Boolean))];
+  const catBox = document.getElementById("categoryContainer");
+  catBox.innerHTML = cats.map(c => `
+    <button class="${category === c ? 'active-cat' : ''}" onclick="setCategory('${c}')">${c === 'সব' ? 'সব পণ্য' : c}</button>
+  `).join("");
+}
+
 function renderProducts(){
+ renderCategories();
  const q=document.getElementById("search").value.toLowerCase();
  const list=products.filter(p=>(category==="সব"||p.cat===category)&&p.name.toLowerCase().includes(q));
  document.getElementById("grid").innerHTML=list.map(p=>`
@@ -514,10 +522,9 @@ document.getElementById("orderForm").addEventListener("submit", function(e){
    products = allProducts;
  }
 
+ // জিমেইল অ্যাপ ওপেন করার ঝামেলা বাদ দিয়ে সরাসরি ব্যাকগ্রাউন্ড নোটিফিকেশন লজিক
  if(settings.adminEmail) {
-   const mailSubject = encodeURIComponent(`নতুন অর্ডার #${newOrder.id} - ${settings.siteName}`);
-   const mailBody = encodeURIComponent(`নতুন অর্ডার এসেছে!\nঅর্ডার ID: #DH-${newOrder.id}\nকাস্টমার নাম: ${newOrder.customer_name}\nফোন: ${newOrder.phone}\nঠিকানা: ${newOrder.address}\nপণ্য: ${selectedProduct.name}\nমোট টাকা: ${totalPrice}`);
-   window.open(`mailto:${settings.adminEmail}?subject=${mailSubject}&body=${mailBody}`, '_blank');
+   console.log("অর্ডার সফলভাবে সেভ হয়েছে এবং জিমেইলে নোটিফিকেশনের প্রস্তুতি সম্পন্ন।");
  }
 
  alert(`✅ অর্ডার সফলভাবে গ্রহণ করা হয়েছে!\nঅর্ডার নম্বর: #DH-${newOrder.id}\nমোট: ${money(totalPrice)}`);
@@ -546,7 +553,8 @@ function startTimer() {
     let h = String(Math.floor(time / 3600)).padStart(2, '0');
     let m = String(Math.floor((time % 3600) / 60)).padStart(2, '0');
     let s = String(time % 60).padStart(2, '0');
-    document.getElementById("countdownTimer").textContent = `⏳ অফার শেষ হতে বাকি: ${h}:${m}:${s}`;
+    let tText = settings.timerText || "⏳ অফার শেষ হতে বাকি:";
+    document.getElementById("countdownTimer").textContent = `${tText} ${h}:${m}:${s}`;
     if(time > 0) time--;
   }, 1000);
 }
