@@ -89,8 +89,8 @@ th{color:var(--muted);font-weight:600}
 <section class="page" id="orders">
   <div class="card">
     <h3 class="section-title">অর্ডার ম্যানেজমেন্ট</h3>
-    <div class="table-wrap"><table><thead><tr><th>ID</th><th>কাস্টমার</th><th>ফোন</th><th>ঠিকানা</th><th>পণ্যের বিবরণ</th><th>মোট</th><th>স্ট্যাটাস</th><th>তারিখ</th></tr></thead>
-    <tbody id="orderRows"><tr><td colspan="8" class="empty">কোনো অর্ডার নেই।</td></tr></tbody></table></div>
+    <div class="table-wrap"><table><thead><tr><th>ID</th><th>কাস্টমার</th><th>ফোন</th><th>ঠিকানা</th><th>পণ্যের বিবরণ</th><th>মোট</th><th>স্ট্যাটাস</th><th>তারিখ</th><th>অ্যাকশন</th></tr></thead>
+    <tbody id="orderRows"><tr><td colspan="9" class="empty">কোনো অর্ডার নেই।</td></tr></tbody></table></div>
   </div>
 </section>
 
@@ -116,10 +116,11 @@ th{color:var(--muted);font-weight:600}
       <div class="field-group">রেটিং (১ থেকে ৫, যেমন: 4.8) <input type="number" step="0.1" min="1" max="5" id="pRating" placeholder="4.8"></div>
       <div class="field-group">মোট সেলস সংখ্যা <input type="number" id="pSales" placeholder="100"></div>
       <div class="field-group">পণ্যের মান (Quality) <input id="pQuality" placeholder="যেমন: ১০০% সুতি কটন"></div>
-      <div class="field-group">ছবির ফাইল আপলোড (অথবা নিচে URL দিন)
-        <input type="file" id="pImgFile" accept="image/*" onchange="convertImageToBase64(this)">
-      </div>
-      <div class="field-group">ছবির লিংক (Image URL) <input id="pImg" placeholder="https://..." oninput="document.getElementById('previewImage').src=this.value; document.getElementById('previewImage').style.display='block';"></div>
+      
+      <div class="field-group">প্রধান ছবির লিংক (Image URL) <input id="pImg" placeholder="https://..." oninput="document.getElementById('previewImage').src=this.value; document.getElementById('previewImage').style.display='block';"></div>
+      
+      <div class="field-group">কালার ভ্যারিয়েন্ট ইমেজ লিংকসমূহ (কমা দিয়ে আলাদা করুন, যেমন: link1, link2, link3) <input id="pColors" placeholder="https://img1..., https://img2..."></div>
+
       <div class="field-group">ইউটিউব ভিডিও রিভিউ লিংক (YouTube URL) <input id="pVideo" placeholder="https://www.youtube.com/watch?v=..."></div>
       <div class="field-group">পণ্যের বিবরণ <textarea id="pDesc" rows="2" placeholder="সংক্ষিপ্ত বিবরণ..."></textarea></div>
       <button class="btn primary" type="submit" id="saveProductBtn">পণ্য সংরক্ষণ করুন</button>
@@ -137,8 +138,16 @@ th{color:var(--muted);font-weight:600}
 <section class="page" id="ads">
   <div class="card"><h3 class="section-title">ফেসবুক অ্যাড পিক্সেল ও ক্যাটালগ</h3><input placeholder="Pixel ID দিন"><button class="btn primary" style="margin-top:10px">সংরক্ষণ করুন</button></div>
 </section>
+
 <section class="page" id="profit">
-  <div class="card"><h3 class="section-title">প্রফিট রিপোর্ট</h3><p class="muted">ব্যবসায়িক হিসাব-নিকাশ তথ্য।</p></div>
+  <div class="card">
+    <h3 class="section-title">প্রফিট রিপোর্ট (Profit & Loss)</h3>
+    <div class="grid" style="margin-bottom:15px">
+      <div class="card" style="margin:0"><div class="stat-label">মোট সেলস রেভিনিউ</div><div class="stat" id="profitTotalSales">৳ ০</div></div>
+      <div class="card" style="margin:0"><div class="stat-label">আনুমানিক প্রফিট (লাভ)</div><div class="stat" id="netProfitAmount" style="color:var(--green)">৳ ০</div></div>
+    </div>
+    <p class="muted">প্রতিটি সফল বা প্রসেসিং অর্ডারের ভিত্তিতে মোট লাভের হিসাব এখানে দেখানো হচ্ছে।</p>
+  </div>
 </section>
 
 <section class="page" id="api">
@@ -162,20 +171,6 @@ th{color:var(--muted);font-weight:600}
 </div>
 
 <script>
-let uploadedBase64 = "";
-
-function convertImageToBase64(fileInput) {
-  if (fileInput.files && fileInput.files[0]) {
-    const reader = new FileReader();
-    reader.onload = function(e) {
-      uploadedBase64 = e.target.result;
-      document.getElementById("previewImage").src = uploadedBase64;
-      document.getElementById("previewImage").style.display = "block";
-    }
-    reader.readAsDataURL(fileInput.files[0]);
-  }
-}
-
 document.querySelectorAll(".nav button").forEach(button=>{
   button.addEventListener("click",()=>{
     document.querySelectorAll(".nav button").forEach(b=>b.classList.remove("active"));
@@ -194,7 +189,12 @@ function loadAdminData() {
   const totalSales = orders.reduce((sum, o) => sum + Number(o.total || 0), 0);
   document.getElementById("totalSalesAmount").textContent = "৳ " + totalSales.toLocaleString();
 
-  document.getElementById("orderRows").innerHTML = orders.length === 0 ? "<tr><td colspan='8' class='empty'>কোনো অর্ডার নেই।</td></tr>" : 
+  // প্রফিট রিপোর্ট ক্যালকুলেশন
+  document.getElementById("profitTotalSales").textContent = "৳ " + totalSales.toLocaleString();
+  let estimatedProfit = totalSales * 0.35; // ধরে নেওয়া হলো গড়ে ৩৫% প্রফিট মার্জিন
+  document.getElementById("netProfitAmount").textContent = "৳ " + Math.round(estimatedProfit).toLocaleString();
+
+  document.getElementById("orderRows").innerHTML = orders.length === 0 ? "<tr><td colspan='9' class='empty'>কোনো অর্ডার নেই।</td></tr>" : 
   orders.map((order, idx) => {
     let itemsText = "";
     try {
@@ -218,6 +218,7 @@ function loadAdminData() {
         </select>
       </td>
       <td>${new Date(order.created_at).toLocaleString()}</td>
+      <td><button class="btn" style="background:#ff4d4d;color:white;padding:5px 8px;font-size:11px" onclick="deleteOrder('${order.id}')">ডিলিট</button></td>
     </tr>`;
   }).join("");
 
@@ -265,11 +266,23 @@ function updateOrderStatus(idx, newStatus){
   }
 }
 
+function deleteOrder(orderId){
+  if(confirm("আপনি কি নিশ্চিতভাবে এই অর্ডারটি ডিলিট করতে চান?")) {
+    let orders = JSON.parse(localStorage.getItem("dhong_orders")) || [];
+    orders = orders.filter(o => String(o.id) !== String(orderId));
+    localStorage.setItem("dhong_orders", JSON.stringify(orders));
+    alert("✅ অর্ডার সফলভাবে মুছে ফেলা হয়েছে!");
+    loadAdminData();
+  }
+}
+
 document.getElementById("productForm").addEventListener("submit", function(e){
   e.preventDefault();
   let products = JSON.parse(localStorage.getItem("dhong_products")) || [];
   let editIdx = document.getElementById("editIndex").value;
-  let finalImg = uploadedBase64 || document.getElementById("pImg").value;
+  
+  let colorsInput = document.getElementById("pColors").value;
+  let colorsArray = colorsInput ? colorsInput.split(',').map(s => s.trim()).filter(Boolean) : [];
 
   const productData = {
     id: editIdx !== "" ? products[editIdx].id : Date.now(),
@@ -281,7 +294,8 @@ document.getElementById("productForm").addEventListener("submit", function(e){
     rating: document.getElementById("pRating").value || "5.0",
     sales: Number(document.getElementById("pSales").value) || 0,
     quality: document.getElementById("pQuality").value,
-    img: finalImg,
+    img: document.getElementById("pImg").value,
+    colors: colorsArray,
     video: document.getElementById("pVideo").value,
     desc: document.getElementById("pDesc").value,
     comments: editIdx !== "" ? (products[editIdx].comments || []) : []
@@ -297,7 +311,6 @@ document.getElementById("productForm").addEventListener("submit", function(e){
 
   localStorage.setItem("dhong_products", JSON.stringify(products));
   e.target.reset();
-  uploadedBase64 = "";
   document.getElementById("previewImage").style.display = "none";
   document.getElementById("editIndex").value = "";
   document.getElementById("formTitle").textContent = "পণ্য যোগ / তথ্য এডিট";
@@ -317,6 +330,7 @@ function editProduct(idx) {
   document.getElementById("pSales").value = p.sales || 0;
   document.getElementById("pQuality").value = p.quality || "";
   document.getElementById("pImg").value = p.img || "";
+  document.getElementById("pColors").value = p.colors ? p.colors.join(', ') : "";
   if(p.img) {
     document.getElementById("previewImage").src = p.img;
     document.getElementById("previewImage").style.display = "block";
