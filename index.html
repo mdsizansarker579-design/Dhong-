@@ -317,12 +317,12 @@ function makeThumb(src){
     if (!String(src).startsWith("data:")) return resolve(src);
     const img = new Image();
     img.onload = () => {
-      const s = 90, r = Math.min(s / img.width, s / img.height, 1);
+      const s = 300, r = Math.min(s / img.width, s / img.height, 1);
       const c = document.createElement("canvas");
       c.width = Math.max(1, Math.round(img.width * r));
       c.height = Math.max(1, Math.round(img.height * r));
       c.getContext("2d").drawImage(img, 0, 0, c.width, c.height);
-      resolve(c.toDataURL("image/jpeg", 0.6));
+      resolve(c.toDataURL("image/jpeg", 0.85));
     };
     img.onerror = () => resolve("");
     img.src = src;
