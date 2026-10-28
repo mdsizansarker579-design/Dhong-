@@ -31,7 +31,7 @@ header{background:var(--card-bg);padding:14px;display:flex;align-items:center;ga
 .primary{background:var(--primary-color);color:white;font-weight:bold}
 .primary:hover{background:var(--primary-hover)}
 
-.hero{margin:12px auto;max-width:1100px;border-radius:16px;color:white;padding:20px;box-shadow:0 8px 20px rgba(0,0,0,0.12);overflow:hidden;position:relative}
+.hero{margin:12px auto;max-width:1100px;border-radius:16px;color:white;padding:20px;box-shadow:0 8px 20px rgba(0,0,0,0.12);overflow:hidden;position:relative;background:#242b49}
 .banner-slider-track{display:flex;transition:transform 0.5s ease-in-out;width:100%}
 .banner-slide{min-width:100%;box-sizing:border-box;display:flex;flex-direction:column;justify-content:center}
 .hero h1{font-size:22px;margin:0 0 8px 0;line-height:1.3}
@@ -70,7 +70,6 @@ main{max-width:1100px;margin:15px auto;padding:0 12px}
 footer{background:var(--top-bg);color:white;padding:24px 16px;line-height:1.6;font-size:13px;text-align:center}
 footer button{background:rgba(255,255,255,0.15);color:white;border:1px solid rgba(255,255,255,0.3)}
 
-/* Modal Fixes for All Devices & Screen Cuts */
 .modalbg{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.65);align-items:center;justify-content:center;padding:10px;z-index:999;backdrop-filter:blur(3px)}
 .modalbg.show{display:flex}
 .modal{background:var(--card-bg);border-radius:16px;padding:18px;width:100%;max-width:520px;max-height:85vh;overflow-y:auto;position:relative;box-shadow:0 10px 25px rgba(0,0,0,0.25);-webkit-overflow-scrolling:touch}
@@ -80,7 +79,6 @@ footer button{background:rgba(255,255,255,0.15);color:white;border:1px solid rgb
 .field input:focus,.field select:focus,.field textarea:focus{border-color:var(--primary-color)}
 .modal .primary{width:100%;margin-top:10px;padding:12px;font-size:15px}
 
-/* Fixed Close Button (Always Visible) */
 .close{position:sticky;top:0;float:right;background:#edf2f7;font-weight:bold;border-radius:50%;color:#4a5568;width:34px;height:34px;display:grid;place-items:center;z-index:10;box-shadow:0 2px 5px rgba(0,0,0,0.1)}
 
 .float-support{position:fixed;bottom:20px;right:20px;display:flex;flex-direction:column;gap:10px;z-index:99}
@@ -91,7 +89,6 @@ footer button{background:rgba(255,255,255,0.15);color:white;border:1px solid rgb
 .trust-icons{display:flex;gap:8px;justify-content:center;margin:12px 0;font-size:11px;color:#4a5568}
 .trust-item{display:flex;align-items:center;gap:4px;background:#f7fafc;padding:6px 10px;border-radius:6px;border:1px solid #edf2f7}
 
-/* Responsive AliExpress Gallery Fixes */
 .slider-container{position:relative;width:100%;max-height:260px;height:260px;background:#f7fafc;overflow:hidden;border-radius:10px;display:flex;align-items:center;justify-content:center}
 .slider-track{display:flex;transition:transform 0.3s ease-in-out;height:100%;width:100%;will-change:transform}
 .slider-item{flex:0 0 100%;min-width:100%;height:100%;display:flex;align-items:center;justify-content:center}
@@ -308,21 +305,10 @@ footer button{background:rgba(255,255,255,0.15);color:white;border:1px solid rgb
     phone: "01700000000",
     freeThreshold: "3000",
     topBannerText: "🎉 ঢং-এ স্বাগতম | প্রথম অর্ডারে ১০% ছাড় ও ক্যাশ অন ডেলিভারি",
-    heroTitleText: "আপনার স্টাইল, আপনারই গল্প।",
-    heroSubtextText: "১০০% প্রিমিয়াম কোয়ালিটি নিশ্চিতকরণে অর্ডার করুন।",
+    heroBg: "#242b49",
     timerStatus: "show",
     timerHours: "24",
-    timerText: "⏳ অফার শেষ হতে বাকি:",
-    heroPadding: "20px",
-    heroBg: "linear-gradient(120deg,#242b49,#a23b5d,#ee9a8c)",
-    btnTrackText: "📦 ট্র্যাক",
-    btnViewProductsText: "পণ্য দেখুন ↓",
-    btnBuyNowText: "অর্ডার করুন",
-    btnDetailOrderText: "সরাসরি ফর্ম পূরণ করে অর্ডার করুন",
-    btnWaOrderText: "💬 WhatsApp-এ এই পণ্যটি অর্ডার করুন",
-    btnConfirmOrderText: "অর্ডার নিশ্চিত করুন",
-    btnWaChatText: "💬 WhatsApp চ্যাট",
-    btnCallNowText: "📞 Call Now"
+    timerText: "⏳ অফার শেষ হতে বাকি:"
   };
 
   function getUrlParameter(name) {
@@ -454,12 +440,9 @@ footer button{background:rgba(255,255,255,0.15);color:white;border:1px solid rgb
     document.getElementById("footerLogo").textContent = settings.siteName;
     document.getElementById("siteTitle").textContent = settings.siteName + " | Customer Panel";
     document.getElementById("topBanner").textContent = settings.topBannerText || "🎉 ঢং-এ স্বাগতম | প্রথম অর্ডারে ১০% ছাড়";
-    document.getElementById("btnTrackEl").textContent = settings.btnTrackText || "📦 ট্র্যাক";
-    document.getElementById("footerTrackBtn").textContent = settings.btnTrackText ? "আমার " + settings.btnTrackText : "আমার অর্ডার ট্র্যাক করুন";
 
     const heroEl = document.getElementById("heroBox");
-    heroEl.style.padding = settings.heroPadding || "20px";
-    heroEl.style.background = settings.heroBg || "linear-gradient(120deg,#242b49,#a23b5d,#ee9a8c)";
+    heroEl.style.background = settings.heroBg || "#242b49";
 
     const timerEl = document.getElementById("countdownTimer");
     timerEl.style.display = (settings.timerStatus === "hide") ? "none" : "inline-block";
@@ -482,8 +465,8 @@ footer button{background:rgba(255,255,255,0.15);color:white;border:1px solid rgb
   function renderSupport(){
     const box = document.getElementById("supportButtons");
     let html = "";
-    if(settings.whatsapp) html += `<a href="https://wa.me/${settings.whatsapp}" target="_blank" class="support-btn">${settings.btnWaChatText || "💬 WhatsApp চ্যাট"}</a>`;
-    if(settings.phone) html += `<a href="tel:${settings.phone}" class="support-btn call">${settings.btnCallNowText || "📞 Call Now"}</a>`;
+    if(settings.whatsapp) html += `<a href="https://wa.me/${settings.whatsapp}" target="_blank" class="support-btn">💬 WhatsApp চ্যাট</a>`;
+    if(settings.phone) html += `<a href="tel:${settings.phone}" class="support-btn call">📞 Call Now</a>`;
     box.innerHTML = html;
   }
 
@@ -537,7 +520,7 @@ footer button{background:rgba(255,255,255,0.15);color:white;border:1px solid rgb
           ${displayOldPrice ? `<div class="old-price">${money(displayOldPrice)}</div>` : ''}
         </div>
         <div class="sales-badge">🔥 <b>${p.sales || 0}+</b> পিস বিক্রি হয়েছে</div>
-        <button class="buy" ${p.stock <= 0 ? 'disabled' : ''} onclick="event.stopPropagation(); currentSelectedImg=''; openOrder('${p.id}')">${p.stock <= 0 ? 'স্টক শেষ' : (settings.btnBuyNowText || 'অর্ডার করুন')}</button>
+        <button class="buy" ${p.stock <= 0 ? 'disabled' : ''} onclick="event.stopPropagation(); currentSelectedImg=''; openOrder('${p.id}')">${p.stock <= 0 ? 'স্টক শেষ' : 'অর্ডার করুন'}</button>
       </div>
     </article>
     `}).join("");
@@ -625,9 +608,9 @@ footer button{background:rgba(255,255,255,0.15);color:white;border:1px solid rgb
           </div>
         ` : ''}
 
-        <button class="primary" ${p.stock <= 0 ? 'disabled' : ''} onclick="closeModal('detailModal'); openOrder('${p.id}')">${p.stock <= 0 ? 'স্টক শেষ' : (settings.btnDetailOrderText || 'সরাসরি ফর্ম পূরণ করে অর্ডার করুন')}</button>
+        <button class="primary" ${p.stock <= 0 ? 'disabled' : ''} onclick="closeModal('detailModal'); openOrder('${p.id}')">${p.stock <= 0 ? 'স্টক শেষ' : 'সরাসরি ফর্ম পূরণ করে অর্ডার করুন'}</button>
 
-        ${settings.whatsapp ? `<button type="button" class="support-btn wa-order" style="border:0;cursor:pointer" onclick="waOrder('${p.id}')">${settings.btnWaOrderText || "💬 WhatsApp-এ এই পণ্যটি অর্ডার করুন"}</button>` : ''}
+        ${settings.whatsapp ? `<button type="button" class="support-btn wa-order" style="border:0;cursor:pointer" onclick="waOrder('${p.id}')">💬 WhatsApp-এ এই পণ্যটি অর্ডার করুন</button>` : ''}
 
         <div class="comments-sec">
           <b>💬 কাস্টমার রিভিউ ও কমেন্ট</b>
