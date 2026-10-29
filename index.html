@@ -374,7 +374,9 @@ footer button{background:rgba(255,255,255,0.15);color:white;border:1px solid rgb
 
   let singleProductId = getUrlParameter('product');
   let refAffId = getUrlParameter('ref');
-  if(refAffId) localStorage.setItem("dhong_ref_id", refAffId);
+  if(refAffId) {
+    localStorage.setItem("dhong_ref_id", refAffId);
+  }
   let showAllProducts = false;
 
   try {
@@ -633,7 +635,7 @@ footer button{background:rgba(255,255,255,0.15);color:white;border:1px solid rgb
     `).join("") || "<small style='color:#888'>এখনো কোনো রিভিউ নেই।</small>";
 
     let currentAffCode = currentAffUser || localStorage.getItem("dhong_ref_id") || "MyCode";
-    let prodAffLink = window.location.origin + window.location.pathname + "?product=" + p.id + "&ref=" + currentAffCode;
+    let prodAffLink = window.location.origin + window.location.pathname + "?product=" + p.id + "&ref=" + encodeURIComponent(currentAffCode);
 
     document.getElementById("detailContent").innerHTML = `
       <div style="text-align:center">
@@ -742,7 +744,8 @@ footer button{background:rgba(255,255,255,0.15);color:white;border:1px solid rgb
     const w = window.open('', '_blank');
     const price = (isTimerExpired && p.oldPrice) ? p.oldPrice : p.price;
     const orderId = Date.now().toString().slice(-4);
-    const link = window.location.origin + window.location.pathname + "?product=" + encodeURIComponent(p.id);
+    const affiliateRef = currentAffUser || localStorage.getItem("dhong_ref_id") || "None";
+    const link = window.location.origin + window.location.pathname + "?product=" + encodeURIComponent(p.id) + "&ref=" + affiliateRef;
     const thumb = await makeThumb(currentSelectedImg || p.img);
 
     const newOrder = {
@@ -750,6 +753,7 @@ footer button{background:rgba(255,255,255,0.15);color:white;border:1px solid rgb
       customer_name: "WhatsApp Customer",
       phone: "",
       address: "",
+      affiliate_ref: affiliateRef,
       items_json: JSON.stringify([{
         name: p.name, price: price, quantity: 1, color: "", size: "", img: thumb, deliveryFee: 0
       }]),
@@ -758,6 +762,16 @@ footer button{background:rgba(255,255,255,0.15);color:white;border:1px solid rgb
       created_at: new Date().toISOString()
     };
     db.ref('dhong_orders').push(newOrder);
+
+    // FIX: Fixed Affiliate transaction update for WhatsApp orders
+    if(affiliateRef && affiliateRef !== "None") {
+      db.ref('dhong_affiliates/' + affiliateRef).transaction(acc => {
+        acc = acc || { sales: 0, commission: 0 };
+        acc.sales = (Number(acc.sales) || 0) + 1;
+        acc.commission = (Number(acc.commission) || 0) + Math.round(price * 0.05);
+        return acc;
+      });
+    }
 
     const text = `আসসালামু আলাইকুম, আমি এই পণ্যটি অর্ডার করতে চাই:\nঅর্ডার নম্বর: #DH-${orderId}\nপণ্য: ${p.name}\nপণ্য আইডি: ${p.id}\nমূল্য: ${money(price)}\nলিংক: ${link}`;
     const url = `https://wa.me/${settings.whatsapp}?text=${encodeURIComponent(text)}`;
@@ -822,7 +836,6 @@ footer button{background:rgba(255,255,255,0.15);color:white;border:1px solid rgb
     checkAffiliateLogin();
   }
 
-  /* Advanced Affiliate Functions */
   function affiliateRegister() {
     const u = document.getElementById("affUser").value.trim().replace(/[^a-zA-Z0-9_]/g, '');
     const p = document.getElementById("affPass").value.trim();
@@ -933,6 +946,7 @@ footer button{background:rgba(255,255,255,0.15);color:white;border:1px solid rgb
     document.getElementById("supportButtons").style.display = "flex";
   }
 
+  // FIX: Fixed Affiliate Sales & Commission Transaction Logic during Normal Order Form Submission
   document.getElementById("orderForm").addEventListener("submit", async function(e){
     e.preventDefault();
     const form = e.target;
@@ -953,7 +967,7 @@ footer button{background:rgba(255,255,255,0.15);color:white;border:1px solid rgb
     const totalPrice = (subtotal - discount) + delivery;
 
     const thumb = await makeThumb(currentSelectedImg || selectedProduct.img);
-    const affiliateRef = localStorage.getItem("dhong_ref_id") || "None";
+    const affiliateRef = currentAffUser || localStorage.getItem("dhong_ref_id") || "None";
 
     const newOrder = {
       id: Date.now().toString().slice(-4),
@@ -978,11 +992,12 @@ footer button{background:rgba(255,255,255,0.15);color:white;border:1px solid rgb
     db.ref('dhong_orders').push(newOrder).catch(err => console.error("order save error:", err));
     localStorage.setItem("dhong_ordered_before", "true");
 
-    if(affiliateRef !== "None") {
+    // FIX: Ensured robust update for Affiliate Sales & Commission
+    if(affiliateRef && affiliateRef !== "None") {
       db.ref('dhong_affiliates/' + affiliateRef).transaction(acc => {
         acc = acc || { sales: 0, commission: 0 };
-        acc.sales = (acc.sales || 0) + 1;
-        acc.commission = (acc.commission || 0) + Math.round(totalPrice * 0.05);
+        acc.sales = (Number(acc.sales) || 0) + 1;
+        acc.commission = (Number(acc.commission) || 0) + Math.round(totalPrice * 0.05); // 5% Commission
         return acc;
       });
     }
