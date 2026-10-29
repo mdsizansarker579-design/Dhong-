@@ -122,7 +122,7 @@ footer button{background:rgba(255,255,255,0.15);color:white;border:1px solid rgb
 <header>
   <div class="logo" id="logoText">DHONG</div>
   <input class="search" id="search" placeholder="পণ্য খুঁজুন..." oninput="renderProducts()">
-  <button onclick="openAffiliateModal()" style="background:#007bff;color:white;font-weight:bold;font-size:12px">🤝 এফিলিয়েট</button>
+  <button onclick="openAffiliateModal()" style="background:#007bff;color:white;font-weight:bold;font-size:12px">🤝 এফিলিয়েট ড্যাশবোর্ড</button>
   <button onclick="openTrack()" class="primary" id="btnTrackEl">📦 ট্র্যাক</button>
 </header>
 
@@ -258,17 +258,72 @@ footer button{background:rgba(255,255,255,0.15);color:white;border:1px solid rgb
   </div>
 </div>
 
-<!-- Affiliate Modal -->
+<!-- Advanced Affiliate Login, Signup & Withdrawal Dashboard Modal -->
 <div class="modalbg" id="affiliateModal">
   <div class="modal">
     <button class="close" onclick="closeModal('affiliateModal')">✕</button>
-    <h2>🤝 ইনস্ট্যান্ট এফিলিয়েট লিংক জেনারেটর</h2>
-    <p style="font-size:12px;color:#666">আপনার নাম বা কোড লিখে সাথে সাথে রেফারেল লিংক বানিয়ে নিন!</p>
-    <div class="field">আপনার নাম বা কোড
-      <input id="affNameInput" placeholder="যেমন: Rahim_01">
+    
+    <!-- Login/Register View -->
+    <div id="affAuthView">
+      <h2>🤝 এফিলিয়েট ড্যাশবোর্ড প্যানেল</h2>
+      <p style="font-size:12px;color:#666">ইনকাম জেনারেট ও উইথড্র করতে লগইন বা নতুন একাউন্ট খুলুন</p>
+      
+      <div class="field">এফিলিয়েট ইউজারনেম / আইডি
+        <input id="affUser" placeholder="যেমন: Rahim_01">
+      </div>
+      <div class="field">পাসওয়ার্ড
+        <input type="password" id="affPass" placeholder="পাসওয়ার্ড লিখুন...">
+      </div>
+      <div style="display:flex;gap:8px;margin-top:10px">
+        <button class="primary" style="flex:1" onclick="affiliateLogin()">লগইন করুন</button>
+        <button style="flex:1;background:#38a169;color:white;font-weight:bold" onclick="affiliateRegister()">নতুন রেজিস্টার</button>
+      </div>
+      <div id="affAuthMsg" style="color:red;font-size:12px;margin-top:10px"></div>
     </div>
-    <button class="primary" onclick="generateAffiliateLink()">লিংক তৈরি করুন</button>
-    <div id="affiliateResult" style="margin-top:12px;font-size:12px;word-break:break-all"></div>
+
+    <!-- Active Affiliate Dashboard View -->
+    <div id="affDashboardView" style="display:none">
+      <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #eee;padding-bottom:8px">
+        <h3 style="margin:0;color:#2d3748">👋 স্বাগতম, <span id="affUserDisp"></span></h3>
+        <button onclick="affiliateLogout()" style="background:#e53e3e;color:white;padding:4px 8px;font-size:11px">লগআউট</button>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:12px 0">
+        <div style="background:#f0f4ff;padding:10px;border-radius:10px;text-align:center">
+          <small style="color:#666">মোট সেলস</small>
+          <div id="affSalesCount" style="font-size:20px;font-weight:bold;color:#4c51bf">০ টি</div>
+        </div>
+        <div style="background:#e6fffa;padding:10px;border-radius:10px;text-align:center">
+          <small style="color:#666">মোট কমিশন ব্যালেন্স</small>
+          <div id="affBalance" style="font-size:20px;font-weight:bold;color:#234e52">৳ ০</div>
+        </div>
+      </div>
+
+      <div class="field" style="background:#fafafa;padding:10px;border-radius:8px">
+        <b>🔗 আপনার এফিলিয়েট রেফারেল লিংক:</b>
+        <input id="affLinkDisp" readonly onclick="this.select(); alert('✅ লিংক কপি হয়েছে!')" style="font-size:11px;margin-top:4px;cursor:pointer">
+      </div>
+
+      <hr style="margin:15px 0;border:0;border-top:1px solid #eee">
+      
+      <h4>💸 টাকা তুলুন (Withdraw Balance)</h4>
+      <div class="field">উইথড্র করার পরিমাণ (৳)
+        <input type="number" id="wAmount" placeholder="যেমন: ৫০০">
+      </div>
+      <div class="field">পেমেন্ট মেথড
+        <select id="wMethod">
+          <option value="bKash">বিকাশ (bKash Personal)</option>
+          <option value="Nagad">নগদ (Nagad Personal)</option>
+          <option value="Rocket">রকেট (Rocket)</option>
+        </select>
+      </div>
+      <div class="field">আপনার মোবাইল নম্বর
+        <input id="wPhone" placeholder="017XXXXXXXX">
+      </div>
+      <button class="primary" style="background:#2b6cb0;width:100%" onclick="submitWithdrawal()">উইথড্র রিকোয়েস্ট পাঠান</button>
+      <div id="wMsg" style="margin-top:8px;font-size:12px"></div>
+    </div>
+
   </div>
 </div>
 
@@ -295,6 +350,7 @@ footer button{background:rgba(255,255,255,0.15);color:white;border:1px solid rgb
   let currentDetailImages = [];
   let bannerIndex = 0;
   let bannerTimer = null;
+  let currentAffUser = null;
 
   let settings = {
     siteName: "ঢং DHONG",
@@ -576,7 +632,7 @@ footer button{background:rgba(255,255,255,0.15);color:white;border:1px solid rgb
       <div class="comment-item"><b>${c.name}:</b> ${c.text}</div>
     `).join("") || "<small style='color:#888'>এখনো কোনো রিভিউ নেই।</small>";
 
-    let currentAffCode = localStorage.getItem("dhong_ref_id") || "MyCode";
+    let currentAffCode = currentAffUser || localStorage.getItem("dhong_ref_id") || "MyCode";
     let prodAffLink = window.location.origin + window.location.pathname + "?product=" + p.id + "&ref=" + currentAffCode;
 
     document.getElementById("detailContent").innerHTML = `
@@ -763,18 +819,113 @@ footer button{background:rgba(255,255,255,0.15);color:white;border:1px solid rgb
 
   function openAffiliateModal() {
     document.getElementById("affiliateModal").classList.add("show");
+    checkAffiliateLogin();
   }
 
-  function generateAffiliateLink() {
-    const code = document.getElementById("affNameInput").value.trim();
-    const res = document.getElementById("affiliateResult");
-    if(!code) {
-      res.innerHTML = "<span style='color:red'>আপনার নাম বা কোড লিখুন।</span>";
+  /* Advanced Affiliate Functions */
+  function affiliateRegister() {
+    const u = document.getElementById("affUser").value.trim().replace(/[^a-zA-Z0-9_]/g, '');
+    const p = document.getElementById("affPass").value.trim();
+    const msg = document.getElementById("affAuthMsg");
+    if(!u || !p) { msg.textContent = "❌ ইউজারনেম এবং পাসওয়ার্ড দিন!"; return; }
+
+    db.ref('dhong_affiliates/' + u).once('value').then(snap => {
+      if(snap.exists() && snap.val().password) {
+        msg.textContent = "❌ এই ইউজারনেম আগে থেকেই রেজিস্টার করা!";
+      } else {
+        db.ref('dhong_affiliates/' + u).set({
+          password: p,
+          sales: 0,
+          commission: 0,
+          created_at: new Date().toISOString()
+        }).then(() => {
+          alert("✅ আপনার এফিলিয়েট একাউন্ট সফলভাবে তৈরি হয়েছে!");
+          currentAffUser = u;
+          localStorage.setItem("dhong_logged_aff", u);
+          checkAffiliateLogin();
+        });
+      }
+    });
+  }
+
+  function affiliateLogin() {
+    const u = document.getElementById("affUser").value.trim();
+    const p = document.getElementById("affPass").value.trim();
+    const msg = document.getElementById("affAuthMsg");
+    if(!u || !p) { msg.textContent = "❌ ইউজারনেম ও পাসওয়ার্ড দিন!"; return; }
+
+    db.ref('dhong_affiliates/' + u).once('value').then(snap => {
+      if(snap.exists() && snap.val().password === p) {
+        currentAffUser = u;
+        localStorage.setItem("dhong_logged_aff", u);
+        checkAffiliateLogin();
+      } else {
+        msg.textContent = "❌ ভুল ইউজারনেম বা পাসওয়ার্ড!";
+      }
+    });
+  }
+
+  function checkAffiliateLogin() {
+    const logged = localStorage.getItem("dhong_logged_aff");
+    if(logged) {
+      currentAffUser = logged;
+      document.getElementById("affAuthView").style.display = "none";
+      document.getElementById("affDashboardView").style.display = "block";
+      document.getElementById("affUserDisp").textContent = logged;
+
+      db.ref('dhong_affiliates/' + logged).on('value', snap => {
+        const data = snap.val() || { sales: 0, commission: 0 };
+        document.getElementById("affSalesCount").textContent = (data.sales || 0) + " টি";
+        document.getElementById("affBalance").textContent = money(data.commission || 0);
+      });
+
+      const affLink = window.location.origin + window.location.pathname + "?ref=" + encodeURIComponent(logged);
+      document.getElementById("affLinkDisp").value = affLink;
+    } else {
+      document.getElementById("affAuthView").style.display = "block";
+      document.getElementById("affDashboardView").style.display = "none";
+    }
+  }
+
+  function affiliateLogout() {
+    localStorage.removeItem("dhong_logged_aff");
+    currentAffUser = null;
+    checkAffiliateLogin();
+  }
+
+  function submitWithdrawal() {
+    const amt = Number(document.getElementById("wAmount").value);
+    const method = document.getElementById("wMethod").value;
+    const phone = document.getElementById("wPhone").value.trim();
+    const msg = document.getElementById("wMsg");
+
+    if(!amt || amt <= 0 || !phone) {
+      msg.innerHTML = "<span style='color:red'>❌ পরিমাণ এবং মোবাইল নম্বর দিন।</span>";
       return;
     }
-    localStorage.setItem("dhong_ref_id", code);
-    const link = window.location.origin + window.location.pathname + "?ref=" + encodeURIComponent(code);
-    res.innerHTML = `<b>আপনার মূল এফিলিয়েট লিংক:</b><br><input type="text" value="${link}" readonly style="width:100%;padding:6px;margin-top:4px" onclick="this.select()">`;
+
+    db.ref('dhong_affiliates/' + currentAffUser).once('value').then(snap => {
+      const data = snap.val() || { commission: 0 };
+      if(amt > data.commission) {
+        msg.innerHTML = "<span style='color:red'>❌ আপনার একাউন্টে পর্যাপ্ত ব্যালেন্স নেই!</span>";
+        return;
+      }
+
+      const wReq = {
+        affiliate: currentAffUser,
+        amount: amt,
+        method: method,
+        phone: phone,
+        status: "Pending",
+        created_at: new Date().toISOString()
+      };
+
+      db.ref('dhong_withdrawals').push(wReq).then(() => {
+        msg.innerHTML = "<span style='color:green'>✅ উইথড্রল রিকোয়েস্ট সফলভাবে পাঠানো হয়েছে! অ্যাডমিন চেক করে পেমেন্ট পাঠিয়ে দেবেন।</span>";
+        document.getElementById("wAmount").value = "";
+        document.getElementById("wPhone").value = "";
+      });
+    });
   }
 
   function closeModal(id){
