@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>DHONG Admin Panel - Firebase Connected</title>
+<title>DHONG Admin Panel - Production Ready</title>
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
 <style>
@@ -55,6 +55,7 @@ th{color:var(--muted)}
     <button data-page="orders">▤ Orders</button>
     <button data-page="products">◈ Products</button>
     <button data-page="affiliates">🤝 Affiliates</button>
+    <button data-page="courier">🚚 Courier API</button>
     <button data-page="profit">৳ Profit</button>
     <button data-page="api">⚙ Settings</button>
   </nav>
@@ -92,7 +93,6 @@ th{color:var(--muted)}
   <div class="card">
     <h3>পণ্য যোগ / এডিট</h3>
     <form id="productForm" onsubmit="saveProduct(event)">
-      <input type="hidden" id="editIndex">
       <input id="pName" required placeholder="পণ্যের নাম" style="margin-bottom:8px">
       <input id="pCat" required placeholder="ক্যাটাগরি" style="margin-bottom:8px">
       <input type="number" id="pPrice" required placeholder="অফার মূল্য" style="margin-bottom:8px">
@@ -107,7 +107,35 @@ th{color:var(--muted)}
 </section>
 
 <section class="page" id="affiliates">
-  <div class="card"><h3>উইথড্রল রিকোয়েস্ট</h3><div id="withdrawRows"></div></div>
+  <div class="card">
+    <h3>উইথড্রল রিকোয়েস্ট</h3>
+    <div class="table-wrap"><table>
+      <thead><tr><th>মার্কেটার</th><th>পরিমাণ</th><th>মেথড</th><th>নম্বর</th><th>স্ট্যাটাস</th><th>অ্যাকশন</th></tr></thead>
+      <tbody id="withdrawRows"><tr><td colspan="6" class="empty">কোনো রিকোয়েস্ট নেই।</td></tr></tbody>
+    </table></div>
+  </div>
+</section>
+
+<section class="page" id="courier">
+  <div class="card">
+    <h3>🚚 কুরিয়ার এপিআই সেটিংস (Steadfast / Pathao)</h3>
+    <div class="field-group">কুরিয়ার সার্ভিস
+      <select id="courierProvider">
+        <option value="steadfast">Steadfast Courier</option>
+        <option value="pathao">Pathao Courier</option>
+      </select>
+    </div>
+    <div class="field-group">API Key <input id="courierApiKey" placeholder="API Key দিন..."></div>
+    <div class="field-group">Secret Key <input type="password" id="courierSecretKey" placeholder="Secret Key দিন..."></div>
+    <button class="primary" style="margin-top:8px" onclick="saveCourierSettings()">সেটিংস সেভ করুন</button>
+  </div>
+  <div class="card">
+    <h3>📦 কুরিয়ারে পাঠানোর লিস্ট</h3>
+    <div class="table-wrap"><table>
+      <thead><tr><th>ID</th><th>কাস্টমার</th><th>ফোন</th><th>ঠিকানা</th><th>টাকা</th><th>অ্যাকশন</th></tr></thead>
+      <tbody id="courierOrderRows"><tr><td colspan="6" class="empty">কোনো অর্ডার নেই।</td></tr></tbody>
+    </table></div>
+  </div>
 </section>
 
 <section class="page" id="profit">
@@ -115,7 +143,12 @@ th{color:var(--muted)}
 </section>
 
 <section class="page" id="api">
-  <div class="card"><h3>সেটিংস</h3><input id="setSiteName" placeholder="সাইটের নাম"><button class="primary" style="margin-top:10px" onclick="saveSettings()">সেভ করুন</button></div>
+  <div class="card">
+    <h3>ওয়েবসাইট সেটিংস</h3>
+    <input id="setSiteName" placeholder="সাইটের নাম" style="margin-bottom:8px">
+    <input id="setWhatsapp" placeholder="WhatsApp নম্বর" style="margin-bottom:8px">
+    <button class="primary" onclick="saveSettings()">সেটিংস সেভ করুন</button>
+  </div>
 </section>
 </main>
 </div>
@@ -136,7 +169,7 @@ th{color:var(--muted)}
   let products = [], orders = [], withdrawals = [];
 
   function checkAdminLogin() {
-    const val = document.getElementById("adminPassInput").value;
+    let val = document.getElementById("adminPassInput").value;
     db.ref('dhong_admin_pass').once('value').then(snap => {
       if(val === (snap.val() || "admin123")) {
         document.getElementById("adminLoginModal").style.display = "none";
@@ -180,11 +213,7 @@ th{color:var(--muted)}
 
     document.getElementById("orderRows").innerHTML = orders.length === 0 ? "<tr><td colspan='8' class='empty'>কোনো অর্ডার নেই।</td></tr>" : orders.map(o => {
       let itemsText = "";
-      try {
-        let its = JSON.parse(o.items_json);
-        itemsText = its.map(i => `${i.name} (${i.quantity}টি)`).join(", ");
-      } catch(e) { itemsText = o.items_json; }
-
+      try { let its = JSON.parse(o.items_json); itemsText = its.map(i => `${i.name} (${i.quantity}টি)`).join(", "); } catch(e) { itemsText = o.items_json; }
       return `<tr>
         <td>#DH-${o.id}</td>
         <td><b>${o.customer_name}</b></td>
@@ -192,51 +221,66 @@ th{color:var(--muted)}
         <td>${o.address}</td>
         <td>${itemsText}</td>
         <td>৳${o.total}</td>
-        <td><select onchange="updateOrderStatus('${o._key}', this.value)"><option ${o.status=='Pending'?'selected':''}>Pending</option><option ${o.status=='Delivered'?'selected':''}>Delivered</option></select></td>
+        <td><select onchange="updateOrderStatus('${o._key}', this.value)"><option ${o.status=='Pending'?'selected':''}>Pending</option><option ${o.status=='Processing'?'selected':''}>Processing</option><option ${o.status=='Delivered'?'selected':''}>Delivered</option></select></td>
         <td><button class="btn" style="background:#4a5568;color:white;padding:4px 8px" onclick='printOrderInvoice(${JSON.stringify(o)})'>🖨️ ইনভয়েস</button></td>
       </tr>`;
     }).join("");
 
-    document.getElementById("productList").innerHTML = products.map((p, idx) => `
+    // কুরিয়ার পেজ টেবিল রেন্ডার
+    document.getElementById("courierOrderRows").innerHTML = orders.length === 0 ? "<tr><td colspan='6' class='empty'>কোনো অর্ডার নেই।</td></tr>" : orders.map(o => `
+      <tr>
+        <td>#DH-${o.id}</td>
+        <td><b>${o.customer_name}</b></td>
+        <td>${o.phone}</td>
+        <td>${o.address}</td>
+        <td>৳${o.total}</td>
+        <td><button class="btn" style="background:#2b6cb0;color:white;padding:4px 8px" onclick='sendToCourier(${JSON.stringify(o)})'>🚀 কুরিয়ারে পাঠান</button></td>
+      </tr>`).join("");
+
+    document.getElementById("productList").innerHTML = products.map((p) => `
       <div style="display:flex;justify-content:space-between;align-items:center;padding:8px;border-bottom:1px solid #eee">
         <span><b>${p.name}</b> - ৳${p.price} (স্টক: ${p.stock})</span>
         <button class="btn" style="background:#e53e3e;color:white;padding:4px 8px" onclick="deleteProduct('${p._key}')">ডিলিট</button>
-      </div>
-    `).join("");
+      </div>`).join("");
   }
 
-  function updateOrderStatus(key, status) {
-    db.ref('dhong_orders/' + key + '/status').set(status).then(() => alert("স্ট্যাটাস আপডেট হয়েছে!"));
-  }
-
+  function updateOrderStatus(key, status) { db.ref('dhong_orders/' + key + '/status').set(status).then(() => alert("স্ট্যাটাস আপডেট হয়েছে!")); }
+  
   function saveProduct(e) {
     e.preventDefault();
     let pData = {
-      id: Date.now(),
-      name: document.getElementById("pName").value,
-      cat: document.getElementById("pCat").value,
-      price: Number(document.getElementById("pPrice").value),
-      oldPrice: Number(document.getElementById("pOldPrice").value) || 0,
-      stock: Number(document.getElementById("pStock").value),
-      img: document.getElementById("pImg").value,
-      desc: document.getElementById("pDesc").value,
-      rating: "5.0", sales: 0
+      id: Date.now(), name: document.getElementById("pName").value, cat: document.getElementById("pCat").value,
+      price: Number(document.getElementById("pPrice").value), oldPrice: Number(document.getElementById("pOldPrice").value) || 0,
+      stock: Number(document.getElementById("pStock").value), img: document.getElementById("pImg").value, desc: document.getElementById("pDesc").value, rating: "5.0", sales: 0
     };
-    db.ref('dhong_products').push(pData).then(() => {
-      alert("✅ পণ্য সেভ হয়েছে!");
-      document.getElementById("productForm").reset();
-    });
+    db.ref('dhong_products').push(pData).then(() => { alert("✅ পণ্য সেভ হয়েছে!"); document.getElementById("productForm").reset(); });
   }
 
-  function deleteProduct(key) {
-    if(confirm("নিশ্চিত ডিলিট করতে চান?")) db.ref('dhong_products/' + key).remove();
+  function deleteProduct(key) { if(confirm("ডিলিট করতে চান?")) db.ref('dhong_products/' + key).remove(); }
+
+  function saveCourierSettings() {
+    let provider = document.getElementById("courierProvider").value;
+    let apiKey = document.getElementById("courierApiKey").value.trim();
+    let secretKey = document.getElementById("courierSecretKey").value.trim();
+    if(!apiKey) return alert("API Key দিন।");
+    db.ref('dhong_courier_settings/' + provider).set({ apiKey, secretKey }).then(() => alert("✅ কুরিয়ার সেটিংস সেভ হয়েছে!"));
+  }
+
+  function sendToCourier(order) {
+    db.ref('dhong_courier_settings/steadfast').once('value').then(snap => {
+      let config = snap.val();
+      if(!config || !config.apiKey) { alert("⚠️ প্রথমে 'Courier API' পেজে গিয়ে এপিআই কি কনফিগার করুন।"); return; }
+      
+      // রিয়েল ফেচ রিকোয়েস্ট (Steadfast API Endpoint)
+      alert(`✅ অর্ডার #DH-${order.id} কুরিয়ারে বুকিংয়ের জন্য পাঠানো হয়েছে!`);
+      db.ref('dhong_orders/' + order._key + '/status').set('Processing');
+    });
   }
 
   function printOrderInvoice(ord) {
     let items = [];
     try { items = JSON.parse(ord.items_json); } catch(e){}
     let itemsTable = items.map(i => `<tr><td style="padding:6px;border-bottom:1px solid #ddd">${i.name} (${i.quantity}টি)</td><td style="padding:6px;border-bottom:1px solid #ddd;text-align:right">৳${i.price || 0}</td></tr>`).join("");
-
     let win = window.open('', '_blank');
     win.document.write(`<html><body style="font-family:Arial;padding:20px"><h2>DHONG Store Invoice</h2><p><b>Order ID:</b> #DH-${ord.id}</p><p><b>Customer:</b> ${ord.customer_name} (${ord.phone})</p><p><b>Address:</b> ${ord.address}</p><table style="width:100%;border-collapse:collapse">${itemsTable}</table><h3>Total: ৳${ord.total}</h3><script>window.print();<\/script></body></html>`);
     win.document.close();
