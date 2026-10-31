@@ -86,6 +86,7 @@ th{color:var(--muted);font-weight:600}
     <button data-page="affiliates" data-title="Affiliates & Withdraws">🤝 Affiliates</button>
     <button data-page="moderators" data-title="Moderators & Security">🛡️ Moderators</button>
     <button data-page="profit" data-title="Profit Report">৳ Profit</button>
+    <button data-page="courier" data-title="Courier API">🚚 Courier</button>
     <button data-page="api" data-title="Settings">⚙ Settings</button>
   </nav>
 </aside>
@@ -197,6 +198,22 @@ th{color:var(--muted);font-weight:600}
   </div>
 </section>
 
+<section class="page" id="courier">
+  <div class="card">
+    <h3 class="section-title">🚚 কুরিয়ার API সেটিংস (Steadfast)</h3>
+    <div class="muted" style="margin:0 0 12px;color:#9a5b08">⚠️ API Key ডাটাবেসে সেভ হয়। Firebase Rules ঠিক না করা পর্যন্ত নিজের ঝুঁকিতে ব্যবহার করুন। নিরাপদ উপায়: নিচের Proxy URL ব্যবহার করুন, তখন Key ব্রাউজারে লাগে না।</div>
+    <form id="courierForm">
+      <div class="field-group">API Base URL <input id="cBase" placeholder="https://portal.steadfast.com.bd/api/v1"></div>
+      <div class="field-group">API Key <input id="cKey" autocomplete="off"></div>
+      <div class="field-group">Secret Key <input type="password" id="cSecret" autocomplete="new-password"></div>
+      <div class="field-group">Proxy URL (ঐচ্ছিক, CORS সমস্যা হলে) <input id="cProxy" placeholder="https://your-worker.workers.dev"></div>
+      <div class="field-group">ডিফল্ট নোট (কুরিয়ারের জন্য) <input id="cNote" placeholder="Handle with care"></div>
+      <button class="btn primary" type="submit">সেভ করুন</button>
+      <button class="btn gray" type="button" id="cTest">ব্যালেন্স চেক (টেস্ট)</button>
+    </form>
+  </div>
+</section>
+
 <section class="page" id="api">
   <div class="card">
     <h3 class="section-title">ওয়েবসাইট ও নোটিফিকেশন সেটিংস</h3>
@@ -242,7 +259,7 @@ const STATUSES = ['WhatsApp Pending', 'Pending', 'Processing', 'Delivered', 'Can
 const LOW_STOCK = 5;
 const FULL_MAX = 900, FULL_Q = .85, THUMB_MAX = 400, THUMB_Q = .75;
 
-let products = [], orders = [], affiliates = [], withdrawals = [], settings = {};
+let products = [], orders = [], affiliates = [], withdrawals = [], settings = {}, courier = {};
 
 function toast(msg, isErr) {
   const t = document.createElement('div');
@@ -302,6 +319,7 @@ listen('dhong_products', s => { products = listFrom(s); render(); });
 listen('dhong_orders', s => { orders = listFrom(s).sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0)); render(); });
 listen('dhong_affiliates', s => { affiliates = listFrom(s); render(); });
 listen('dhong_withdrawals', s => { withdrawals = listFrom(s); render(); });
+listen('dhong_courier', s => { courier = s.val() || {}; fillCourierForm(); });
 listen('dhong_settings', s => { settings = s.val() || {}; fillSettingsForm(); });
 
 /* ---------- Rendering ---------- */
@@ -333,7 +351,8 @@ function render() {
       <td><b>${esc(o.affiliate_ref || 'None')}</b></td><td>${money(o.total)}</td>
       <td><select data-act="status" data-key="${esc(o._key)}">${STATUSES.map(s => `<option ${o.status === s ? 'selected' : ''}>${s}</option>`).join('')}</select></td>
       <td>${o.created_at ? esc(new Date(o.created_at).toLocaleString()) : ''}</td>
-      <td><button class="btn sm red" data-act="delOrder" data-key="${esc(o._key)}">ডিলিট</button></td></tr>`;
+      <td>${o.consignment_id ? `<small>CID: ${esc(o.consignment_id)}<br>${esc(o.courier_status || '')}</small><br><button class="btn sm gray" data-act="trackCourier" data-key="${esc(o._key)}">স্ট্যাটাস</button>` : `<button class="btn sm blue" data-act="sendCourier" data-key="${esc(o._key)}">🚚 কুরিয়ারে পাঠান</button>`}
+      <button class="btn sm red" data-act="delOrder" data-key="${esc(o._key)}">ডিলিট</button></td></tr>`;
   }).join('') || '<tr><td colspan="10" class="empty">কোনো অর্ডার পাওয়া যায়নি।</td></tr>';
 
   $('withdrawRows').innerHTML = withdrawals.map(w => `<tr><td><b>${esc(w.affiliate)}</b></td><td>${money(w.amount)}</td><td>${esc(w.method)}</td><td><b>${esc(w.phone)}</b></td>
@@ -382,6 +401,8 @@ document.addEventListener('click', e => {
   const { act, key } = b.dataset;
   if (act === 'delOrder' && confirm('এই অর্ডার ডিলিট করবেন?')) db.ref('dhong_orders/' + key).remove().then(() => toast('✅ অর্ডার মুছে গেছে')).catch(fail);
   if (act === 'pay') approveWithdrawal(key);
+  if (act === 'sendCourier') sendCourier(key, b);
+  if (act === 'trackCourier') trackCourier(key, b);
   if (act === 'copy') navigator.clipboard.writeText(b.dataset.link).then(() => toast('✅ লিংক কপি হয়েছে'));
   if (act === 'editProduct') editProduct(key);
   if (act === 'delProduct') deleteProduct(key);
@@ -491,6 +512,69 @@ function editProduct(key) {
 function deleteProduct(key) {
   const p = products.find(x => x._key === key); if (!p || !confirm('এই পণ্যটি ডিলিট করবেন? (' + p.name + ')')) return;
   Promise.all([db.ref('dhong_products/' + key).remove(), db.ref('dhong_images/' + p.id).remove()]).then(() => toast('✅ পণ্য মুছে গেছে')).catch(fail);
+}
+
+/* ---------- Courier (Steadfast) ---------- */
+const DEFAULT_COURIER_BASE = 'https://portal.steadfast.com.bd/api/v1';
+function fillCourierForm() {
+  const v = (id, val) => { const el = $(id); if (el) el.value = val || ''; };
+  v('cBase', courier.baseUrl || DEFAULT_COURIER_BASE); v('cKey', courier.apiKey); v('cSecret', courier.secretKey);
+  v('cProxy', courier.proxyUrl); v('cNote', courier.note);
+}
+$('courierForm').addEventListener('submit', e => {
+  e.preventDefault();
+  db.ref('dhong_courier').set({
+    baseUrl: $('cBase').value.trim(), apiKey: $('cKey').value.trim(), secretKey: $('cSecret').value.trim(),
+    proxyUrl: $('cProxy').value.trim(), note: $('cNote').value.trim()
+  }).then(() => toast('✅ কুরিয়ার সেটিংস সংরক্ষণ হয়েছে')).catch(fail);
+});
+async function courierCall(path, method, body) {
+  const c = courier, proxy = (c.proxyUrl || '').replace(/\/$/, '');
+  if (!proxy && (!c.apiKey || !c.secretKey)) throw new Error('Courier ট্যাবে API Key ও Secret Key দিন।');
+  const url = (proxy || (c.baseUrl || DEFAULT_COURIER_BASE).replace(/\/$/, '')) + path;
+  const headers = { 'Content-Type': 'application/json', Accept: 'application/json' };
+  if (!proxy) { headers['Api-Key'] = c.apiKey; headers['Secret-Key'] = c.secretKey; }
+  let r;
+  try { r = await fetch(url, { method, headers, body: body ? JSON.stringify(body) : undefined }); }
+  catch { throw new Error('কুরিয়ার সার্ভারে পৌঁছানো যায়নি (CORS/নেটওয়ার্ক)। Proxy URL ব্যবহার করুন।'); }
+  const j = await r.json().catch(() => ({}));
+  if (!r.ok) throw new Error(j.message || 'কুরিয়ার API এরর (' + r.status + ')');
+  return j;
+}
+$('cTest').onclick = () => courierCall('/get_balance', 'GET')
+  .then(j => toast('✅ সংযোগ ঠিক আছে। ব্যালেন্স: ৳' + (j.current_balance ?? '?'))).catch(fail);
+
+async function sendCourier(key, btn) {
+  const o = orders.find(x => x._key === key); if (!o || o.consignment_id) return;
+  let phone = String(o.phone || '').replace(/\D/g, '').replace(/^88/, '');
+  if (!/^01\d{9}$/.test(phone)) return toast('ফোন নম্বর সঠিক নয় (১১ ডিজিট, 01 দিয়ে শুরু)।', true);
+  if (!o.address) return toast('ঠিকানা নেই।', true);
+  if (!confirm(`#DH-${o.id} অর্ডারটি কুরিয়ারে পাঠাবেন? COD: ৳${o.total}`)) return;
+  btn.disabled = true;
+  try {
+    const j = await courierCall('/create_order', 'POST', {
+      invoice: 'DH-' + o.id, recipient_name: o.customer_name || 'Customer', recipient_phone: phone,
+      recipient_address: o.address, cod_amount: Number(o.total || 0), note: courier.note || ''
+    });
+    const c = j.consignment;
+    if (!c || !c.consignment_id) throw new Error(j.message || 'কুরিয়ার অর্ডার তৈরি হয়নি।');
+    await db.ref('dhong_orders/' + key).update({
+      courier: 'Steadfast', consignment_id: String(c.consignment_id), tracking_code: c.tracking_code || '',
+      courier_status: c.status || 'in_review', status: 'Processing'
+    });
+    toast('✅ কুরিয়ারে পাঠানো হয়েছে। CID: ' + c.consignment_id);
+  } catch (err) { fail(err); btn.disabled = false; }
+}
+async function trackCourier(key, btn) {
+  const o = orders.find(x => x._key === key); if (!o || !o.consignment_id) return;
+  btn.disabled = true;
+  try {
+    const j = await courierCall('/status_by_cid/' + encodeURIComponent(o.consignment_id), 'GET');
+    const st = j.delivery_status || 'unknown';
+    await db.ref('dhong_orders/' + key + '/courier_status').set(st);
+    toast('📦 কুরিয়ার স্ট্যাটাস: ' + st);
+  } catch (err) { fail(err); }
+  btn.disabled = false;
 }
 
 /* ---------- Settings ---------- */
