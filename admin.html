@@ -3,152 +3,106 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>DHONG Admin Panel - Production Ready</title>
+<title>DHONG Admin Panel - Full Fixed</title>
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
 <style>
-:root{--bg:#f4f6fb;--card:#fff;--text:#182230;--muted:#667085;--dark:#151b2b;--accent:#6558e8;--line:#e7eaf0;--green:#12805c}
+:root{--bg:#f4f6fb;--card:#fff;--text:#182230;--muted:#667085;--dark:#151b2b;--accent:#6558e8;--line:#e7eaf0}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);font-family:Arial,sans-serif;color:var(--text)}
 button,input,select,textarea{font:inherit}
 .layout{display:flex;min-height:100vh}
-.sidebar{width:240px;background:var(--dark);color:white;padding:20px 14px;flex-shrink:0}
-.brand{font-size:22px;font-weight:900;letter-spacing:1px;padding:8px 0;color:white}
-.brand small{display:block;font-size:10px;color:#aeb7ca;margin-top:4px}
+.sidebar{width:240px;background:var(--dark);color:white;padding:20px 14px}
+.brand{font-size:22px;font-weight:900;color:white}
 .nav{margin-top:15px;display:flex;flex-direction:column;gap:4px}
-.nav button{width:100%;text-align:left;border:0;background:transparent;color:#cbd2e1;padding:11px 12px;border-radius:8px;cursor:pointer;font-size:13px}
+.nav button{width:100%;text-align:left;border:0;background:transparent;color:#cbd2e1;padding:11px 12px;border-radius:8px;cursor:pointer}
 .nav button.active,.nav button:hover{background:#343b54;color:white;font-weight:bold}
-.main{flex:1;min-width:0;padding:20px}
-.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}
+.main{flex:1;padding:20px}
 .page{display:none}.page.active{display:block}
-.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
 .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:14px}
-.stat-label{color:var(--muted);font-size:12px}
 .stat{font-size:24px;font-weight:800;margin:10px 0 4px}
 input,select,textarea{border:1px solid #dce1eb;background:white;border-radius:8px;padding:10px;width:100%;margin-top:4px}
-.btn{border:0;border-radius:8px;padding:10px 12px;cursor:pointer;font-weight:650}
+.btn{border:0;border-radius:8px;padding:8px 12px;cursor:pointer;font-weight:bold}
 .primary{background:var(--accent);color:white}
-table{width:100%;border-collapse:collapse;min-width:550px}
-th,td{text-align:left;padding:11px 8px;border-bottom:1px solid var(--line);font-size:12px}
-th{color:var(--muted)}
-.table-wrap{overflow-x:auto}
-.empty{padding:20px;text-align:center;color:var(--muted)}
-@media(max-width:768px){.layout{flex-direction:column}.sidebar{width:100%}.grid{grid-template-columns:1fr 1fr}}
+table{width:100%;border-collapse:collapse}
+th,td{text-align:left;padding:10px;border-bottom:1px solid var(--line);font-size:12px}
+@media(max-width:768px){.layout{flex-direction:column}.sidebar{width:100%}}
 </style>
 </head>
 <body>
 
 <div id="adminLoginModal" style="position:fixed;inset:0;background:#151b2b;display:flex;align-items:center;justify-content:center;z-index:99999;">
   <div style="background:white;padding:30px;border-radius:14px;width:100%;max-width:380px;text-align:center">
-    <h2>DHONG Super Admin</h2>
-    <input type="password" id="adminPassInput" placeholder="পাসওয়ার্ড দিন..." style="margin-bottom:12px">
-    <button onclick="checkAdminLogin()" style="width:100%;padding:12px;background:#6558e8;color:white;border:0;border-radius:8px;font-weight:bold">লগইন</button>
-    <div id="loginError" style="color:red;font-size:12px;margin-top:10px"></div>
+    <h2>DHONG Admin</h2>
+    <input type="password" id="adminPassInput" placeholder="পাসওয়ার্ড..." style="margin-bottom:12px">
+    <button onclick="checkAdminLogin()" class="primary" style="width:100%;padding:12px">লগইন</button>
   </div>
 </div>
 
 <div class="layout">
 <aside class="sidebar">
-  <div class="brand">DHONG<small>SUPER ADMIN</small></div>
+  <div class="brand">DHONG<small>ADMIN</small></div>
   <nav class="nav">
     <button class="active" data-page="dashboard">▦ Dashboard</button>
     <button data-page="orders">▤ Orders</button>
-    <button data-page="products">◈ Products</button>
-    <button data-page="affiliates">🤝 Affiliates</button>
-    <button data-page="courier">🚚 Courier API</button>
+    <button data-page="products">◈ Products & Edit</button>
+    <button data-page="moderators">🛡️ Moderators</button>
     <button data-page="profit">৳ Profit</button>
-    <button data-page="api">⚙ Settings</button>
   </nav>
 </aside>
 
 <main class="main">
-<header class="top">
-  <div><h1 id="pageTitle">Dashboard</h1></div>
-  <div style="background:#e8f7ef;color:#12805c;padding:6px 10px;border-radius:8px;font-size:12px">● Super Admin Live</div>
+<header style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+  <h1 id="pageTitle" style="margin:0">Dashboard</h1>
+  <div id="notificationAlert" style="background:#fff5f5;color:#c53030;padding:6px 12px;border-radius:8px;font-size:12px;font-weight:bold;display:none">🔔 নতুন অর্ডার এসেছে!</div>
 </header>
 
 <section class="page active" id="dashboard">
   <div class="grid">
-    <div class="card"><div class="stat-label">মোট অর্ডার</div><div class="stat" id="totalOrdersCount">০</div></div>
-    <div class="card"><div class="stat-label">নতুন অর্ডার</div><div class="stat" id="newOrdersCount">০</div></div>
-    <div class="card"><div class="stat-label">মোট বিক্রি</div><div class="stat" id="totalSalesAmount">৳ ০</div></div>
-  </div>
-  <div class="card" id="lowStockAlertBox" style="background:#fff5f5;border-color:#feb2b2;display:none">
-    <h3 style="color:#c53030;margin:0 0 6px">⚠️ লো-স্টক অ্যালার্ট!</h3>
-    <div id="lowStockList" style="font-size:12px;color:#9b2c2c"></div>
+    <div class="card"><div>মোট অর্ডার</div><div class="stat" id="totalOrdersCount">০</div></div>
+    <div class="card"><div>নতুন অর্ডার</div><div class="stat" id="newOrdersCount">০</div></div>
+    <div class="card"><div>মোট বিক্রি</div><div class="stat" id="totalSalesAmount">৳ ০</div></div>
   </div>
 </section>
 
 <section class="page" id="orders">
   <div class="card">
-    <h3>অর্ডার ম্যানেজমেন্ট</h3>
-    <div class="table-wrap"><table>
-      <thead><tr><th>ID</th><th>কাস্টমার</th><th>ফোন</th><th>ঠিকানা</th><th>পণ্যের বিবরণ</th><th>মোট</th><th>স্ট্যাটাস</th><th>অ্যাকশন</th></tr></thead>
-      <tbody id="orderRows"><tr><td colspan="8" class="empty">লোড হচ্ছে...</td></tr></tbody>
-    </table></div>
+    <h3>অর্ডার লিস্ট</h3>
+    <table><thead><tr><th>ID</th><th>কাস্টমার</th><th>ফোন</th><th>টাকা</th><th>স্ট্যাটাস</th><th>অ্যাকশন</th></tr></thead><tbody id="orderRows"></tbody></table>
   </div>
 </section>
 
 <section class="page" id="products">
   <div class="card">
-    <h3>পণ্য যোগ / এডিট</h3>
+    <h3 id="formTitle">নতুন পণ্য যোগ বা এডিট</h3>
     <form id="productForm" onsubmit="saveProduct(event)">
-      <input id="pName" required placeholder="পণ্যের নাম" style="margin-bottom:8px">
-      <input id="pCat" required placeholder="ক্যাটাগরি" style="margin-bottom:8px">
-      <input type="number" id="pPrice" required placeholder="অফার মূল্য" style="margin-bottom:8px">
-      <input type="number" id="pOldPrice" placeholder="পুরোনো মূল্য" style="margin-bottom:8px">
-      <input type="number" id="pStock" required placeholder="স্টক পরিমাণ" style="margin-bottom:8px">
-      <input id="pImg" placeholder="ছবির লিংক (URL)" style="margin-bottom:8px">
-      <textarea id="pDesc" placeholder="বিবরণ" style="margin-bottom:8px"></textarea>
-      <button class="primary" type="submit" style="width:100%">পণ্য সংরক্ষণ করুন</button>
+      <input type="hidden" id="editKey">
+      <input id="pName" required placeholder="পণ্যের নাম">
+      <input id="pCat" required placeholder="ক্যাটাগরি">
+      <input type="number" id="pPrice" required placeholder="মূল্য">
+      <input type="number" id="pStock" required placeholder="স্টক">
+      <input id="pImg" placeholder="প্রধান ছবির লিংক (URL)">
+      <input id="pColors" placeholder="বাকি ছবিগুলো কমা দিয়ে দিন (Link1, Link2, Link3...)">
+      <textarea id="pDesc" placeholder="বিবরণ" rows="2"></textarea>
+      <button class="primary" type="submit" style="width:100%;margin-top:8px">পণ্য সংরক্ষণ করুন</button>
     </form>
   </div>
-  <div class="card"><div id="productList"></div></div>
+  <div class="card"><h3>প্রোডাক্ট লিস্ট (এডিট / ডিলিট)</h3><div id="productList"></div></div>
 </section>
 
-<section class="page" id="affiliates">
+<section class="page" id="moderators">
   <div class="card">
-    <h3>উইথড্রল রিকোয়েস্ট</h3>
-    <div class="table-wrap"><table>
-      <thead><tr><th>মার্কেটার</th><th>পরিমাণ</th><th>মেথড</th><th>নম্বর</th><th>স্ট্যাটাস</th><th>অ্যাকশন</th></tr></thead>
-      <tbody id="withdrawRows"><tr><td colspan="6" class="empty">কোনো রিকোয়েস্ট নেই।</td></tr></tbody>
-    </table></div>
-  </div>
-</section>
-
-<section class="page" id="courier">
-  <div class="card">
-    <h3>🚚 কুরিয়ার এপিআই সেটিংস (Steadfast / Pathao)</h3>
-    <div class="field-group">কুরিয়ার সার্ভিস
-      <select id="courierProvider">
-        <option value="steadfast">Steadfast Courier</option>
-        <option value="pathao">Pathao Courier</option>
-      </select>
-    </div>
-    <div class="field-group">API Key <input id="courierApiKey" placeholder="API Key দিন..."></div>
-    <div class="field-group">Secret Key <input type="password" id="courierSecretKey" placeholder="Secret Key দিন..."></div>
-    <button class="primary" style="margin-top:8px" onclick="saveCourierSettings()">সেটিংস সেভ করুন</button>
-  </div>
-  <div class="card">
-    <h3>📦 কুরিয়ারে পাঠানোর লিস্ট</h3>
-    <div class="table-wrap"><table>
-      <thead><tr><th>ID</th><th>কাস্টমার</th><th>ফোন</th><th>ঠিকানা</th><th>টাকা</th><th>অ্যাকশন</th></tr></thead>
-      <tbody id="courierOrderRows"><tr><td colspan="6" class="empty">কোনো অর্ডার নেই।</td></tr></tbody>
-    </table></div>
+    <h3>মডারেটর যুক্ত করুন</h3>
+    <input id="modUser" placeholder="ইউজারনেম">
+    <input type="password" id="modPass" placeholder="পাসওয়ার্ড">
+    <button class="primary" style="margin-top:8px" onclick="addModerator()">মডারেটর যোগ করুন</button>
+    <div id="modList" style="margin-top:15px"></div>
   </div>
 </section>
 
 <section class="page" id="profit">
   <div class="card"><h3>প্রফিট রিপোর্ট</h3><div class="stat" id="netProfitAmount">৳ ০</div></div>
-</section>
-
-<section class="page" id="api">
-  <div class="card">
-    <h3>ওয়েবসাইট সেটিংস</h3>
-    <input id="setSiteName" placeholder="সাইটের নাম" style="margin-bottom:8px">
-    <input id="setWhatsapp" placeholder="WhatsApp নম্বর" style="margin-bottom:8px">
-    <button class="primary" onclick="saveSettings()">সেটিংস সেভ করুন</button>
-  </div>
 </section>
 </main>
 </div>
@@ -166,7 +120,7 @@ th{color:var(--muted)}
   firebase.initializeApp(firebaseConfig);
   const db = firebase.database();
 
-  let products = [], orders = [], withdrawals = [];
+  let products = [], orders = [], lastOrderCount = 0;
 
   function checkAdminLogin() {
     let val = document.getElementById("adminPassInput").value;
@@ -174,7 +128,7 @@ th{color:var(--muted)}
       if(val === (snap.val() || "admin123")) {
         document.getElementById("adminLoginModal").style.display = "none";
         sessionStorage.setItem("dhong_admin_logged", "true");
-      } else { document.getElementById("loginError").textContent = "ভুল পাসওয়ার্ড!"; }
+      } else { alert("ভুল পাসওয়ার্ড!"); }
     });
   }
   if(sessionStorage.getItem("dhong_admin_logged") === "true") document.getElementById("adminLoginModal").style.display = "none";
@@ -185,105 +139,121 @@ th{color:var(--muted)}
       document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
       b.classList.add("active");
       document.getElementById(b.dataset.page).classList.add("active");
+      document.getElementById("pageTitle").textContent = b.textContent;
     });
   });
 
-  db.ref('dhong_products').on('value', snap => { products = listFrom(snap); loadAdminData(); });
-  db.ref('dhong_orders').on('value', snap => { orders = listFrom(snap); loadAdminData(); });
-  db.ref('dhong_withdrawals').on('value', snap => { withdrawals = listFrom(snap); loadAdminData(); });
+  db.ref('dhong_products').on('value', snap => {
+    products = []; snap.forEach(ch => { let v = ch.val(); if(v) { v._key = ch.key; products.push(v); } });
+    loadAdminData();
+  });
 
-  function listFrom(snap) {
-    let out = [];
-    snap.forEach(ch => { let v = ch.val(); if(v) { v._key = ch.key; out.push(v); } });
-    return out;
-  }
+  db.ref('dhong_orders').on('value', snap => {
+    orders = []; snap.forEach(ch => { let v = ch.val(); if(v) { v._key = ch.key; orders.push(v); } });
+    if(lastOrderCount > 0 && orders.length > lastOrderCount) {
+      // নতুন অর্ডার আসলে নোটিফিকেশন অ্যালার্ট বাজবে বা দেখাবে
+      let alertBox = document.getElementById("notificationAlert");
+      alertBox.style.display = "block";
+      setTimeout(() => alertBox.style.display = "none", 6000);
+    }
+    lastOrderCount = orders.length;
+    loadAdminData();
+  });
 
   function loadAdminData() {
     document.getElementById("totalOrdersCount").textContent = orders.length;
-    document.getElementById("newOrdersCount").textContent = orders.filter(o => o.status === 'Pending').length;
+    let newOrd = orders.filter(o => o.status === 'Pending').length;
+    document.getElementById("newOrdersCount").textContent = newOrd;
     let totalSales = orders.filter(o => o.status !== 'Cancelled').reduce((s, o) => s + Number(o.total || 0), 0);
     document.getElementById("totalSalesAmount").textContent = "৳ " + totalSales.toLocaleString();
     document.getElementById("netProfitAmount").textContent = "৳ " + Math.round(totalSales * 0.35).toLocaleString();
 
-    let lowStocks = products.filter(p => Number(p.stock) <= 5);
-    if(lowStocks.length > 0) {
-      document.getElementById("lowStockAlertBox").style.display = "block";
-      document.getElementById("lowStockList").innerHTML = lowStocks.map(p => `• ${p.name} (স্টক বাকি: ${p.stock}টি)`).join("<br>");
-    }
-
-    document.getElementById("orderRows").innerHTML = orders.length === 0 ? "<tr><td colspan='8' class='empty'>কোনো অর্ডার নেই।</td></tr>" : orders.map(o => {
-      let itemsText = "";
-      try { let its = JSON.parse(o.items_json); itemsText = its.map(i => `${i.name} (${i.quantity}টি)`).join(", "); } catch(e) { itemsText = o.items_json; }
-      return `<tr>
-        <td>#DH-${o.id}</td>
-        <td><b>${o.customer_name}</b></td>
-        <td>${o.phone}</td>
-        <td>${o.address}</td>
-        <td>${itemsText}</td>
-        <td>৳${o.total}</td>
-        <td><select onchange="updateOrderStatus('${o._key}', this.value)"><option ${o.status=='Pending'?'selected':''}>Pending</option><option ${o.status=='Processing'?'selected':''}>Processing</option><option ${o.status=='Delivered'?'selected':''}>Delivered</option></select></td>
-        <td><button class="btn" style="background:#4a5568;color:white;padding:4px 8px" onclick='printOrderInvoice(${JSON.stringify(o)})'>🖨️ ইনভয়েস</button></td>
-      </tr>`;
-    }).join("");
-
-    // কুরিয়ার পেজ টেবিল রেন্ডার
-    document.getElementById("courierOrderRows").innerHTML = orders.length === 0 ? "<tr><td colspan='6' class='empty'>কোনো অর্ডার নেই।</td></tr>" : orders.map(o => `
+    document.getElementById("orderRows").innerHTML = orders.length === 0 ? "<tr><td colspan='6'>কোনো অর্ডার নেই।</td></tr>" : orders.map(o => `
       <tr>
-        <td>#DH-${o.id}</td>
-        <td><b>${o.customer_name}</b></td>
-        <td>${o.phone}</td>
-        <td>${o.address}</td>
-        <td>৳${o.total}</td>
-        <td><button class="btn" style="background:#2b6cb0;color:white;padding:4px 8px" onclick='sendToCourier(${JSON.stringify(o)})'>🚀 কুরিয়ারে পাঠান</button></td>
+        <td>#DH-${o.id}</td><td><b>${o.customer_name}</b></td><td>${o.phone}</td><td>৳${o.total}</td>
+        <td><select onchange="updateStatus('${o._key}', this.value)"><option ${o.status=='Pending'?'selected':''}>Pending</option><option ${o.status=='Delivered'?'selected':''}>Delivered</option></select></td>
+        <td><button class="btn" style="background:#e53e3e;color:white;padding:4px 8px" onclick="deleteOrder('${o._key}')">ডিলিট</button></td>
       </tr>`).join("");
 
-    document.getElementById("productList").innerHTML = products.map((p) => `
+    document.getElementById("productList").innerHTML = products.map(p => `
       <div style="display:flex;justify-content:space-between;align-items:center;padding:8px;border-bottom:1px solid #eee">
         <span><b>${p.name}</b> - ৳${p.price} (স্টক: ${p.stock})</span>
-        <button class="btn" style="background:#e53e3e;color:white;padding:4px 8px" onclick="deleteProduct('${p._key}')">ডিলিট</button>
+        <div>
+          <button class="btn primary" style="padding:4px 8px" onclick="editProduct('${p._key}')">এডিট</button>
+          <button class="btn" style="background:#e53e3e;color:white;padding:4px 8px" onclick="deleteProduct('${p._key}')">ডিলিট</button>
+        </div>
       </div>`).join("");
+
+    loadModerators();
   }
 
-  function updateOrderStatus(key, status) { db.ref('dhong_orders/' + key + '/status').set(status).then(() => alert("স্ট্যাটাস আপডেট হয়েছে!")); }
-  
+  function updateStatus(key, status) { db.ref('dhong_orders/' + key + '/status').set(status); }
+  function deleteOrder(key) { if(confirm("অর্ডার ডিলিট করবেন?")) db.ref('dhong_orders/' + key).remove(); }
+
+  // প্রোডাক্ট সেভ বা এডিট করার ফাংশন
   function saveProduct(e) {
     e.preventDefault();
+    let key = document.getElementById("editKey").value;
+    let colorsInput = document.getElementById("pColors").value.split(',').map(s => s.trim()).filter(Boolean);
+    
     let pData = {
-      id: Date.now(), name: document.getElementById("pName").value, cat: document.getElementById("pCat").value,
-      price: Number(document.getElementById("pPrice").value), oldPrice: Number(document.getElementById("pOldPrice").value) || 0,
-      stock: Number(document.getElementById("pStock").value), img: document.getElementById("pImg").value, desc: document.getElementById("pDesc").value, rating: "5.0", sales: 0
+      id: key ? products.find(p => p._key === key).id : Date.now(),
+      name: document.getElementById("pName").value,
+      cat: document.getElementById("pCat").value,
+      price: Number(document.getElementById("pPrice").value),
+      stock: Number(document.getElementById("pStock").value),
+      img: document.getElementById("pImg").value,
+      colors: colorsInput,
+      desc: document.getElementById("pDesc").value,
+      rating: "5.0", sales: 0
     };
-    db.ref('dhong_products').push(pData).then(() => { alert("✅ পণ্য সেভ হয়েছে!"); document.getElementById("productForm").reset(); });
+
+    if(key) {
+      db.ref('dhong_products/' + key).update(pData).then(() => { alert("✅ পণ্য আপডেট হয়েছে!"); resetForm(); });
+    } else {
+      db.ref('dhong_products').push(pData).then(() => { alert("✅ নতুন পণ্য যুক্ত হয়েছে!"); resetForm(); });
+    }
   }
 
-  function deleteProduct(key) { if(confirm("ডিলিট করতে চান?")) db.ref('dhong_products/' + key).remove(); }
-
-  function saveCourierSettings() {
-    let provider = document.getElementById("courierProvider").value;
-    let apiKey = document.getElementById("courierApiKey").value.trim();
-    let secretKey = document.getElementById("courierSecretKey").value.trim();
-    if(!apiKey) return alert("API Key দিন।");
-    db.ref('dhong_courier_settings/' + provider).set({ apiKey, secretKey }).then(() => alert("✅ কুরিয়ার সেটিংস সেভ হয়েছে!"));
+  function editProduct(key) {
+    let p = products.find(item => item._key === key);
+    if(!p) return;
+    document.getElementById("editKey").value = key;
+    document.getElementById("pName").value = p.name;
+    document.getElementById("pCat").value = p.cat;
+    document.getElementById("pPrice").value = p.price;
+    document.getElementById("pStock").value = p.stock;
+    document.getElementById("pImg").value = p.img || '';
+    document.getElementById("pColors").value = Array.isArray(p.colors) ? p.colors.join(", ") : '';
+    document.getElementById("pDesc").value = p.desc || '';
+    document.getElementById("formTitle").textContent = "পণ্য এডিট করুন";
+    window.scrollTo({top: 0, behavior: 'smooth'});
   }
 
-  function sendToCourier(order) {
-    db.ref('dhong_courier_settings/steadfast').once('value').then(snap => {
-      let config = snap.val();
-      if(!config || !config.apiKey) { alert("⚠️ প্রথমে 'Courier API' পেজে গিয়ে এপিআই কি কনফিগার করুন।"); return; }
-      
-      // রিয়েল ফেচ রিকোয়েস্ট (Steadfast API Endpoint)
-      alert(`✅ অর্ডার #DH-${order.id} কুরিয়ারে বুকিংয়ের জন্য পাঠানো হয়েছে!`);
-      db.ref('dhong_orders/' + order._key + '/status').set('Processing');
+  function resetForm() {
+    document.getElementById("productForm").reset();
+    document.getElementById("editKey").value = "";
+    document.getElementById("formTitle").textContent = "নতুন পণ্য যোগ বা এডিট";
+  }
+
+  function deleteProduct(key) { if(confirm("পণ্য ডিলিট করতে চান?")) db.ref('dhong_products/' + key).remove(); }
+
+  // মডারেটর ম্যানেজমেন্ট
+  function addModerator() {
+    let u = document.getElementById("modUser").value.trim();
+    let p = document.getElementById("modPass").value.trim();
+    if(!u || !p) return alert("ইউজারনেম ও পাসওয়ার্ড দিন।");
+    db.ref('dhong_moderators/' + u).set({ password: p }).then(() => { alert("✅ মডারেটর যোগ হয়েছে!"); document.getElementById("modUser").value=''; document.getElementById("modPass").value=''; });
+  }
+
+  function loadModerators() {
+    db.ref('dhong_moderators').once('value').then(snap => {
+      let html = "";
+      snap.forEach(ch => {
+        html += `<div style="display:flex;justify-content:space-between;padding:6px;border-bottom:1px solid #ddd"><b>${ch.key}</b> <button class="btn" style="background:#e53e3e;color:white;padding:2px 6px" onclick="db.ref('dhong_moderators/${ch.key}').remove()">ডিলিট</button></div>`;
+      });
+      document.getElementById("modList").innerHTML = html || "<small>কোনো মডারেটর নেই।</small>";
     });
-  }
-
-  function printOrderInvoice(ord) {
-    let items = [];
-    try { items = JSON.parse(ord.items_json); } catch(e){}
-    let itemsTable = items.map(i => `<tr><td style="padding:6px;border-bottom:1px solid #ddd">${i.name} (${i.quantity}টি)</td><td style="padding:6px;border-bottom:1px solid #ddd;text-align:right">৳${i.price || 0}</td></tr>`).join("");
-    let win = window.open('', '_blank');
-    win.document.write(`<html><body style="font-family:Arial;padding:20px"><h2>DHONG Store Invoice</h2><p><b>Order ID:</b> #DH-${ord.id}</p><p><b>Customer:</b> ${ord.customer_name} (${ord.phone})</p><p><b>Address:</b> ${ord.address}</p><table style="width:100%;border-collapse:collapse">${itemsTable}</table><h3>Total: ৳${ord.total}</h3><script>window.print();<\/script></body></html>`);
-    win.document.close();
   }
 </script>
 </body>
